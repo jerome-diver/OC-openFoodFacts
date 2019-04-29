@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>OpenFoodFacts Food Substitutions (OpeClassRooms projet-5)</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="images.qrc">
+    <normaloff>:/images/assets/images/icon.png</normaloff>:/images/assets/images/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_6">
     <item>
@@ -75,8 +79,26 @@
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QPushButton" name="openfoodfacts_mode">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="text">
             <string>List OpenFoodFacts</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+           <property name="default">
+            <bool>false</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -84,6 +106,9 @@
           <widget class="QPushButton" name="local_mode">
            <property name="text">
             <string>Liste locale</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -166,6 +191,16 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="0" colspan="2">
+            <widget class="QPushButton" name="record">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Enregistrer dans ma base</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -184,6 +219,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -14,8 +14,8 @@
    <string>S'enregistrer sur la base de donnée locale</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>../assets/images/icon.png</normaloff>../assets/images/icon.png</iconset>
+   <iconset resource="images.qrc">
+    <normaloff>:/images/assets/images/icon.png</normaloff>:/images/assets/images/icon.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -108,6 +108,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

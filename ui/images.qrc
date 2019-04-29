@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/images">
-        <file>openfoodfacts - icon 48x48.png</file>
-        <file>openfoodfacts+oc.png</file>
+        <file>../assets/images/icon.png</file>
+        <file>../assets/images/openfoodfacts+oc.png</file>
     </qresource>
 </RCC>
