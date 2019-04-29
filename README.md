@@ -1,6 +1,8 @@
 # OC-openFoodFacts
 Utilisez les données publiques de l'OpenFoodFacts
 
+![OpenFoodFacts + OC](assets/images/openfoodfacts+OC.png)
+
 ## Trello board
 I use [Trello board](https://trello.com/b/2EKEGLIA/oc-python-projet-5-openfoodfacts) to manage agile Doc Driven Development technic
 
