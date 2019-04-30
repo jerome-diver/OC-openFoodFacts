@@ -1,6 +1,6 @@
 '''Database link objects to MariaDB database'''
 
-import mysql
+import pymysql
 
 class Database():
 

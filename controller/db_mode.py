@@ -1,7 +1,7 @@
 '''Controller for Daytabase mode'''
 
-from ..model import Database
-from ..view import MainWindow
+from model import Database
+from view import MainWindow
 
 class DatabaseMode():
     ''' Print/record data inside local database'''

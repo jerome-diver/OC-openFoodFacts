@@ -1,6 +1,6 @@
 '''Controller for OpenFoodFacts API access mode'''
 
-from ..model import OpenFoodFacts
+from model import OpenFoodFacts
 import requests
 
 

@@ -1,7 +1,7 @@
 '''User model exist after authentication
 it empty if not'''
 
-import mysql
+import pymysql
 
 
 class User():
