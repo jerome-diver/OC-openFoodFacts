@@ -6,7 +6,7 @@
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/45968eff/
 Authentication	controller/authentication.py	/^class Authentication():$/;"	c
-Controller	controller/control.py	/^class Controller:$/;"	c
+Controller	controller/control.py	/^class Controller(QObject):$/;"	c
 Database	model/database.py	/^class Database():$/;"	c
 DatabaseMode	controller/db_mode.py	/^class DatabaseMode():$/;"	c
 Langage used	README.md	/^## Langage used$/;"	s
@@ -30,10 +30,11 @@ __init__	controller/openfoodfacts_mode.py	/^    def __init__(self):$/;"	m	class:
 __init__	model/database.py	/^    def __init__(self):$/;"	m	class:Database
 __init__	model/openfoodfacts.py	/^    def __init__(self):$/;"	m	class:OpenFoodFacts
 __init__	model/user.py	/^    def __init__(self):$/;"	m	class:User
-__init__	view/mainwindow.py	/^    def __init__(self):$/;"	m	class:MainWindow
+__init__	view/mainwindow.py	/^    def __init__(self, controller):$/;"	m	class:MainWindow
 __init__	view/sign_in.py	/^    def __init__(self):$/;"	m	class:SignIn
 __init__	view/sign_up.py	/^    def __init__(self):$/;"	m	class:SignUp
 application	__main__.py	/^    application = Controller()/;"	v
+on_quit	controller/control.py	/^    def on_quit(self):$/;"	m	class:Controller
 qCleanupResources	ui/images_rc.py	/^def qCleanupResources():$/;"	f
 qInitResources	ui/images_rc.py	/^def qInitResources():$/;"	f
 qt_resource_data	ui/images_rc.py	/^qt_resource_data = b"\\$/;"	v
