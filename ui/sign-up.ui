@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>534</width>
+    <height>354</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,9 @@
   <property name="windowIcon">
    <iconset resource="images.qrc">
     <normaloff>:/images/assets/images/icon.png</normaloff>:/images/assets/images/icon.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-image: url(:/images/assets/images/openfoodfacts+oc.png);</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

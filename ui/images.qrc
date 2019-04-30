@@ -1,6 +1,7 @@
 <RCC>
-    <qresource prefix="/images">
-        <file>../assets/images/icon.png</file>
-        <file>../assets/images/openfoodfacts+oc.png</file>
-    </qresource>
+  <qresource prefix="/images">
+    <file>../assets/images/OpenClassRooms__clair__1.png</file>
+    <file>../assets/images/icon.png</file>
+    <file>../assets/images/openfoodfacts+oc.png</file>
+  </qresource>
 </RCC>

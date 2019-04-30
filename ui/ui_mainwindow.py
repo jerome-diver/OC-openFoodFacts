@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import images_rc
+#from PyQt5.QtWidgets import QApplication, QMainWindow
 
 
 class Ui_MainWindow(object):
@@ -144,3 +144,4 @@ class Ui_MainWindow(object):
         self.quit.setText(_translate("MainWindow", "Quitter"))
 
 
+import ui.images_rc

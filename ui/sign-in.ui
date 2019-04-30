@@ -23,6 +23,9 @@
    <iconset resource="images.qrc">
     <normaloff>:/images/assets/images/icon.png</normaloff>:/images/assets/images/icon.png</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-image: url(:/images/assets/images/OpenClassRooms__clair__1.png);</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">

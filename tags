@@ -10,3 +10,9 @@ Libraries dependancies	README.md	/^## Libraries dependancies$/;"	s
 OC-openFoodFacts	README.md	/^# OC-openFoodFacts$/;"	c
 OpenClassRooms Python Path	README.md	/^## OpenClassRooms Python Path$/;"	s
 Trello board	README.md	/^## Trello board$/;"	s
+Ui_Login	ui/sign_in.py	/^class Ui_Login(object):$/;"	c
+Ui_MainWindow	ui/mainwindow.py	/^class Ui_MainWindow(object):$/;"	c
+retranslateUi	ui/mainwindow.py	/^    def retranslateUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
+retranslateUi	ui/sign_in.py	/^    def retranslateUi(self, Login):$/;"	m	class:Ui_Login
+setupUi	ui/mainwindow.py	/^    def setupUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
+setupUi	ui/sign_in.py	/^    def setupUi(self, Login):$/;"	m	class:Ui_Login
