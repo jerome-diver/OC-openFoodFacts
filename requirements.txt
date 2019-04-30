@@ -1,7 +1,6 @@
 certifi==2019.3.9
 chardet==3.0.4
 idna==2.8
-mysql==0.0.2
 mysqlclient==1.4.2.post1
 PyMySQL==0.9.3
 PyQt5==5.12.1
