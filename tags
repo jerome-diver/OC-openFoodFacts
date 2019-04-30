@@ -6,11 +6,12 @@
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/45968eff/
 Authentication	controller/authentication.py	/^class Authentication():$/;"	c
+Controller	controller/control.py	/^class Controller:$/;"	c
 Database	model/database.py	/^class Database():$/;"	c
 DatabaseMode	controller/db_mode.py	/^class DatabaseMode():$/;"	c
 Langage used	README.md	/^## Langage used$/;"	s
 Libraries dependancies	README.md	/^## Libraries dependancies$/;"	s
-MainWindow	view/mainwindow.py	/^class MainWindow():$/;"	c
+MainWindow	view/mainwindow.py	/^class MainWindow(QMainWindow):$/;"	c
 OC-openFoodFacts	README.md	/^# OC-openFoodFacts$/;"	c
 OpenClassRooms Python Path	README.md	/^## OpenClassRooms Python Path$/;"	s
 OpenFoodFacts	model/openfoodfacts.py	/^class OpenFoodFacts():$/;"	c
@@ -18,10 +19,12 @@ OpenFoodFactsMode	controller/openfoodfacts_mode.py	/^class OpenFoodFactsMode():$
 SignIn	view/sign_in.py	/^class SignIn():$/;"	c
 SignUp	view/sign_up.py	/^class SignUp():$/;"	c
 Trello board	README.md	/^## Trello board$/;"	s
-Ui_Login	ui/ui_sign_in.py	/^class Ui_Login(object):$/;"	c
 Ui_MainWindow	ui/ui_mainwindow.py	/^class Ui_MainWindow(object):$/;"	c
+Ui_SignIn	ui/ui_sign_in.py	/^class Ui_SignIn(object):$/;"	c
+Ui_SignUp	ui/ui_sign_up.py	/^class Ui_SignUp(object):$/;"	c
 User	model/user.py	/^class User():$/;"	c
 __init__	controller/authentication.py	/^    def __init__(self):$/;"	m	class:Authentication
+__init__	controller/control.py	/^    def __init__(self):$/;"	m	class:Controller
 __init__	controller/db_mode.py	/^    def __init__(self):$/;"	m	class:DatabaseMode
 __init__	controller/openfoodfacts_mode.py	/^    def __init__(self):$/;"	m	class:OpenFoodFactsMode
 __init__	model/database.py	/^    def __init__(self):$/;"	m	class:Database
@@ -30,7 +33,7 @@ __init__	model/user.py	/^    def __init__(self):$/;"	m	class:User
 __init__	view/mainwindow.py	/^    def __init__(self):$/;"	m	class:MainWindow
 __init__	view/sign_in.py	/^    def __init__(self):$/;"	m	class:SignIn
 __init__	view/sign_up.py	/^    def __init__(self):$/;"	m	class:SignUp
-app	__main__.py	/^    app = QApplication(sys.argv)$/;"	v
+application	__main__.py	/^    application = Controller()/;"	v
 qCleanupResources	ui/images_rc.py	/^def qCleanupResources():$/;"	f
 qInitResources	ui/images_rc.py	/^def qInitResources():$/;"	f
 qt_resource_data	ui/images_rc.py	/^qt_resource_data = b"\\$/;"	v
@@ -42,8 +45,8 @@ qt_resource_struct_v2	ui/images_rc.py	/^qt_resource_struct_v2 = b"\\$/;"	v
 qt_version	ui/images_rc.py	/^qt_version = [int(v) for v in QtCore.qVersion().split('.')]$/;"	v
 rcc_version	ui/images_rc.py	/^    rcc_version = 1$/;"	v
 retranslateUi	ui/ui_mainwindow.py	/^    def retranslateUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
-retranslateUi	ui/ui_sign_in.py	/^    def retranslateUi(self, Login):$/;"	m	class:Ui_Login
+retranslateUi	ui/ui_sign_in.py	/^    def retranslateUi(self, SignIn):$/;"	m	class:Ui_SignIn
+retranslateUi	ui/ui_sign_up.py	/^    def retranslateUi(self, SignUp):$/;"	m	class:Ui_SignUp
 setupUi	ui/ui_mainwindow.py	/^    def setupUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
-setupUi	ui/ui_sign_in.py	/^    def setupUi(self, Login):$/;"	m	class:Ui_Login
-ui	__main__.py	/^    ui = Ui_MainWindow()$/;"	v
-window	__main__.py	/^    window = QMainWindow()$/;"	v
+setupUi	ui/ui_sign_in.py	/^    def setupUi(self, SignIn):$/;"	m	class:Ui_SignIn
+setupUi	ui/ui_sign_up.py	/^    def setupUi(self, SignUp):$/;"	m	class:Ui_SignUp
