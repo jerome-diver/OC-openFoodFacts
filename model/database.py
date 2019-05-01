@@ -15,19 +15,22 @@ class Database():
      #       Database._connection.close()
         if username == None:
             try:
-                Database._connection = pymysql.connect(DB_HOSTNAME,
-                                                       GRANT_USER,\
-                                                       GRANT_USER_PASSWD,
-                                                       'test')
+                Database._connection = pymysql.connect(host=DB_HOSTNAME,
+                                                       user=GRANT_USER,\
+                                                       password=GRANT_USER_PASSWD,
+                                                       port=DB_PORT,
+                                                       database='test')
             except ConnectionError:
                 print("Impossible to establish connection between grant "
                       "user and database")
             self._generateDatabase()
         else:
             try:
-                Database._connection = pymysql.connect(DB_HOSTNAME,
-                                                       username,
-                                                       password, db)
+                Database._connection = pymysql.connect(host=DB_HOSTNAME,
+                                                       port=DB_PORT,
+                                                       user=username,
+                                                       password=password,
+                                                       database=db)
             except ConnectionError:
                 print("Impossible to establish connection between",
                       username, "and", db)
@@ -50,20 +53,36 @@ class Database():
     def create_user(self, username, password):
         '''Create a database user to ba able to login with roles'''
 
-        print("i have to create a new database user and give privileges role")
+        db_cursor = self._connection.cursor()
+        request = "CREATE OR REPLACE USER '{}' IDENTIFIED BY '{}';".format(
+            username, password)
+        db_cursor.execute(request)
+        self._connection.commit()
+        request = "GRANT openfoodfacts_role TO '{}';".format(username)
+        db_cursor.execute(request)
+        self._connection.commit()
+        print("i do created a new database user and give privileges role")
 
     def record_user(self, username, nick_name, family_name):
         '''Record an entry inside Table Users'''
 
-        print("i have to record this user inside users table")
+        print("let's try tis...")
+        db_cursor = self._connection.cursor()
+        request = "INSERT INTO users (family_name, nick_name, " \
+                  "username) VALUES ('{}', '{}', '{}');".format(
+                        family_name, nick_name, username)
+        db_cursor.execute(request)
+        self._connection.commit()
+        print("i recorded this user inside users table")
 
     def exist_username(self, username):
         '''Return if record users.username for username exist'''
 
         db_cursor = self._connection.cursor()
-        db_cursor.execute("SELECT id FROM users WHERE username='{}';".format(
-            username))
-        data = db_cursor.fetchall()
+        request = "SELECT id FROM users WHERE username='{}';".format(
+                   username)
+        db_cursor.execute(request)
+        data = db_cursor.fetchone()
         exist = True if data else False
         db_cursor.close()
         return exist

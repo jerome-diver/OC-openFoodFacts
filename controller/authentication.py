@@ -22,6 +22,7 @@ class Authentication(QObject):
         self.signup.cancel.clicked.connect(self.on_close)
         self.signup.username.textChanged.connect(self.on_username_changed)
         self.signup.password.textChanged.connect(self.signup.on_reset_status)
+        self.signup.record.clicked.connect(self.new_user)
         self.username_exist.connect(self.signin.on_username_exist)
         self.username_exist.connect(self.signup.on_username_exist)
 
@@ -53,7 +54,7 @@ class Authentication(QObject):
                                              "rgba(20,20,20,0.7);")
             self.username_exist.emit(username)
         else:
-            self.signup.status.setStyleSheet("color: green;")
+            self.signup.on_reset_status()
 
     def connect_user(self):
         username = self.signin.username.text()
@@ -72,11 +73,15 @@ class Authentication(QObject):
         password = self.signup.password.text()
         nick_name = self.signup.nickname.text()
         family_name = self.signup.familyname.text()
-        self._db.create_user(username, password)
         if len(username) <= 8:
-            self.signup.status_label.setText("this username is too short")
+            self.signin.status.setStyleSheet("color: red; background-color: "
+                                             "rgba(20,20,20,0.7);")
+            self.signup.status.setText("this username is too short")
         elif self._db.exist_username(username):
-            self.signup.status_label.setText("this username exist already")
+            self.signin.status.setStyleSheet("color: red; background-color: "
+                                             "rgba(20,20,20,0.7);")
+            self.signup.status.setText("this username exist already")
         else:
+            self._db.create_user(username, password)
             self._db.record_user(username, nick_name, family_name)
             self.connect_user()

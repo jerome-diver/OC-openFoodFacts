@@ -11,8 +11,6 @@ class SignUp(QDialog, Ui_SignUp):
         super().__init__()
         self.controller = controller
         self.setupUi(self)
-        self.username.textChanged.connect(
-            self.controller.on_username_changed)
 
     @pyqtSlot(str)
     def on_username_exist(self, username):

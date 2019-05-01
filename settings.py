@@ -5,7 +5,7 @@
 GRANT_USER = 'root'
     # protect password by pass a environment OS variable
 GRANT_USER_PASSWD = "overaquaworks@2"
-DB_PORT = "3306"
+DB_PORT = 3306
 DB_SOCKET = ""
     # can be "socket" or "tcp"
 DB_CONNECT_MODE = "tcp"
