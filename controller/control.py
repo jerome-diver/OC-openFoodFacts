@@ -2,10 +2,13 @@
 
 from controller import Authentication, DatabaseMode, OpenFoodFactsMode
 from view import MainWindow, SignIn, SignUp
+from controller import Authentication
+from model import Database
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import sys
+import pymysql
 
 
 class Controller(QObject):
@@ -14,30 +17,16 @@ class Controller(QObject):
     def __init__(self):
         super().__init__()
         self.app = QApplication([])
+        self.authenticate = Authentication()
         self.window = MainWindow(self)
-        self.signin = SignIn(self)
-        self.signup = SignUp(self)
         self.window.show()
         sys.exit(self.app.exec_())
-
 
     @pyqtSlot()
     def on_quit(self):
         '''Close application slot'''
 
         self.app.closeAllWindows()
-
-    @pyqtSlot()
-    def on_sign_in(self):
-        '''Sing-in button slot'''
-
-        self.signin.open()
-
-    @pyqtSlot()
-    def on_sign_up(self):
-        '''Sing-up button slot'''
-
-        self.signup.open()
 
     @pyqtSlot()
     def on_local_mode(self):

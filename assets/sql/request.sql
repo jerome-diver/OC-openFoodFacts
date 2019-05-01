@@ -11,8 +11,10 @@ CREATE TABLE IF NOT EXISTS foods (
     description text);
 CREATE TABLE IF NOT EXISTS shops (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
-    name_ VARCHAR(128), 
-    address text, 
+    name_ VARCHAR(128),
+    url_ VARCHAR(256),
+    score VARCHAR(1),
+    address TEXT,
     url VARCHAR(256));
 CREATE TABLE IF NOT EXISTS user_foods (
     user_id INT, 
@@ -62,5 +64,3 @@ CREATE TABLE IF NOT EXISTS food_shops (
 CREATE OR REPLACE ROLE openfoodfacts_role;
 GRANT SELECT, INSERT, UPDATE, DELETE, SHOW VIEW
   ON openfoodfacts_substitutes.* TO openfoodfacts_role;
-#CREATE OR REPLACE USER username IDENTIFIED BY password;
-#GRANT openfoodfacts_role TO username;

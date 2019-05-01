@@ -47,6 +47,12 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QPushButton" name="signin">
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Sign-in</string>
            </property>
@@ -54,12 +60,50 @@
          </item>
          <item>
           <widget class="QPushButton" name="signup">
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Sign-up</string>
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QFrame" name="frame_2">
+           <property name="styleSheet">
+            <string notr="true">border-image: url(:/images/assets/images/home 1.png);</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+          </widget>
+         </item>
         </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>150</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border-image: url(:/images/assets/images/openfoodfacts+oc.png);</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
        </widget>
       </item>
       <item>
@@ -76,6 +120,15 @@
           <height>250</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <family>Ubuntu Condensed</family>
+          <pointsize>11</pointsize>
+          <underline>true</underline>
+          <stylestrategy>NoAntialias</stylestrategy>
+          <kerning>true</kerning>
+         </font>
+        </property>
         <property name="title">
          <string>Reherche de substitution d'aliment</string>
         </property>
@@ -85,8 +138,35 @@
            <property name="enabled">
             <bool>true</bool>
            </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+             <underline>false</underline>
+             <stylestrategy>NoAntialias</stylestrategy>
+             <kerning>true</kerning>
+            </font>
+           </property>
            <property name="text">
             <string>List OpenFoodFacts</string>
+           </property>
+           <property name="icon">
+            <iconset resource="images.qrc">
+             <normaloff>:/images/assets/images/icon.png</normaloff>:/images/assets/images/icon.png</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -107,8 +187,41 @@
          </item>
          <item>
           <widget class="QPushButton" name="local_mode">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+             <underline>false</underline>
+             <stylestrategy>NoAntialias</stylestrategy>
+             <kerning>true</kerning>
+            </font>
+           </property>
            <property name="text">
             <string>Liste locale</string>
+           </property>
+           <property name="icon">
+            <iconset resource="images.qrc">
+             <normaloff>:/images/assets/images/home 1.png</normaloff>:/images/assets/images/home 1.png</iconset>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -126,6 +239,13 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QGroupBox" name="categories_grp">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>11</pointsize>
+         <underline>true</underline>
+        </font>
+       </property>
        <property name="title">
         <string>Sélectionnez une catégorie</string>
        </property>
@@ -136,6 +256,13 @@
        </layout>
       </widget>
       <widget class="QGroupBox" name="foods_grp">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>11</pointsize>
+         <underline>true</underline>
+        </font>
+       </property>
        <property name="title">
         <string>Sélectionnez un aliment</string>
        </property>
@@ -146,6 +273,13 @@
        </layout>
       </widget>
       <widget class="QGroupBox" name="substitute_result_grp">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>11</pointsize>
+         <underline>true</underline>
+        </font>
+       </property>
        <property name="title">
         <string>Substitutions proposée</string>
        </property>
@@ -155,6 +289,13 @@
           <layout class="QFormLayout" name="formLayout">
            <item row="0" column="0">
             <widget class="QLabel" name="label_nom">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
              <property name="text">
               <string>Nom</string>
              </property>
@@ -169,6 +310,13 @@
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_description">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
              <property name="text">
               <string>Description</string>
              </property>
@@ -176,6 +324,13 @@
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_shops">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
              <property name="text">
               <string>Magasins</string>
              </property>
@@ -199,6 +354,15 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+               <underline>false</underline>
+              </font>
+             </property>
              <property name="text">
               <string>Enregistrer dans ma base</string>
              </property>
@@ -213,6 +377,13 @@
     </item>
     <item>
      <widget class="QPushButton" name="quit">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>10</pointsize>
+        <underline>false</underline>
+       </font>
+      </property>
       <property name="text">
        <string>Quitter</string>
       </property>
