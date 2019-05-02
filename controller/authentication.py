@@ -3,15 +3,16 @@
 from model import Database, User
 from view import SignUp, SignIn
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QPalette
+from PyQt5.QtWidgets import QMessageBox
 import pymysql
 
 class Authentication(QObject):
     '''Authenticate User on local database'''
-    username_exist = pyqtSignal(str)
+    status_message = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
+        self.dialog_open = None
         self._db = Database()
         self.signin = SignIn(self)
         self.signup = SignUp(self)
@@ -21,10 +22,9 @@ class Authentication(QObject):
         self.signin.password.textChanged.connect(self.signin.on_reset_status)
         self.signup.cancel.clicked.connect(self.on_close)
         self.signup.username.textChanged.connect(self.on_username_changed)
-        self.signup.password.textChanged.connect(self.signup.on_reset_status)
         self.signup.record.clicked.connect(self.new_user)
-        self.username_exist.connect(self.signin.on_username_exist)
-        self.username_exist.connect(self.signup.on_username_exist)
+        self.status_message.connect(self.signin.on_status)
+        self.status_message.connect(self.signup.on_status)
 
 
     @pyqtSlot()
@@ -32,41 +32,47 @@ class Authentication(QObject):
         '''Sing-in button slot'''
 
         self.signin.open()
+        self.dialog_open = "SignIn"
 
     @pyqtSlot()
     def on_sign_up(self):
         '''Sing-up button slot'''
 
         self.signup.open()
+        self.dialog_open = "SignUp"
 
     @pyqtSlot()
     def on_close(self):
         '''Dialog box close slot'''
 
-        self.signin.close()
-        self.signup.close()
+        if self.dialog_open == "SignIn":
+            self.signin.close()
+        if self.dialog_open == "SignUp":
+            self.signup.close()
+        self.dialog_open = None
 
     @pyqtSlot(str)
     def on_username_changed(self, username):
-        print(username)
         if self._db.exist_username(self.signup.username.text()):
-            self.signup.status.setStyleSheet("color: red; background-color: "
-                                             "rgba(20,20,20,0.7);")
-            self.username_exist.emit(username)
+            self.status_message.emit("{} exite déjà".format(username))
         else:
             self.signup.on_reset_status()
 
     def connect_user(self):
-        username = self.signin.username.text()
-        password = self.signin.password.text()
+        username = self.signin.username.text() if self.dialog_open == "SignIn"\
+                        else self.signup.username.text()
+        password = self.signin.password.text() if self.dialog_open == "SignUp"\
+                        else self.signup.password.text()
         try:
-            self._db = Database(username, password,
-                                'openfoodfacts_substitutes')
-        except pymysql.err.OperationalError:
-            self.signin.status.setStyleSheet("color: red; background-color: "
-                                             "rgba(20,20,20,0.7);")
-            self.signin.status.setText("Can not connect, username or "
-                                       "password failed")
+            self._db = Database(username, password, 'openfoodfacts_substitutes')
+            QMessageBox.information(None, "Connexion réussie",
+                                    "Vous êtes connecté à vôtre base de "
+                                    "donnée")
+            self.on_close()
+        except pymysql.err.OperationalError as e:
+            self.signin.status.setText("Username or password failed")
+            QMessageBox.information(None, "Problème de connexion",
+                                    "{}\n{}".format(e.args[0], e.args[1]))
 
     def new_user(self):
         username = self.signup.username.text()
@@ -74,13 +80,10 @@ class Authentication(QObject):
         nick_name = self.signup.nickname.text()
         family_name = self.signup.familyname.text()
         if len(username) <= 8:
-            self.signin.status.setStyleSheet("color: red; background-color: "
-                                             "rgba(20,20,20,0.7);")
-            self.signup.status.setText("this username is too short")
+            self.status_message.emit("Nom d'utilisateur trop court "
+                                       "(+ de 8 lettres)")
         elif self._db.exist_username(username):
-            self.signin.status.setStyleSheet("color: red; background-color: "
-                                             "rgba(20,20,20,0.7);")
-            self.signup.status.setText("this username exist already")
+            self.status_message.emit("{} exite déjà".format(username))
         else:
             self._db.create_user(username, password)
             self._db.record_user(username, nick_name, family_name)

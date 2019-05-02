@@ -3,8 +3,9 @@
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from ui import Ui_SignUp
+from view.share_methods import Share
 
-class SignUp(QDialog, Ui_SignUp):
+class SignUp(QDialog, Ui_SignUp, Share):
     '''Sign up User view'''
 
     def __init__(self, controller):
@@ -12,14 +13,14 @@ class SignUp(QDialog, Ui_SignUp):
         self.controller = controller
         self.setupUi(self)
 
-    @pyqtSlot(str)
-    def on_username_exist(self, username):
-        '''Should emit a signal with arguments:
-        username, nick_name, family_name'''
-
-        self.status.setText("username {} exist already".format(username))
-
     @pyqtSlot()
     def on_reset_status(self):
-        self.status.setText("")
-        self.status.setStyleSheet("background-color: rgba(0,0,0,0);")
+        '''call superclass slot from Share'''
+
+        super(SignIn, self).on_reset_status()
+
+    @pyqtSlot(str)
+    def on_status(self, message):
+        '''call superclass slot from Share'''
+
+        super(SignUp, self).on_status(message)

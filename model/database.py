@@ -54,26 +54,23 @@ class Database():
         '''Create a database user to ba able to login with roles'''
 
         db_cursor = self._connection.cursor()
-        request = "CREATE OR REPLACE USER '{}' IDENTIFIED BY '{}';".format(
-            username, password)
+        request = "CREATE OR REPLACE USER '{}' IDENTIFIED BY '{}';".\
+                    format(username, password)
         db_cursor.execute(request)
         self._connection.commit()
         request = "GRANT openfoodfacts_role TO '{}';".format(username)
         db_cursor.execute(request)
         self._connection.commit()
-        print("i do created a new database user and give privileges role")
 
     def record_user(self, username, nick_name, family_name):
         '''Record an entry inside Table Users'''
 
-        print("let's try tis...")
         db_cursor = self._connection.cursor()
         request = "INSERT INTO users (family_name, nick_name, " \
                   "username) VALUES ('{}', '{}', '{}');".format(
                         family_name, nick_name, username)
         db_cursor.execute(request)
         self._connection.commit()
-        print("i recorded this user inside users table")
 
     def exist_username(self, username):
         '''Return if record users.username for username exist'''

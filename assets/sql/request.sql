@@ -63,4 +63,4 @@ CREATE TABLE IF NOT EXISTS food_shops (
         UNIQUE (shop_id, food_id));
 CREATE OR REPLACE ROLE openfoodfacts_role;
 GRANT SELECT, INSERT, UPDATE, DELETE, SHOW VIEW
-  ON openfoodfacts_substitutes.* TO openfoodfacts_role;
+  ON *.* TO openfoodfacts_role;
