@@ -17,7 +17,7 @@ class SignUp(QDialog, Ui_SignUp, Share):
     def on_reset_status(self):
         '''call superclass slot from Share'''
 
-        super(SignIn, self).on_reset_status()
+        super(SignUp, self).on_reset_status()
 
     @pyqtSlot(str)
     def on_status(self, message):

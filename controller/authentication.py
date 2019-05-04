@@ -61,7 +61,7 @@ class Authentication(QObject):
     def connect_user(self):
         username = self.signin.username.text() if self.dialog_open == "SignIn"\
                         else self.signup.username.text()
-        password = self.signin.password.text() if self.dialog_open == "SignUp"\
+        password = self.signin.password.text() if self.dialog_open == "SignIn"\
                         else self.signup.password.text()
         try:
             self._db = Database(username, password, 'openfoodfacts_substitutes')
