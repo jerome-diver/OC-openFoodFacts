@@ -18,5 +18,6 @@ Python-3
 - requests
 - os
 - sys
+- [openfoodfacts](https://github.com/openfoodfacts/openfoodfacts-python)
 
 look at requirements.tx file, i used virtualenv to install virtual python-3 environment

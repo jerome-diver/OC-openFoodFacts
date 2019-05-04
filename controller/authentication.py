@@ -88,3 +88,6 @@ class Authentication(QObject):
             self._db.create_user(username, password)
             self._db.record_user(username, nick_name, family_name)
             self.connect_user()
+
+    def get_database(self):
+        return self._db

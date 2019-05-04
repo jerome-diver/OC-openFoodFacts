@@ -13,10 +13,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.openfoodfacts_mode.setChecked(False)
         self.local_mode.setChecked(False)
-        self.quit.clicked.connect(self.controller.on_quit)
-        self.signin.clicked.connect(self.controller.authenticate.on_sign_in)
-        self.signup.clicked.connect(self.controller.authenticate.on_sign_up)
-        self.openfoodfacts_mode.clicked.\
-             connect(self.controller.on_openfoodfacts_mode)
-        self.local_mode.clicked.connect(self.controller.on_local_mode)
 
+    def show_categories(self, model):
+        self.categories_list.setModel(model)
+        self.categories_list.show()

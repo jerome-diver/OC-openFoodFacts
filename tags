@@ -7,15 +7,15 @@
 !_TAG_PROGRAM_VERSION	0.0.0	/45968eff/
 Authentication	controller/authentication.py	/^class Authentication(QObject):$/;"	c
 Controller	controller/control.py	/^class Controller(QObject):$/;"	c
-DB_CONNECT_MODE	settings.py	/^DB_CONNECT_MODE = "tcp"$/;"	v
+DB_CONNECT_MODE	settings.py	/^DB_CONNECT_MODE = "TCP"$/;"	v
 DB_HOSTNAME	settings.py	/^DB_HOSTNAME = "localhost"$/;"	v
 DB_INIT_FILE	settings.py	/^DB_INIT_FILE = "assets\/sql\/request.sql"$/;"	v
 DB_PORT	settings.py	/^DB_PORT = 3306$/;"	v
-DB_SOCKET	settings.py	/^DB_SOCKET = ""$/;"	v
+DB_SOCKET	settings.py	/^DB_SOCKET = "\/run\/mysqld\/mysqld.sock"$/;"	v
 Database	model/database.py	/^class Database():$/;"	c
 DatabaseMode	controller/db_mode.py	/^class DatabaseMode():$/;"	c
 GRANT_USER	settings.py	/^GRANT_USER = 'root'$/;"	v
-GRANT_USER_PASSWD	settings.py	/^GRANT_USER_PASSWD = "overaquaworks@2"$/;"	v
+GRANT_USER_PASSWD	settings.py	/^GRANT_USER_PASSWD = os.getenv("MARIA_ROOT_PASSWD")$/;"	v
 Langage used	README.md	/^## Langage used$/;"	s
 Libraries dependancies	README.md	/^## Libraries dependancies$/;"	s
 MainWindow	view/mainwindow.py	/^class MainWindow(QMainWindow, Ui_MainWindow):$/;"	c
@@ -34,21 +34,27 @@ User	model/user.py	/^class User():$/;"	c
 __del__	model/database.py	/^    def __del__(self):$/;"	m	class:Database
 __init__	controller/authentication.py	/^    def __init__(self):$/;"	m	class:Authentication
 __init__	controller/control.py	/^    def __init__(self):$/;"	m	class:Controller
-__init__	controller/db_mode.py	/^    def __init__(self):$/;"	m	class:DatabaseMode
-__init__	controller/openfoodfacts_mode.py	/^    def __init__(self):$/;"	m	class:OpenFoodFactsMode
+__init__	controller/db_mode.py	/^    def __init__(self, window, database):$/;"	m	class:DatabaseMode
+__init__	controller/openfoodfacts_mode.py	/^    def __init__(self, window, database):$/;"	m	class:OpenFoodFactsMode
 __init__	model/database.py	/^    def __init__(self, username=None, password=None, db=None):$/;"	m	class:Database
-__init__	model/openfoodfacts.py	/^    def __init__(self):$/;"	m	class:OpenFoodFacts
+__init__	model/openfoodfacts.py	/^    def __init__(self, database, views):$/;"	m	class:OpenFoodFacts
 __init__	model/user.py	/^    def __init__(self):$/;"	m	class:User
 __init__	view/mainwindow.py	/^    def __init__(self, controller):$/;"	m	class:MainWindow
 __init__	view/sign_in.py	/^    def __init__(self, controller):$/;"	m	class:SignIn
 __init__	view/sign_up.py	/^    def __init__(self, controller):$/;"	m	class:SignUp
+_connect_database	model/database.py	/^    def _connect_database(self, user=None, passwd=None,$/;"	m	class:Database
+_connect_to_off_db	model/database.py	/^    def _connect_to_off_db(self):$/;"	m	class:Database
 _connection	model/database.py	/^    _connection = None$/;"	v	class:Database
 _generateDatabase	model/database.py	/^    def _generateDatabase(self):$/;"	m	class:Database
+_generate_users_role	model/database.py	/^    def _generate_users_role(self):$/;"	m	class:Database
 application	__main__.py	/^    application = Controller()$/;"	v
+ask_request	model/database.py	/^    def ask_request(request, values=None):$/;"	m	class:Database
 authentication	__main__.py	/^    authentication = Authentication(application)$/;"	v
+categories	model/openfoodfacts.py	/^    def categories(self):$/;"	m	class:OpenFoodFacts
 connect_user	controller/authentication.py	/^    def connect_user(self):$/;"	m	class:Authentication
 create_user	model/database.py	/^    def create_user(self, username, password):$/;"	m	class:Database
 exist_username	model/database.py	/^    def exist_username(self, username):$/;"	m	class:Database
+get_database	controller/authentication.py	/^    def get_database(self):$/;"	m	class:Authentication
 new_user	controller/authentication.py	/^    def new_user(self):$/;"	m	class:Authentication
 on_close	controller/authentication.py	/^    def on_close(self):$/;"	m	class:Authentication
 on_local_mode	controller/control.py	/^    def on_local_mode(self):$/;"	m	class:Controller
@@ -63,6 +69,7 @@ on_status	view/share_methods.py	/^    def on_status(self, message):$/;"	m	class:
 on_status	view/sign_in.py	/^    def on_status(self, message):$/;"	m	class:SignIn
 on_status	view/sign_up.py	/^    def on_status(self, message):$/;"	m	class:SignUp
 on_username_changed	controller/authentication.py	/^    def on_username_changed(self, username):$/;"	m	class:Authentication
+populate_categories	model/openfoodfacts.py	/^    def populate_categories(self):$/;"	m	class:OpenFoodFacts
 qCleanupResources	ui/images_rc.py	/^def qCleanupResources():$/;"	f
 qInitResources	ui/images_rc.py	/^def qInitResources():$/;"	f
 qt_resource_data	ui/images_rc.py	/^qt_resource_data = b"\\$/;"	v
@@ -77,7 +84,10 @@ record_user	model/database.py	/^    def record_user(self, username, nick_name, f
 retranslateUi	ui/ui_mainwindow.py	/^    def retranslateUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
 retranslateUi	ui/ui_sign_in.py	/^    def retranslateUi(self, SignIn):$/;"	m	class:Ui_SignIn
 retranslateUi	ui/ui_sign_up.py	/^    def retranslateUi(self, SignUp):$/;"	m	class:Ui_SignUp
+send_request	model/database.py	/^    def send_request(request, values=None):$/;"	m	class:Database
 setupUi	ui/ui_mainwindow.py	/^    def setupUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
 setupUi	ui/ui_sign_in.py	/^    def setupUi(self, SignIn):$/;"	m	class:Ui_SignIn
 setupUi	ui/ui_sign_up.py	/^    def setupUi(self, SignUp):$/;"	m	class:Ui_SignUp
+show_categories	controller/openfoodfacts_mode.py	/^    def show_categories(self):$/;"	m	class:OpenFoodFactsMode
+show_categories	view/mainwindow.py	/^    def show_categories(self, model):$/;"	m	class:MainWindow
 status_message	controller/authentication.py	/^    status_message = pyqtSignal(str)$/;"	v	class:Authentication

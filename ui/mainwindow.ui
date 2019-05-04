@@ -21,7 +21,7 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_6">
+   <layout class="QVBoxLayout" name="verticalLayout_7">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_user_mode">
       <property name="sizeConstraint">
@@ -234,7 +234,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QSplitter" name="search_splitter">
+     <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -251,7 +251,15 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QListWidget" name="categories_list"/>
+         <widget class="QListView" name="categories_list">
+          <property name="font">
+           <font>
+            <family>Ubuntu</family>
+            <pointsize>10</pointsize>
+            <underline>false</underline>
+           </font>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -268,11 +276,44 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QListView" name="foods_list"/>
+         <widget class="QListView" name="foods_list">
+          <property name="font">
+           <font>
+            <family>Ubuntu</family>
+            <pointsize>10</pointsize>
+            <underline>false</underline>
+           </font>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QGroupBox" name="substitute_result_grp">
+      <widget class="QGroupBox" name="groupBox">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>11</pointsize>
+         <underline>true</underline>
+        </font>
+       </property>
+       <property name="title">
+        <string>Substituts proposés</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QListView" name="substitutes_list">
+          <property name="font">
+           <font>
+            <family>Ubuntu</family>
+            <pointsize>10</pointsize>
+            <underline>false</underline>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="substitute_selected_grp">
        <property name="font">
         <font>
          <family>Ubuntu Condensed</family>
@@ -303,6 +344,13 @@
            </item>
            <item row="0" column="1">
             <widget class="QLineEdit" name="substitute_name">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
              <property name="readOnly">
               <bool>true</bool>
              </property>
@@ -332,15 +380,19 @@
               </font>
              </property>
              <property name="text">
-              <string>Magasins</string>
+              <string>Magasin</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QListView" name="substitute_shops"/>
-           </item>
            <item row="1" column="1">
             <widget class="QTextEdit" name="substitute_description">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
              <property name="autoFillBackground">
               <bool>false</bool>
              </property>
@@ -349,26 +401,109 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0" colspan="2">
-            <widget class="QPushButton" name="record">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="substitute_shop">
              <property name="font">
               <font>
                <family>Ubuntu</family>
                <pointsize>10</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_url">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
                <underline>false</underline>
               </font>
              </property>
              <property name="text">
-              <string>Enregistrer dans ma base</string>
+              <string>url</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="substitute_url">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_score">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="text">
+              <string>Score</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="substitute_score">
+             <property name="font">
+              <font>
+               <family>Ubuntu</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+              </font>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="record">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="font">
+           <font>
+            <family>Ubuntu</family>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+            <underline>false</underline>
+           </font>
+          </property>
+          <property name="text">
+           <string>Enregistrer dans ma base</string>
+          </property>
          </widget>
         </item>
        </layout>
