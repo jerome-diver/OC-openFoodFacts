@@ -11,7 +11,7 @@ class Database():
 
     _connection = None
 
-    def __init__(self, username=None, password=None):
+    def __init__(self, username=None, password=None, db=None):
         super()
 
         if Database._connection:
@@ -26,7 +26,7 @@ class Database():
         else:
             self._connect_database(user=username,
                                    passwd=password,
-                                   db='information_schema')
+                                   db=db)
             self._connect_to_off_db()
 
     def _connect_database(self, user=None, passwd=None,
@@ -53,8 +53,8 @@ class Database():
     def _connect_to_off_db(self):
         '''Connect the current user on database'''
 
-        request = "SET ROLE openfoodfacts_role;"
-        self.send_request(request)
+        #request = "SET ROLE openfoodfacts_role;"
+        #self.send_request(request)
         request =  "USE openfoodfacts_substitutes;"
         self.send_request(request)
 
@@ -113,20 +113,12 @@ class Database():
         '''From users list of openfoodfacts_substitutes,
         generate users role of the mariadb database'''
 
-        print("===================================================")
         request = "SELECT username FROM users;"
-        users = []
         for row in self.ask_request(request):
-            users.append(row['username'])
-            print("username:", row["username"])
-            time.sleep(1)
-        #for user in users:
-            request = "GRANT %s TO %s;"
-            values = ('openfoodfacts_role', row['username'])
+            request = "GRANT SELECT, INSERT, DELETE, UPDATE, SHOW VIEW ON " \
+                      "openfoodfacts_substitutes.* TO %s ;"
+            values = (row['username'])
             self.send_request(request, values)
-            #request = "GRANT openfoodfacts_role TO {};".format(answer[0])
-            #print(request)
-            #elf.send_request(request)
 
     def create_user(self, username, password):
         '''Create a database user to ba able to login with roles'''
