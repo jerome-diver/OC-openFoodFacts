@@ -5,7 +5,7 @@ from view import MainWindow, SignIn, SignUp
 from controller import Authentication
 from model import Database
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot
 
 import sys
 import pymysql
@@ -22,13 +22,18 @@ class Controller(QObject):
         self.window.show()
         self.db_mode = None
         self.off_mode = None
+        self.connect_signals()
+        sys.exit(self.app.exec_())
+
+    def connect_signals(self):
+        '''Let's connect signals to slots for concerned controller'''
+
         self.window.quit.clicked.connect(self.on_quit)
         self.window.signin.clicked.connect(self.authenticate.on_sign_in)
         self.window.signup.clicked.connect(self.authenticate.on_sign_up)
         self.window.openfoodfacts_mode.clicked. \
             connect(self.on_openfoodfacts_mode)
         self.window.local_mode.clicked.connect(self.on_local_mode)
-        sys.exit(self.app.exec_())
 
     @pyqtSlot()
     def on_quit(self):

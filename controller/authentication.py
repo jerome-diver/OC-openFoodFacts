@@ -16,6 +16,11 @@ class Authentication(QObject):
         self._db = Database()
         self.signin = SignIn(self)
         self.signup = SignUp(self)
+        self.connect_signals()
+
+    def connect_signals(self):
+        '''Let's connect signals to slots for concerned controller'''
+
         self.signin.cancel.clicked.connect(self.on_close)
         self.signin.connection.clicked.connect(self.connect_user)
         self.signin.username.textChanged.connect(self.signin.on_reset_status)
