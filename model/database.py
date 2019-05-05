@@ -8,6 +8,8 @@ from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
 import time
 
 class Database():
+    '''Database model for user to be abee to record Open Food Facts data
+    localy'''
 
     _connection = None
 

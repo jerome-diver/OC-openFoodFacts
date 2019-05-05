@@ -5,7 +5,7 @@ from view import MainWindow, SignIn, SignUp
 from controller import Authentication
 from model import Database
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 import sys
 import pymysql
@@ -13,6 +13,8 @@ import pymysql
 
 class Controller(QObject):
     '''Control everything'''
+
+    status_message = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -34,6 +36,7 @@ class Controller(QObject):
         self.window.openfoodfacts_mode.clicked. \
             connect(self.on_openfoodfacts_mode)
         self.window.local_mode.clicked.connect(self.on_local_mode)
+        self.status_message.connect(self.window.on_status_message)
 
     @pyqtSlot()
     def on_quit(self):
@@ -62,3 +65,5 @@ class Controller(QObject):
         self.off_mode = OpenFoodFactsMode(
             self.window,
             self.authenticate.get_database())
+        self.off_mode.status_message.connect(
+            self.window.on_status_message)

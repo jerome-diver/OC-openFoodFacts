@@ -6,6 +6,7 @@ import re
 from collections import OrderedDict
 
 class OpenFoodFacts():
+    '''Model for Open Food Facts data requests'''
 
     def __init__(self, database, views):
         self._database = database
@@ -15,7 +16,6 @@ class OpenFoodFacts():
         self._foods_recorded = []
         self._substitutes = QStandardItemModel(self._views["substitutes"])
         self._substitutes.setHorizontalHeaderLabels(["Nom", "Grade"])
-        self.populate_categories()
 
     @property
     def categories(self):
@@ -89,11 +89,16 @@ class OpenFoodFacts():
         substitutes list view'''
 
         self.substitutes.removeRows(0, self.substitutes.rowCount())
-        for food in self._foods_recorded:
-            item_name = QStandardItem(food["product_name_fr"])
-            item_name.setCheckable(True)
-            item_grade = QStandardItem("{}".format(food[
-                                           "nutrition_grades_tags"][0]))
-            self._substitutes.appendRow([item_name, item_grade])
+        foods_grade_sorted = sorted(self._foods_recorded,
+                                    key = lambda kv:
+                                    kv["nutrition_grades_tags"][0])
+        for _food in foods_grade_sorted:
+            if _food["product_name_fr"] != food \
+                    and _food["nutrition_grades_tags"][0] != "not-applicable":
+                item_name = QStandardItem(_food["product_name_fr"])
+                item_name.setCheckable(True)
+                item_grade = QStandardItem("{}".format(_food[
+                                               "nutrition_grades_tags"][0]))
+                self._substitutes.appendRow([item_name, item_grade])
 
 

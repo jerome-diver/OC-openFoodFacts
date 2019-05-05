@@ -63,6 +63,7 @@ get_food_item	model/openfoodfacts.py	/^        def get_food_item(this, food, key
 new_user	controller/authentication.py	/^    def new_user(self):$/;"	m	class:Authentication
 normalize_foods_products	model/openfoodfacts.py	/^        def normalize_foods_products(foods_products):$/;"	f	member:OpenFoodFacts.populate_foods	file:
 on_category_selected	controller/openfoodfacts_mode.py	/^    def on_category_selected(self, index):$/;"	m	class:OpenFoodFactsMode
+on_category_selected	view/mainwindow.py	/^    def on_category_selected(self):$/;"	m	class:MainWindow
 on_close	controller/authentication.py	/^    def on_close(self):$/;"	m	class:Authentication
 on_food_selected	controller/openfoodfacts_mode.py	/^    def on_food_selected(self, index):$/;"	m	class:OpenFoodFactsMode
 on_local_mode	controller/control.py	/^    def on_local_mode(self):$/;"	m	class:Controller
@@ -101,5 +102,6 @@ setupUi	ui/ui_sign_up.py	/^    def setupUi(self, SignUp):$/;"	m	class:Ui_SignUp
 show_categories	controller/openfoodfacts_mode.py	/^    def show_categories(self):$/;"	m	class:OpenFoodFactsMode
 show_categories	view/mainwindow.py	/^    def show_categories(self, model):$/;"	m	class:MainWindow
 show_foods	view/mainwindow.py	/^    def show_foods(self, model):$/;"	m	class:MainWindow
+show_substitutes	view/mainwindow.py	/^    def show_substitutes(self, model):$/;"	m	class:MainWindow
 status_message	controller/authentication.py	/^    status_message = pyqtSignal(str)$/;"	v	class:Authentication
 substitutes	model/openfoodfacts.py	/^    def substitutes(self):$/;"	m	class:OpenFoodFacts
