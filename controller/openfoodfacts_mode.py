@@ -30,6 +30,8 @@ class OpenFoodFactsMode(QObject):
 
         self._window.categories_list.clicked.connect(
             self.on_category_selected)
+        self._window.foods_list.clicked.connect(
+            self.on_food_selected)
 
     def show_categories(self):
         '''Show categories of products food
@@ -45,3 +47,12 @@ class OpenFoodFactsMode(QObject):
         category_selected = index.data()
         self._model.populate_foods(category_selected)
         self._window.show_foods(self._model.foods)
+
+    pyqtSlot(QModelIndex)
+    def on_food_selected(self, index):
+        '''Slot for next action on clicked foods selection from
+        foods list view'''
+
+        food_selected = index.data
+        self._model.populate_substitutes(food_selected)
+        self._window.show_substitutes(self._model.substitutes)

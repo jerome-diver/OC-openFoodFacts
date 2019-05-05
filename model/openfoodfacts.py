@@ -3,6 +3,7 @@
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 import openfoodfacts
 import re
+from collections import OrderedDict
 
 class OpenFoodFacts():
 
@@ -11,6 +12,7 @@ class OpenFoodFacts():
         self._views = views
         self._categories = QStandardItemModel(self._views['categories'])
         self._foods = QStandardItemModel(self._views["foods"])
+        self._substitutes = QStandardItemModel(self._views["substitutes"])
         self.populate_categories()
 
     @property
@@ -21,13 +23,18 @@ class OpenFoodFacts():
     def foods(self):
         return self._foods
 
+    @property
+    def substitutes(self):
+        return self._substitutes
+
     def populate_categories(self):
         '''Return all categories inside list categories view
         by openfoodfacts module helper'''
 
         self._categories.removeRows(0, self.foods.rowCount())
         categories = openfoodfacts.facets.get_categories()
-        for category in categories:
+        sorted_categories = sorted(categories, key = lambda kv: kv["name"])
+        for category in sorted_categories:
             is_fr = re.match(r'^fr:', category["name"])
             is_latin_chars = re.match(r'[0-9a-zA-z\s]', category["name"])
             if is_fr and is_latin_chars:
@@ -39,24 +46,43 @@ class OpenFoodFacts():
         '''Return the list wiew of foods for give category string
         with openfoodfacts library helper'''
 
+        def get_food_item(this, food, key):
+            '''Define item'''
+
+            item = QStandardItem("undefined")
+            if food[key].strip().isspace() \
+                    or food[key] == '':
+                print(food)
+            else:
+                item = QStandardItem(food[key].strip())
+            this._foods.appendRow(item)
+
+        def normalize_foods_products(foods_products):
+            '''Normalize data products content by adding missing keys'''
+
+            for food in foods_products:
+                if "product_name_fr" not in food:
+                    food["product_name_fr"] = food["product_name"]
+
+
         self.foods.removeRows(0, self.foods.rowCount())
         foods = openfoodfacts.products.advanced_search(
             {   "search_terms" : category,
                 "search_tag" : "categories",
                 "country" : "france" }
         )
-        for food in foods["products"]:
-            item = QStandardItem("undefined")
+        normalize_foods_products(foods["products"])
+        sorted_foods = sorted(foods["products"],
+                              key = lambda kv: kv["product_name_fr"])
+        for food in sorted_foods:
             if "product_name_fr" in food:
-                if food["product_name_fr"].strip().isspace() \
-                        or food["product_name_fr"] == '':
-                    print(food)
-                else:
-                    item = QStandardItem(food["product_name_fr"].strip())
+                get_food_item(self, food, "product_name_fr")
             else:
-                if food["product_name"].strip().isspace() \
-                        or food["product_name"] == '':
-                    print(food)
-                else:
-                    item = QStandardItem(food["product_name"].strip())
-            self._foods.appendRow(item)
+                get_food_item(self, food, "product_name")
+
+
+    def populate_substitutes(self, food):
+        '''Return the list of possible substitution products inside
+        substitutes list view'''
+
+        pass
