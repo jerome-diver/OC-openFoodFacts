@@ -17,7 +17,7 @@ class OpenFoodFactsMode(QObject):
                        "substitutes": self._window.substitutes_list,
                        "name" : self._window.substitute_name,
                        "description" : self._window.substitute_description,
-                       "shop" : self._window.substitute_shop,
+                       "shop" : self._window.substitute_shops,
                        "url" : self._window.substitute_url,
                        "score" : self._window.substitute_score
                       }
@@ -32,6 +32,8 @@ class OpenFoodFactsMode(QObject):
             self.on_category_selected)
         self._window.foods_list.clicked.connect(
             self.on_food_selected)
+        self._window.categories_list.clicked.connect(
+            self._window.on_category_selected)
 
     def show_categories(self):
         '''Show categories of products food
