@@ -1,6 +1,6 @@
 '''Mainwindow Qt-5 application'''
 
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5.QtCore import pyqtSlot
 from ui import Ui_MainWindow
 
@@ -45,18 +45,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.substitutes_list.resizeColumnsToContents()
         self.substitutes_list.show()
 
-    def show_product_details(self, model):
+    def show_product_details(self, model, state = False):
         '''Sow models for all details of product selected'''
 
-        self.statusBar.showMessage("Détails du produit sélectionné "
-                                   "affichés")
+        if not state:
+            self.statusBar.showMessage("Détails du produit sélectionné "
+                                       "affichés")
         self.substitute_name.setText(model["name"])
         self.substitute_description.setText(model["description"])
         self.substitute_shops.setModel(model["shops"])
         self.substitute_url.setText(model["url"])
         self.substitute_score.setText(model["score"])
 
-
     @pyqtSlot(str)
     def on_status_message(self, message):
         self.statusBar.showMessage(message)
+
+    @pyqtSlot(str)
+    def on_error_message(self, message):
+        QMessageBox.information(self, "Erreur de données", message)

@@ -1,13 +1,17 @@
 '''OpenFoodFacts link API of openFoodFacts online with application'''
 
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import QObject, pyqtSlot, QModelIndex
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 import openfoodfacts
 import re
 from collections import OrderedDict
 
 class OpenFoodFacts(QObject):
     '''Model for Open Food Facts data requests'''
+
+    error_signal = pyqtSignal(str)
+    status_message = pyqtSignal(str)
+    update_details_view = pyqtSignal()
 
     def __init__(self, database, views):
         super().__init__()
@@ -115,17 +119,28 @@ class OpenFoodFacts(QObject):
     def populate_product_details(self, code):
         '''Return the full views models of views for show product details'''
 
+        def normalize(product):
+            '''ormalize API keys'''
+            if "product_name_fr" not in product:
+                product["product_name_fr"] = product["product_name"]
+            if "nutrition_grade_fr" not in product:
+                product["nutrition_grade_fr"] = product["nutrition_grade"]
+
         food = openfoodfacts.products.get_by_facets({ "code" : code })
         print("code: ", code, "type:", type(code), "size:", len(food))
-        if "product_name_fr" not in food[0]:
-            food[0]["product_name_fr"] = food[0]["product_name"]
-        self._details["name"] = food[0]["product_name_fr"]
-        self._details["description"] = food[0]["ingredients_text"]
-        for shop in food[0]["stores_tags"]:
-            item = QStandardItem(shop)
-            self._details["shops"].appendRow(item)
-        self._details["url"] = food[0]["url"]
-        self._details["score"] = food[0]["nutrition_grade_fr"]
+        if len(food) != 0:
+            normalize(food[0])
+            self._details["name"] = food[0]["product_name_fr"]
+            self._details["description"] = food[0]["ingredients_text"]
+            for shop in food[0]["stores_tags"]:
+                item = QStandardItem(shop)
+                self._details["shops"].appendRow(item)
+            self._details["url"] = food[0]["url"]
+            self._details["score"] = food[0]["nutrition_grade_fr"]
+        else:
+            self.reset_product_details()
+            self.error_signal.emit("Hélas, il n'y a aucun détail enregistré "
+                                   "pour ce code produit")
 
     @pyqtSlot(QModelIndex)
     def reset_substitute_list(self):
@@ -140,4 +155,7 @@ class OpenFoodFacts(QObject):
             self._details["shops"].removeRows(0,
                                 self._details["shops"].rowCount())
         self._details["name"] = ""
-
+        self._details["description"] =""
+        self._details["url"] =  ""
+        self._details["score"] = ""
+        self.update_details_view.emit()

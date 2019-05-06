@@ -55,6 +55,16 @@ class OpenFoodFactsMode(QObject):
             self.on_load_foods_finished)
         self._load_product_details.finished.connect(
             self.on_load_product_details_finished)
+        self._model.error_signal.connect(
+            self._window.on_error_message)
+        self._model.status_message.connect(
+            self._window.on_status_message)
+        self._model.update_details_view.connect(
+            self.update_product_details)
+
+    @pyqtSlot()
+    def update_product_details(self):
+        self._window.show_product_details(self._model.details, True)
 
     @pyqtSlot()
     def on_load_categories_finished(self):
