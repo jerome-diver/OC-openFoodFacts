@@ -1,21 +1,29 @@
 '''OpenFoodFacts link API of openFoodFacts online with application'''
 
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtCore import QObject, pyqtSlot, QModelIndex
 import openfoodfacts
 import re
 from collections import OrderedDict
 
-class OpenFoodFacts():
+class OpenFoodFacts(QObject):
     '''Model for Open Food Facts data requests'''
 
     def __init__(self, database, views):
+        super().__init__()
         self._database = database
         self._views = views
         self._categories = QStandardItemModel(self._views['categories'])
         self._foods = QStandardItemModel(self._views["foods"])
         self._foods_recorded = []
         self._substitutes = QStandardItemModel(self._views["substitutes"])
-        self._substitutes.setHorizontalHeaderLabels(["Nom", "Grade"])
+        self._substitutes.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
+        self._details = { "name": self._views["name"],
+                          "description" : self._views["description"],
+                          "shops" : QStandardItemModel(self._views["shops"]),
+                          "url" : self._views["url"],
+                          "score" : self._views["score"]
+                          }
 
     @property
     def categories(self):
@@ -28,6 +36,10 @@ class OpenFoodFacts():
     @property
     def substitutes(self):
         return self._substitutes
+
+    @property
+    def details(self):
+        return self._details
 
     def populate_categories(self):
         '''Return all categories inside list categories view
@@ -66,7 +78,6 @@ class OpenFoodFacts():
                 if "product_name_fr" not in food:
                     food["product_name_fr"] = food["product_name"]
 
-
         self.foods.removeRows(0, self.foods.rowCount())
         foods = openfoodfacts.products.advanced_search(
             {   "search_terms" : category,
@@ -97,8 +108,36 @@ class OpenFoodFacts():
                     and _food["nutrition_grades_tags"][0] != "not-applicable":
                 item_name = QStandardItem(_food["product_name_fr"])
                 item_name.setCheckable(True)
-                item_grade = QStandardItem("{}".format(_food[
-                                               "nutrition_grades_tags"][0]))
-                self._substitutes.appendRow([item_name, item_grade])
+                item_grade = QStandardItem(_food["nutrition_grades_tags"][0])
+                item_code = QStandardItem(_food["code"])
+                self._substitutes.appendRow([item_name, item_grade, item_code])
 
+    def populate_product_details(self, code):
+        '''Return the full views models of views for show product details'''
+
+        food = openfoodfacts.products.get_by_facets({ "code" : code })
+        print("code: ", code, "type:", type(code), "size:", len(food))
+        if "product_name_fr" not in food[0]:
+            food[0]["product_name_fr"] = food[0]["product_name"]
+        self._details["name"] = food[0]["product_name_fr"]
+        self._details["description"] = food[0]["ingredients_text"]
+        for shop in food[0]["stores_tags"]:
+            item = QStandardItem(shop)
+            self._details["shops"].appendRow(item)
+        self._details["url"] = food[0]["url"]
+        self._details["score"] = food[0]["nutrition_grade_fr"]
+
+    @pyqtSlot(QModelIndex)
+    def reset_substitute_list(self):
+        if self._substitutes:
+            self._substitutes.removeRows(0, self._substitutes.rowCount())
+            # should reset also product details
+            self.reset_product_details()
+
+    @pyqtSlot(QModelIndex)
+    def reset_product_details(self):
+        if self._details["shops"]:
+            self._details["shops"].removeRows(0,
+                                self._details["shops"].rowCount())
+        self._details["name"] = ""
 

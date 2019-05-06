@@ -1,7 +1,7 @@
 '''Mainwindow Qt-5 application'''
 
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QModelIndex
+from PyQt5.QtCore import pyqtSlot
 from ui import Ui_MainWindow
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -39,13 +39,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.substitutes_list.setModel(model)
         self.statusBar.showMessage("Produits possibles de substitutions "
                                    "proposées avec leur score affichées")
+        self.substitutes_list.setColumnHidden(2, True)
+        header = self.substitutes_list.horizontalHeader()
+        header.setStretchLastSection(True)
+        self.substitutes_list.resizeColumnsToContents()
         self.substitutes_list.show()
 
-    @pyqtSlot(QModelIndex)
-    def on_category_selected(self):
-        model = self.substitutes_list.model()
-        if model:
-            model.removeRows(0, model.rowCount())
+    def show_product_details(self, model):
+        '''Sow models for all details of product selected'''
+
+        self.statusBar.showMessage("Détails du produit sélectionné "
+                                   "affichés")
+        self.substitute_name.setText(model["name"])
+        self.substitute_description.setText(model["description"])
+        self.substitute_shops.setModel(model["shops"])
+        self.substitute_url.setText(model["url"])
+        self.substitute_score.setText(model["score"])
+
 
     @pyqtSlot(str)
     def on_status_message(self, message):
