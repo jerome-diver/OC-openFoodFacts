@@ -1,5 +1,12 @@
 <RCC>
   <qresource prefix="/images">
+    <file>../assets/images/nutriscore A.png</file>
+    <file>../assets/images/off icon.png</file>
+    <file>../assets/images/nutriscore B.png</file>
+    <file>../assets/images/nutriscore D.png</file>
+    <file>../assets/images/nutriscore E.png</file>
+    <file>../assets/images/off logo_thumb.png</file>
+    <file>../assets/images/nutriscore C.png</file>
     <file>../assets/images/home 1.png</file>
     <file>../assets/images/sign_in_localDB_openfoodfacts.png</file>
     <file>../assets/images/OpenClassRooms__clair__1.png</file>

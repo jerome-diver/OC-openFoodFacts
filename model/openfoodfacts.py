@@ -22,11 +22,14 @@ class OpenFoodFacts(QObject):
         self._foods_recorded = []
         self._substitutes = QStandardItemModel(self._views["substitutes"])
         self._substitutes.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
-        self._details = { "name": self._views["name"],
-                          "description" : self._views["description"],
+        self._details = { "name": "",
+                          "description" : "",
                           "shops" : QStandardItemModel(self._views["shops"]),
-                          "url" : self._views["url"],
-                          "score" : self._views["score"]
+                          "url" : "",
+                          "score" : "",
+                          "brand" : "",
+                          "packaging" : "",
+                          "img_thumb" : "",
                           }
 
     @property
@@ -125,10 +128,21 @@ class OpenFoodFacts(QObject):
                 product["product_name_fr"] = product["product_name"]
             if "nutrition_grade_fr" not in product:
                 product["nutrition_grade_fr"] = product["nutrition_grade"]
+            if "ingredients_text" not in product:
+                product["ingredients_text"] = "--aucune description--"
+            if "packaging" not in product:
+                product["packaging"] = "--aucune indication--"
+            if isinstance(product["brands_tags"], list):
+                brands = ""
+                for brand in product["brands_tags"]:
+                    brands += ", " + brand if brands != "" else brand
+                product["brands_tags"] = brands
 
         food = openfoodfacts.products.get_by_facets({ "code" : code })
         print("code: ", code, "type:", type(code), "size:", len(food))
         if len(food) != 0:
+            self._details["shops"].removeRows(0,
+                                    self._details["shops"].rowCount())
             normalize(food[0])
             self._details["name"] = food[0]["product_name_fr"]
             self._details["description"] = food[0]["ingredients_text"]
@@ -137,10 +151,13 @@ class OpenFoodFacts(QObject):
                 self._details["shops"].appendRow(item)
             self._details["url"] = food[0]["url"]
             self._details["score"] = food[0]["nutrition_grade_fr"]
+            self._details["packaging"] = food[0]["packaging"]
+            self._details["brand"] = food[0]["brands_tags"]
         else:
             self.reset_product_details()
             self.error_signal.emit("Hélas, il n'y a aucun détail enregistré "
                                    "pour ce code produit")
+            self.status_message.emit("Aucun détail cohérent n'est fourni")
 
     @pyqtSlot(QModelIndex)
     def reset_substitute_list(self):
@@ -158,4 +175,6 @@ class OpenFoodFacts(QObject):
         self._details["description"] =""
         self._details["url"] =  ""
         self._details["score"] = ""
+        self._details["brand"] = ""
+        self._details["packaging"] = ""
         self.update_details_view.emit()

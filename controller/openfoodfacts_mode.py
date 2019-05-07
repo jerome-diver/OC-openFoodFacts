@@ -1,7 +1,8 @@
 '''Controller for OpenFoodFacts API access mode'''
 
 from model import OpenFoodFacts
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex, QThread
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
+from controller import LoadCategories, LoadFoods, LoadProductDetails
 
 
 class OpenFoodFactsMode(QObject):
@@ -17,11 +18,14 @@ class OpenFoodFactsMode(QObject):
         self._views = { "categories": self._window.categories_list,
                         "foods": self._window.foods_list,
                         "substitutes": self._window.substitutes_list,
-                        "name" : self._window.substitute_name,
-                        "description" : self._window.substitute_description,
-                        "shops" : self._window.substitute_shops,
-                        "url" : self._window.substitute_url,
-                        "score" : self._window.substitute_score
+                        "name" : self._window.product_name,
+                        "brand" : self._window.product_brand,
+                        "packaging" : self._window.product_packaging,
+                        "score" : self._window.product_score,
+                        "shops" : self._window.product_shops,
+                        "description" : self._window.product_description,
+                        "url" : self._window.product_url,
+                        "img_thumb" : self._window.product_img_thumb,
                        }
         self._model = OpenFoodFacts(self._database, self._views)
         self._load_categories = LoadCategories(self._model)
@@ -63,10 +67,6 @@ class OpenFoodFactsMode(QObject):
             self.update_product_details)
 
     @pyqtSlot()
-    def update_product_details(self):
-        self._window.show_product_details(self._model.details, True)
-
-    @pyqtSlot()
     def on_load_categories_finished(self):
         '''Show categories of products food
         from openFoodFacts model in view'''
@@ -106,6 +106,11 @@ class OpenFoodFactsMode(QObject):
                                  "sur Open Food Facts...")
         food_selected = index.data
         self._model.populate_substitutes(food_selected)
+        self.show_substitutes()
+
+    def show_substitutes(self):
+        '''Just show substitute products list'''
+
         self._window.show_substitutes(self._model.substitutes)
 
     @pyqtSlot(QModelIndex)
@@ -118,70 +123,9 @@ class OpenFoodFactsMode(QObject):
         self._load_product_details.code = code
         self._load_product_details.start()
 
-class LoadCategories(QThread):
-    '''Load Categories model in background process to not freeze
-    thz application'''
+    @pyqtSlot()
+    def update_product_details(self):
+        '''Update product selected details'''
 
-    def __init__(self, model):
-        super().__init__()
-        self._model = model
+        self._window.show_product_details(self._model.details, True)
 
-    def __del__(self):
-        self.wait()
-
-    def run(self):
-        '''Start running the thread for populate model of Open Food Facts
-        categories list'''
-
-        self._model.populate_categories()
-
-class LoadFoods(QThread):
-    '''Load foods model in background to not freeze application'''
-
-    def __init__(self, model):
-        super().__init__()
-        self._model = model
-        self._category = ''
-
-    @property
-    def category(self):
-        return self._category
-
-    @category.setter
-    def category(self, value):
-        self._category = value
-
-    def __del__(self):
-        self.wait()
-
-    def run(self):
-        '''Start running thread to load model for foods list from
-        Open Food Facts'''
-
-        self._model.populate_foods(self._category)
-
-class LoadProductDetails(QThread):
-    '''Load product selected from substitutes list to create model
-    for details'''
-
-    def __init__(self, model):
-        super().__init__()
-        self._model = model
-        self._code = ""
-
-    @property
-    def code(self):
-        return self._code
-
-    @code.setter
-    def code(self, value):
-        self._code = value
-
-    def __del__(self):
-        self.wait()
-
-    def run(self):
-        '''Start to load details of product in background from Open Food
-        Facts'''
-
-        self._model.populate_product_details(self._code)

@@ -1,6 +1,7 @@
 '''Mainwindow Qt-5 application'''
 
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtCore import pyqtSlot
 from ui import Ui_MainWindow
 
@@ -51,11 +52,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if not state:
             self.statusBar.showMessage("Détails du produit sélectionné "
                                        "affichés")
-        self.substitute_name.setText(model["name"])
-        self.substitute_description.setText(model["description"])
-        self.substitute_shops.setModel(model["shops"])
-        self.substitute_url.setText(model["url"])
-        self.substitute_score.setText(model["score"])
+        self.product_name.setText(model["name"])
+        self.product_brand.setText(model["brand"])
+        self.product_packaging.setText(model["packaging"])
+        self.product_score.setText(model["score"])
+        self.product_shops.setModel(model["shops"])
+        self.product_description.setText(model["description"])
+        self.product_url.setText(model["url"])
+
+    def reset_views(self, views=["all"]):
+        empty_model = QStandardItemModel()
+        if "categories" in views or "all" in views:
+            self.categories_list.setModel(empty_model)
+        if "foods" in views or "all" in views:
+            self.foods_list.setModel(empty_model)
+        if "substitutes" in views or "all" in views:
+            self.substitutes_list.setModel(empty_model)
+        if "details" in views or "all" in views:
+            self.product_name.setText("")
+            self.product_brand.setText("")
+            self.product_packaging.setText("")
+            self.product_shops.setModel(empty_model)
+            self.product_score.setText("")
+            self.product_description.setText("")
+            self.product_url.setText("")
+            self.product_img_thumb.setText("")
 
     @pyqtSlot(str)
     def on_status_message(self, message):

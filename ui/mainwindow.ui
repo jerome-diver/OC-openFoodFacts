@@ -336,7 +336,14 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <widget class="QTableView" name="substitutes_list"/>
+         <widget class="QTableView" name="substitutes_list">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <underline>false</underline>
+           </font>
+          </property>
+         </widget>
          <widget class="QGroupBox" name="substitute_selected_grp">
           <property name="font">
            <font>
@@ -351,51 +358,26 @@
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
             <widget class="QWidget" name="substitute_widget" native="true">
-             <layout class="QFormLayout" name="formLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_nom">
-                <property name="font">
-                 <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
-                  <underline>false</underline>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Nom</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="substitute_name">
-                <property name="font">
-                 <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
-                  <underline>false</underline>
-                 </font>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
+             <property name="accessibleName">
+              <string notr="true"/>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
               <item row="1" column="0">
-               <widget class="QLabel" name="label_description">
+               <widget class="QLabel" name="label_brand">
                 <property name="font">
                  <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>8</pointsize>
                   <underline>false</underline>
                  </font>
                 </property>
                 <property name="text">
-                 <string>Description</string>
+                 <string>Marque</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_shops">
+              <item row="7" column="1" colspan="2">
+               <widget class="QTextEdit" name="product_description">
                 <property name="font">
                  <font>
                   <family>Ubuntu</family>
@@ -403,19 +385,8 @@
                   <underline>false</underline>
                  </font>
                 </property>
-                <property name="text">
-                 <string>Magasins</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QTextEdit" name="substitute_description">
-                <property name="font">
-                 <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
-                  <underline>false</underline>
-                 </font>
+                <property name="acceptDrops">
+                 <bool>false</bool>
                 </property>
                 <property name="autoFillBackground">
                  <bool>false</bool>
@@ -425,12 +396,49 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_description">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>8</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="lineWidth">
+                 <number>-1</number>
+                </property>
+                <property name="text">
+                 <string>Description</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_shops">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>8</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Magasins</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
                <widget class="QLabel" name="label_url">
                 <property name="font">
                  <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>8</pointsize>
                   <underline>false</underline>
                  </font>
                 </property>
@@ -439,22 +447,14 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="substitute_url">
-                <property name="font">
-                 <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
-                  <underline>false</underline>
-                 </font>
+              <item row="8" column="1">
+               <widget class="QLabel" name="product_url">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_score">
                 <property name="font">
                  <font>
                   <family>Ubuntu</family>
@@ -463,16 +463,43 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Score</string>
+                 <string>url...</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
-               <widget class="QLineEdit" name="substitute_score">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_nom">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>8</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Nom</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QListView" name="product_shops">
                 <property name="font">
                  <font>
                   <family>Ubuntu</family>
                   <pointsize>10</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" colspan="2">
+               <widget class="QLineEdit" name="product_name">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu</family>
+                  <pointsize>10</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
                   <underline>false</underline>
                  </font>
                 </property>
@@ -481,8 +508,106 @@
                 </property>
                </widget>
               </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_score">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>8</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Score</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_packaging">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>8</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Packaging</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="product_brand">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu</family>
+                  <pointsize>10</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+               </widget>
+              </item>
               <item row="2" column="1">
-               <widget class="QListView" name="substitute_shops"/>
+               <widget class="QLineEdit" name="product_packaging">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu</family>
+                  <pointsize>10</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2" rowspan="6">
+               <widget class="QLabel" name="product_img_thumb">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="accessibleName">
+                 <string notr="true"/>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border-image: url(:/images/assets/images/off logo_thumb.png);</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QLabel" name="product_score">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu</family>
+                  <pointsize>10</pointsize>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
