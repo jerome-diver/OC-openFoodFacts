@@ -3,6 +3,7 @@
 from model import OpenFoodFacts
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 from controller import LoadCategories, LoadFoods, LoadProductDetails
+import webbrowser
 
 
 class OpenFoodFactsMode(QObject):
@@ -65,6 +66,10 @@ class OpenFoodFactsMode(QObject):
             self._window.on_status_message)
         self._model.update_details_view.connect(
             self.update_product_details)
+        self._window.product_url.clicked.connect(
+            self.on_detail_product_url_clicked)
+        self._window.product_name.linkActivated.connect(
+            self.on_detail_product_url_clicked)
 
     @pyqtSlot()
     def on_load_categories_finished(self):
@@ -129,3 +134,9 @@ class OpenFoodFactsMode(QObject):
 
         self._window.show_product_details(self._model.details, True)
 
+    @pyqtSlot()
+    def on_detail_product_url_clicked(self):
+        '''Go to url'''
+
+        url = self._model.details["url"]
+        webbrowser.open(url)

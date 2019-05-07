@@ -1,10 +1,12 @@
 '''OpenFoodFacts link API of openFoodFacts online with application'''
 
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QImage, QPixmap
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
+from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
+                     NUTRISCORE_D, NUTRISCORE_E
 import openfoodfacts
+from urllib.request import urlopen
 import re
-from collections import OrderedDict
 
 class OpenFoodFacts(QObject):
     '''Model for Open Food Facts data requests'''
@@ -132,27 +134,49 @@ class OpenFoodFacts(QObject):
                 product["ingredients_text"] = "--aucune description--"
             if "packaging" not in product:
                 product["packaging"] = "--aucune indication--"
+            if "brands_tags" not in product:
+                product["brands_tags"] = ""
             if isinstance(product["brands_tags"], list):
                 brands = ""
                 for brand in product["brands_tags"]:
                     brands += ", " + brand if brands != "" else brand
                 product["brands_tags"] = brands
+            if "stores_tags" not in product:
+                product["stores_tags"] = ""
 
         food = openfoodfacts.products.get_by_facets({ "code" : code })
         print("code: ", code, "type:", type(code), "size:", len(food))
         if len(food) != 0:
+            url = "<a href=\"" + food[0]["url"] + "\" />"
             self._details["shops"].removeRows(0,
                                     self._details["shops"].rowCount())
             normalize(food[0])
-            self._details["name"] = food[0]["product_name_fr"]
+            self._details["name"] = url + food[0]["product_name_fr"] + "</a>"
             self._details["description"] = food[0]["ingredients_text"]
             for shop in food[0]["stores_tags"]:
                 item = QStandardItem(shop)
                 self._details["shops"].appendRow(item)
             self._details["url"] = food[0]["url"]
-            self._details["score"] = food[0]["nutrition_grade_fr"]
+            score = food[0]["nutrition_grade_fr"]
+            if score == "a":
+                self._details["score"] = QPixmap(NUTRISCORE_A)
+            if score == "b":
+                self._details["score"] = QPixmap(NUTRISCORE_B)
+            if score == "c":
+                self._details["score"] = QPixmap(NUTRISCORE_C)
+            if score == "d":
+                self._details["score"] = QPixmap(NUTRISCORE_D)
+            if score == "e":
+                self._details["score"] = QPixmap(NUTRISCORE_E)
+            self._details["score"].scaled(32, 64)
             self._details["packaging"] = food[0]["packaging"]
             self._details["brand"] = food[0]["brands_tags"]
+            img_url = food[0]["image_front_url"]
+            print("url =>", img_url)
+            data_front = urlopen(img_url).read()
+            img_front = QImage()
+            img_front.loadFromData(data_front)
+            self._details["img_thumb"] = QPixmap(img_front)
         else:
             self.reset_product_details()
             self.error_signal.emit("Hélas, il n'y a aucun détail enregistré "

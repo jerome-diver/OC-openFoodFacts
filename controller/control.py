@@ -44,16 +44,20 @@ class Controller(QObject):
 
         self.app.closeAllWindows()
 
-    @pyqtSlot()
-    def on_local_mode(self):
+    @pyqtSlot(bool)
+    def on_local_mode(self, state):
         '''OpenFoodFacts list button slot'''
 
         self.window.openfoodfacts_mode.setChecked(False)
-        if self.off_mode:
-            del self.off_mode
-        self.db_mode = DatabaseMode(
-            self.window,
-            self.authenticate.get_database())
+        if state:
+            if self.off_mode:
+                self.off_mode = None
+            if not self.db_mode:
+                self.db_mode = DatabaseMode(
+                    self.window,
+                    self.authenticate.get_database())
+        else:
+            self.window.reset_views()
 
     @pyqtSlot(bool)
     def on_openfoodfacts_mode(self, state):

@@ -448,7 +448,7 @@
                </widget>
               </item>
               <item row="8" column="1">
-               <widget class="QLabel" name="product_url">
+               <widget class="QLabelClickable" name="product_url">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -489,22 +489,6 @@
                   <pointsize>10</pointsize>
                   <underline>false</underline>
                  </font>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1" colspan="2">
-               <widget class="QLineEdit" name="product_name">
-                <property name="font">
-                 <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                  <underline>false</underline>
-                 </font>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -609,6 +593,19 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="1" colspan="2">
+               <widget class="QLabel" name="product_name">
+                <property name="font">
+                 <font>
+                  <family>Ubuntu</family>
+                  <underline>false</underline>
+                 </font>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -664,6 +661,13 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QLabelClickable</class>
+   <extends>QLabel</extends>
+   <header>assets/objects/qlabel_clickable.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="images.qrc"/>
  </resources>

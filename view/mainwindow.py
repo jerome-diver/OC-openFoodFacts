@@ -1,8 +1,8 @@
 '''Mainwindow Qt-5 application'''
 
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from PyQt5.QtGui import QStandardItemModel
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QStandardItemModel, QPixmap
+from PyQt5.QtCore import pyqtSlot, Qt
 from ui import Ui_MainWindow
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -15,6 +15,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.openfoodfacts_mode.setChecked(False)
         self.local_mode.setChecked(False)
         self.substitutes_list.verticalHeader().setVisible(False)
+        self.product_name.setOpenExternalLinks(True)
         self.statusBar.showMessage("Effectuez une recherche sur Open Food "
                                    "Facts ou authentifiez vous pour accéder "
                                    "à vôtre base de données")
@@ -55,10 +56,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.product_name.setText(model["name"])
         self.product_brand.setText(model["brand"])
         self.product_packaging.setText(model["packaging"])
-        self.product_score.setText(model["score"])
+        if isinstance(model["score"], QPixmap):
+            self.product_score.setPixmap(model["score"])
+            self.product_score.setScaledContents(True)
+        else:
+            self.product_score.setText(model["score"])
         self.product_shops.setModel(model["shops"])
         self.product_description.setText(model["description"])
         self.product_url.setText(model["url"])
+        if isinstance(model["score"], QPixmap):
+            self.product_img_thumb.setPixmap(model["img_thumb"])
+            self.product_img_thumb.setScaledContents(True)
 
     def reset_views(self, views=["all"]):
         empty_model = QStandardItemModel()
@@ -77,6 +85,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.product_description.setText("")
             self.product_url.setText("")
             self.product_img_thumb.setText("")
+            self.product_score.setPixmap(QPixmap())
+            self.product_img_thumb.setPixmap(QPixmap())
 
     @pyqtSlot(str)
     def on_status_message(self, message):
