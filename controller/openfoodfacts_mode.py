@@ -1,7 +1,8 @@
 '''Controller for OpenFoodFacts API access mode'''
 
 from model import OpenFoodFacts
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex, Qt
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
+                         QModelIndex, Qt
 from PyQt5.QtGui import QBrush
 from controller import LoadCategories, LoadFoods, \
                        LoadProductDetails, CheckProductCodeExist
@@ -106,6 +107,7 @@ class OpenFoodFactsMode(QObject):
         self.status_message.emit("Patientez, recherche des produits "
                                  "relatifs à la catégorie en cours "
                                  "sur Open Food Facts...")
+        self._model._empty_product_code = []
         self._load_foods.category = index.data()
         self._load_foods.start()
 
@@ -118,7 +120,6 @@ class OpenFoodFactsMode(QObject):
                                  "de substitutions proposés en cours "
                                  "sur Open Food Facts...")
         food_selected = index.data
-        print("ok, tu as clické sur un produit à substitué...")
         self._model.populate_substitutes(food_selected)
         self.show_substitutes()
 
@@ -158,7 +159,13 @@ class OpenFoodFactsMode(QObject):
                                               Qt.DisplayRole,
                                               code,
                                               Qt.MatchContains)
+        self._model._empty_product_code.append(code)
         target = self._model._foods
-        target.setData(target.index(item_index[0].row(),0),
-                                   QBrush(Qt.red),
-                                   Qt.BackgroundRole)
+        t_index = target.index(item_index[0].row(),0)
+        target.setData(t_index, QBrush(Qt.red), Qt.BackgroundRole)
+        target.itemFromIndex(t_index).setEnabled(False)
+        if self._model._substitutes.rowCount() != 0:
+            selections = self._window.foods_list.selectionModel()
+            if selections.hasSelection():
+                indexes = selections.selectedIndexes()
+                self._model.populate_substitutes(indexes[0].data())

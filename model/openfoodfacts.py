@@ -36,6 +36,7 @@ class OpenFoodFacts(QObject):
                           "img_thumb" : "",
                           }
         self._codes = []
+        self._empty_product_code = []
 
     @property
     def categories(self):
@@ -123,7 +124,8 @@ class OpenFoodFacts(QObject):
                                     kv["nutrition_grades_tags"][0])
         for _food in foods_grade_sorted:
             if _food["product_name_fr"] != food \
-                    and _food["nutrition_grades_tags"][0] != "not-applicable":
+                    and _food["nutrition_grades_tags"][0] != "not-applicable"\
+                    and _food["code"] not in self._empty_product_code:
                 item_name = QStandardItem(_food["product_name_fr"])
                 item_name.setCheckable(True)
                 item_grade = QStandardItem(_food["nutrition_grades_tags"][0])
