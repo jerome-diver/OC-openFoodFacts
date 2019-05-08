@@ -24,3 +24,5 @@ NUTRISCORE_B = os.path.join(CWD, "assets/images/nutriscore B.png")
 NUTRISCORE_C = os.path.join(CWD, "assets/images/nutriscore C.png")
 NUTRISCORE_D = os.path.join(CWD, "assets/images/nutriscore D.png")
 NUTRISCORE_E = os.path.join(CWD, "assets/images/nutriscore E.png")
+
+REQUEST_PAGE_SIZE = 20

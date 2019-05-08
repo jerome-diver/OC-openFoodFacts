@@ -2,16 +2,18 @@
 
 import pymysql
 from pymysql.err import OperationalError
+from PyQt5.QtCore import pyqtSignal, QObject
 from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
                      DB_SOCKET, DB_CONNECT_MODE, DB_HOSTNAME,\
                      DB_INIT_FILE
 import time
 
-class Database():
+class Database(QObject):
     '''Database model for user to be abee to record Open Food Facts data
     localy'''
 
     _connection = None
+    status_message = pyqtSignal(str)
 
     def __init__(self, username=None, password=None, db=None):
         super()
@@ -50,7 +52,8 @@ class Database():
                                                 password=passwd,
                                                 database=db)
         except ConnectionError:
-                print("Failed connection between", user, "and", db)
+                self.status_message.emit("Failed connection between", user,
+                                         "and", db)
 
     def _connect_to_off_db(self):
         '''Connect the current user on database'''
@@ -70,35 +73,43 @@ class Database():
     def send_request(request, values=None):
         '''Execute database request'''
 
-        Database._connection.begin()
-        cursor = Database._connection.cursor()
+        cursor = None
         try:
+            Database._connection.begin()
+            cursor = Database._connection.cursor()
             if values:
                 cursor.execute(request, values)
             else:
                 cursor.execute(request)
+            Database._connection.commit()
         except OperationalError as e:
             print(e.args[0], e.args[1])
             Database._connection.rollback()
-        Database._connection.commit()
-        cursor.close()
+            Database.status_message.emit("Erreur lors de l'exécution de "
+                                "la requête SQL dans la base de donnée")
+        finally:
+            if cursor:
+                cursor.close()
 
     @staticmethod
     def ask_request(request, values=None):
         '''Return an iterator result for request question'''
 
-        Database._connection.begin()
-        cursor = Database._connection.cursor(pymysql.cursors.DictCursor)
+        cursor = None
         try:
+            Database._connection.begin()
+            cursor = Database._connection.cursor(pymysql.cursors.DictCursor)
             if values:
                 cursor.execute(request, values)
             else:
                 cursor.execute(request)
+            Database._connection.commit()
         except OperationalError as e:
             print(e.args[0], e.args[1])
             Database._connection.rollback()
-        Database._connection.commit()
-        cursor.close()
+        finally:
+            if cursor:
+                cursor.close()
         return cursor
 
 

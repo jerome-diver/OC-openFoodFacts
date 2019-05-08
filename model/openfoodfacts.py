@@ -5,6 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
                      NUTRISCORE_D, NUTRISCORE_E
 import openfoodfacts
+import requests
 from urllib.request import urlopen
 import re
 
@@ -19,6 +20,7 @@ class OpenFoodFacts(QObject):
         super().__init__()
         self._database = database
         self._views = views
+        self._db_categories = []
         self._categories = QStandardItemModel(self._views['categories'])
         self._foods = QStandardItemModel(self._views["foods"])
         self._foods_recorded = []
@@ -33,6 +35,7 @@ class OpenFoodFacts(QObject):
                           "packaging" : "",
                           "img_thumb" : "",
                           }
+        self._codes = []
 
     @property
     def categories(self):
@@ -50,20 +53,29 @@ class OpenFoodFacts(QObject):
     def details(self):
         return self._details
 
-    def populate_categories(self):
+    def download_categories(self):
+        '''Download categories and return them sorted by name'''
+
+        req = requests.get("https://fr.openfoodfacts.org/categories.json")
+        categories = req.json()["tags"]
+        #categories = openfoodfacts.facets.get_categories()
+        return sorted(categories, key = lambda kv: kv["name"])
+
+
+    def populate_categories(self, categories):
         '''Return all categories inside list categories view
         by openfoodfacts module helper'''
 
         self._categories.removeRows(0, self.foods.rowCount())
-        categories = openfoodfacts.facets.get_categories()
-        sorted_categories = sorted(categories, key = lambda kv: kv["name"])
-        for category in sorted_categories:
+        for category in categories:
             is_fr = re.match(r'^fr:', category["name"])
             is_latin_chars = re.match(r'[0-9a-zA-z\s]', category["name"])
-            if is_fr and is_latin_chars:
-                find = re.sub(r'^fr:', '', category["name"])
-                item = QStandardItem(find)
-                self._categories.appendRow(item)
+            if is_latin_chars:
+                find = re.sub(r'^fr:', '', category["name"]) if is_fr \
+                    else category["name"]
+                item_name = QStandardItem(find)
+                item_id = QStandardItem(category["id"])
+                self._categories.appendRow([item_name, item_id])
 
     def populate_foods(self, category):
         '''Return the list wiew of foods for give category string
@@ -72,13 +84,13 @@ class OpenFoodFacts(QObject):
         def get_food_item(this, food, key):
             '''Define item'''
 
-            item = QStandardItem("undefined")
-            if food[key].strip().isspace() \
-                    or food[key] == '':
-                print(food)
+            if food[key].strip().isspace() or food[key] == '':
+                print("no way for:", food[key])
             else:
                 item = QStandardItem(food[key].strip())
-            this._foods.appendRow(item)
+                code = QStandardItem(food["code"])
+                this._foods.appendRow([item, code])
+            return food["code"]
 
         def normalize_foods_products(foods_products):
             '''Normalize data products content by adding missing keys'''
@@ -90,7 +102,7 @@ class OpenFoodFacts(QObject):
         self.foods.removeRows(0, self.foods.rowCount())
         foods = openfoodfacts.products.advanced_search(
             {   "search_terms" : category,
-                "search_tag" : "categories",
+                "search_tag" : "categories_tags",
                 "country" : "france" }
         )
         normalize_foods_products(foods["products"])
@@ -98,10 +110,7 @@ class OpenFoodFacts(QObject):
                               key = lambda kv: kv["product_name_fr"])
         self._foods_recorded = sorted_foods
         for food in sorted_foods:
-            if "product_name_fr" in food:
-                get_food_item(self, food, "product_name_fr")
-            else:
-                get_food_item(self, food, "product_name")
+            self._codes.append(get_food_item(self, food, "product_name_fr"))
 
 
     def populate_substitutes(self, food):
@@ -121,15 +130,19 @@ class OpenFoodFacts(QObject):
                 item_code = QStandardItem(_food["code"])
                 self._substitutes.appendRow([item_name, item_grade, item_code])
 
-    def populate_product_details(self, code):
-        '''Return the full views models of views for show product details'''
+    def get_product(self, code):
+        '''Return product for this code'''
 
         def normalize(product):
-            '''ormalize API keys'''
+            '''Normalize API keys'''
+
             if "product_name_fr" not in product:
                 product["product_name_fr"] = product["product_name"]
             if "nutrition_grade_fr" not in product:
-                product["nutrition_grade_fr"] = product["nutrition_grade"]
+                if "nutrition_grade" in product:
+                    product["nutrition_grade_fr"] = product["nutrition_grade"]
+                else:
+                    product["nutrition_grade_fr"] = "e"
             if "ingredients_text" not in product:
                 product["ingredients_text"] = "--aucune description--"
             if "packaging" not in product:
@@ -144,20 +157,27 @@ class OpenFoodFacts(QObject):
             if "stores_tags" not in product:
                 product["stores_tags"] = ""
 
-        food = openfoodfacts.products.get_by_facets({ "code" : code })
-        print("code: ", code, "type:", type(code), "size:", len(food))
-        if len(food) != 0:
-            url = "<a href=\"" + food[0]["url"] + "\" />"
+        product = openfoodfacts.products.get_by_facets({ "code" : code })
+        if product and len(product[0]) != 0:
+            normalize(product[0])
+            return product[0]
+        return None
+
+    def populate_product_details(self, code):
+        '''Return the full views models of views for show product details'''
+
+        food = self.get_product(code)
+        if food:
+            url = "<a href=\"" + food["url"] + "\" />"
             self._details["shops"].removeRows(0,
                                     self._details["shops"].rowCount())
-            normalize(food[0])
-            self._details["name"] = url + food[0]["product_name_fr"] + "</a>"
-            self._details["description"] = food[0]["ingredients_text"]
-            for shop in food[0]["stores_tags"]:
+            self._details["name"] = url + food["product_name_fr"] + "</a>"
+            self._details["description"] = food["ingredients_text"]
+            for shop in food["stores_tags"]:
                 item = QStandardItem(shop)
                 self._details["shops"].appendRow(item)
-            self._details["url"] = food[0]["url"]
-            score = food[0]["nutrition_grade_fr"]
+            self._details["url"] = food["url"]
+            score = food["nutrition_grade_fr"]
             if score == "a":
                 self._details["score"] = QPixmap(NUTRISCORE_A)
             if score == "b":
@@ -169,10 +189,9 @@ class OpenFoodFacts(QObject):
             if score == "e":
                 self._details["score"] = QPixmap(NUTRISCORE_E)
             self._details["score"].scaled(32, 64)
-            self._details["packaging"] = food[0]["packaging"]
-            self._details["brand"] = food[0]["brands_tags"]
-            img_url = food[0]["image_front_url"]
-            print("url =>", img_url)
+            self._details["packaging"] = food["packaging"]
+            self._details["brand"] = food["brands_tags"]
+            img_url = food["image_front_url"]
             data_front = urlopen(img_url).read()
             img_front = QImage()
             img_front.loadFromData(data_front)
@@ -187,7 +206,6 @@ class OpenFoodFacts(QObject):
     def reset_substitute_list(self):
         if self._substitutes:
             self._substitutes.removeRows(0, self._substitutes.rowCount())
-            # should reset also product details
             self.reset_product_details()
 
     @pyqtSlot(QModelIndex)
@@ -198,7 +216,8 @@ class OpenFoodFacts(QObject):
         self._details["name"] = ""
         self._details["description"] =""
         self._details["url"] =  ""
-        self._details["score"] = ""
+        self._details["score"] = QPixmap()
         self._details["brand"] = ""
         self._details["packaging"] = ""
+        self._details["img_thumb"] = QPixmap()
         self.update_details_view.emit()

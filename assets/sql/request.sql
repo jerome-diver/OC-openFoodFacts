@@ -1,5 +1,9 @@
 CREATE DATABASE IF NOT EXISTS openfoodfacts_substitutes;
 USE openfoodfacts_substitutes;
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    item_id VARCHAR(256),
+    item_name VARCHAR(256));
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
     family_name VARCHAR(64), 
@@ -8,14 +12,32 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS foods (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
     name_ VARCHAR(128), 
-    description text);
+    description TINYTEXT,
+    url_ VARCHAR(256),
+    score ENUM('a','b','c','d','e') NOT NULL,
+    brand VARCHAR(64),
+    packaging VARCHAR(256),
+    image BLOB);
 CREATE TABLE IF NOT EXISTS shops (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
     name_ VARCHAR(128),
-    url_ VARCHAR(256),
-    score VARCHAR(1),
     address TEXT,
     url VARCHAR(256));
+CREATE TABLE IF NOT EXISTS food_categories (
+    food_id INT,
+    category_id INT,
+    CONSTRAINT fk_food_categories__food_id
+        FOREIGN KEY (food_id)
+        REFERENCES foods (id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+    CONSTRAINT fk_food_categories__categories_id
+        FOREIGN KEY (category_id)
+        REFERENCES categories (id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+    CONSTRAINT unique_food_categoriee
+        UNIQUE (food_id, category_id));
 CREATE TABLE IF NOT EXISTS user_foods (
     user_id INT, 
     food_id INT,

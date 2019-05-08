@@ -6,8 +6,10 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
 import pymysql
 
+
 class Authentication(QObject):
     '''Authenticate User on local database'''
+
     status_message = pyqtSignal(str)
 
     def __init__(self):
@@ -30,7 +32,6 @@ class Authentication(QObject):
         self.signup.record.clicked.connect(self.new_user)
         self.status_message.connect(self.signin.on_status)
         self.status_message.connect(self.signup.on_status)
-
 
     @pyqtSlot()
     def on_sign_in(self):
@@ -58,12 +59,16 @@ class Authentication(QObject):
 
     @pyqtSlot(str)
     def on_username_changed(self, username):
+        '''Slot action when username text is changed'''
+
         if self._db.exist_username(self.signup.username.text()):
             self.status_message.emit("{} exite déjà".format(username))
         else:
             self.signup.on_reset_status()
 
     def connect_user(self):
+        '''Do connect the user'''
+
         username = self.signin.username.text() if self.dialog_open == "SignIn"\
                         else self.signup.username.text()
         password = self.signin.password.text() if self.dialog_open == "SignIn"\
@@ -80,6 +85,8 @@ class Authentication(QObject):
                                     "{}\n{}".format(e.args[0], e.args[1]))
 
     def new_user(self):
+        '''Create a new user'''
+
         username = self.signup.username.text()
         password = self.signup.password.text()
         nick_name = self.signup.nickname.text()
@@ -95,4 +102,6 @@ class Authentication(QObject):
             self.connect_user()
 
     def get_database(self):
+        '''Return the databse connection'''
+
         return self._db

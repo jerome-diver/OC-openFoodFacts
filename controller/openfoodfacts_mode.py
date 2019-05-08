@@ -1,8 +1,10 @@
 '''Controller for OpenFoodFacts API access mode'''
 
 from model import OpenFoodFacts
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
-from controller import LoadCategories, LoadFoods, LoadProductDetails
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex, Qt
+from PyQt5.QtGui import QBrush
+from controller import LoadCategories, LoadFoods, \
+                       LoadProductDetails, CheckProductCodeExist
 import webbrowser
 
 
@@ -32,6 +34,7 @@ class OpenFoodFactsMode(QObject):
         self._load_categories = LoadCategories(self._model)
         self._load_foods = LoadFoods(self._model)
         self._load_product_details = LoadProductDetails(self._model)
+        self._check_exist = CheckProductCodeExist(self._model)
         self.connect_signals()
         self._load_categories.start()
         self.status_message.emit("Patientez, recherche des catégories "
@@ -70,6 +73,8 @@ class OpenFoodFactsMode(QObject):
             self.on_detail_product_url_clicked)
         self._window.product_name.linkActivated.connect(
             self.on_detail_product_url_clicked)
+        self._check_exist.empty_product.connect(
+            self.on_empty_product)
 
     @pyqtSlot()
     def on_load_categories_finished(self):
@@ -83,6 +88,9 @@ class OpenFoodFactsMode(QObject):
         '''Show food's products from Open Food Facts'''
 
         self._window.show_foods(self._model.foods)
+        if self._model._codes:
+            self._check_exist.codes = self._model._codes
+            self._check_exist.start()
 
     @pyqtSlot()
     def on_load_product_details_finished(self):
@@ -110,6 +118,7 @@ class OpenFoodFactsMode(QObject):
                                  "de substitutions proposés en cours "
                                  "sur Open Food Facts...")
         food_selected = index.data
+        print("ok, tu as clické sur un produit à substitué...")
         self._model.populate_substitutes(food_selected)
         self.show_substitutes()
 
@@ -140,3 +149,16 @@ class OpenFoodFactsMode(QObject):
 
         url = self._model.details["url"]
         webbrowser.open(url)
+
+    @pyqtSlot(str)
+    def on_empty_product(self, code):
+        '''Background red line for empty product searched from code'''
+
+        item_index = self._model._foods.match(self._model._foods.index(0,1),
+                                              Qt.DisplayRole,
+                                              code,
+                                              Qt.MatchContains)
+        target = self._model._foods
+        target.setData(target.index(item_index[0].row(),0),
+                                   QBrush(Qt.red),
+                                   Qt.BackgroundRole)
