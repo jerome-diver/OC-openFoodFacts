@@ -1,6 +1,6 @@
 '''Sign-up Qt-5 Dialog view'''
 
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QLineEdit
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from ui import Ui_SignUp
 from view.share_methods import Share
@@ -12,6 +12,8 @@ class SignUp(QDialog, Ui_SignUp, Share):
         super().__init__()
         self.controller = controller
         self.setupUi(self)
+        self.password.setEchoMode(QLineEdit.Password)
+        self.passwd_confirm.setEchoMode(QLineEdit.Password)
 
     @pyqtSlot()
     def on_reset_status(self):

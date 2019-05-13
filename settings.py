@@ -6,12 +6,13 @@ CWD = os.path.dirname(os.path.abspath(__file__))
 
 # -- m y S Q L   S E T T I N G S  --
 
-GRANT_USER = 'root'
+GRANT_USER = os.getenv("MARIA_GRANT_OFF_USER")
     # protect password by pass a environment OS variable
 #GRANT_USER_PASSWD = os.getenv("HOME")
-GRANT_USER_PASSWD = os.getenv("MARIA_ROOT_PASSWD")
+GRANT_USER_PASSWD = os.getenv("MARIA_GRANT_OFF_PASSWD")
 DB_PORT = 3306
-DB_SOCKET = os.path.join("/run/mysqld/", "mysqld.sock")
+MARIA_RUN_DIR = os.path.dirname("/run/mysqld/")
+DB_SOCKET = os.path.join(MARIA_RUN_DIR, "mysqld.sock")
     # can be "socket" or "tcp"
 DB_CONNECT_MODE = "TCP"
 DB_HOSTNAME = "localhost"

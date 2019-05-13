@@ -31,8 +31,8 @@ class OpenFoodFactsMode(QObject):
                         "url" : self._window.product_url,
                         "img_thumb" : self._window.product_img_thumb,
                        }
-        self._model = OpenFoodFacts(self._database, self._views)
-        self._load_categories = LoadCategories(self._model)
+        self._model = OpenFoodFacts(self._views)
+        self._load_categories = LoadCategories(self._model,self._database)
         self._load_foods = LoadFoods(self._model)
         self._load_product_details = LoadProductDetails(self._model)
         self._check_exist = CheckProductCodeExist(self._model)
@@ -76,6 +76,8 @@ class OpenFoodFactsMode(QObject):
             self.on_detail_product_url_clicked)
         self._check_exist.empty_product.connect(
             self.on_empty_product)
+        self._model.substitutes.itemChanged.connect(
+            self._model.on_substitute_selected)
 
     @pyqtSlot()
     def on_load_categories_finished(self):

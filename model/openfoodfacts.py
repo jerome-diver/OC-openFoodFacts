@@ -16,27 +16,28 @@ class OpenFoodFacts(QObject):
     status_message = pyqtSignal(str)
     update_details_view = pyqtSignal()
 
-    def __init__(self, database, views):
+    def __init__(self, views=None):
         super().__init__()
-        self._database = database
         self._views = views
-        self._db_categories = []
-        self._categories = QStandardItemModel(self._views['categories'])
-        self._foods = QStandardItemModel(self._views["foods"])
-        self._foods_recorded = []
-        self._substitutes = QStandardItemModel(self._views["substitutes"])
-        self._substitutes.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
-        self._details = { "name": "",
-                          "description" : "",
-                          "shops" : QStandardItemModel(self._views["shops"]),
-                          "url" : "",
-                          "score" : "",
-                          "brand" : "",
-                          "packaging" : "",
-                          "img_thumb" : "",
-                          }
-        self._codes = []
-        self._empty_product_code = []
+        if views != None:
+            self._db_categories = []
+            self._categories = QStandardItemModel(self._views['categories'])
+            self._foods = QStandardItemModel(self._views["foods"])
+            self._foods_recorded = []
+            self._substitutes = QStandardItemModel(self._views["substitutes"])
+            self._substitutes.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
+            self._details = { "name": "",
+                              "description" : "",
+                              "shops" : QStandardItemModel(self._views["shops"]),
+                              "url" : "",
+                              "score" : "",
+                              "brand" : "",
+                              "packaging" : "",
+                              "img_thumb" : "",
+                              }
+            self._codes = []
+            self._empty_product_code = []
+            self._selected_substitutes = []
 
     @property
     def categories(self):
@@ -70,8 +71,9 @@ class OpenFoodFacts(QObject):
         self._categories.removeRows(0, self.foods.rowCount())
         for category in categories:
             is_fr = re.match(r'^fr:', category["name"])
+            is_not_fr = re.match(r'^[^fr]:', category["name"])
             is_latin_chars = re.match(r'[0-9a-zA-z\s]', category["name"])
-            if is_latin_chars:
+            if is_latin_chars and not is_not_fr:
                 find = re.sub(r'^fr:', '', category["name"]) if is_fr \
                     else category["name"]
                 item_name = QStandardItem(find)
@@ -223,3 +225,10 @@ class OpenFoodFacts(QObject):
         self._details["packaging"] = ""
         self._details["img_thumb"] = QPixmap()
         self.update_details_view.emit()
+
+    def on_substitute_selected(self, item):
+        '''From item checkbox selected, add selection to the selected
+        substitutes own list'''
+
+        print("i checked this sunstitute:", item.text(), "/ncorrect ?",
+              item.checkState())

@@ -1,6 +1,7 @@
 '''Genral controller for the application'''
 
 from controller import DatabaseMode, OpenFoodFactsMode
+from controller import UpdateCategories
 from view import MainWindow
 from controller import Authentication
 from PyQt5.QtWidgets import QApplication
@@ -24,6 +25,8 @@ class Controller(QObject):
         self._db_mode = None
         self._off_mode = None
         self.connect_signals()
+        loader = UpdateCategories(self._authenticate.get_database())
+        loader.start()
         sys.exit(self._app.exec_())
 
     def connect_signals(self):
@@ -36,6 +39,8 @@ class Controller(QObject):
             self.on_openfoodfacts_mode)
         self._window.local_mode.clicked.connect(self.on_local_mode)
         self.status_message.connect(self._window.on_status_message)
+        self._authenticate.status_user_connected.connect(
+            self.on_user_connected)
 
     @pyqtSlot()
     def on_quit(self):
@@ -65,7 +70,7 @@ class Controller(QObject):
         if state:
             self._window.local_mode.setChecked(False)
             if self._db_mode:
-                del self._db_mode
+                self._db_mode = None
             if not self._off_mode:
                 self._off_mode = OpenFoodFactsMode(
                     self._window,
@@ -77,3 +82,9 @@ class Controller(QObject):
                 self._off_mode.on_load_product_details_finished()
         else:
             self._window.reset_views()
+
+    @pyqtSlot()
+    def on_user_connected(self):
+        '''When user is connected to his local database'''
+
+        pass

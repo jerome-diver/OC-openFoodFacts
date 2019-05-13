@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
                      DB_SOCKET, DB_CONNECT_MODE, DB_HOSTNAME,\
                      DB_INIT_FILE
-import time
+import re
 
 class Database(QObject):
     '''Database model for user to be abee to record Open Food Facts data
@@ -25,8 +25,6 @@ class Database(QObject):
             self._connect_database(user=GRANT_USER,
                                    passwd=GRANT_USER_PASSWD,
                                    db='information_schema')
-            self._generateDatabase()
-            self._generate_users_role()
         else:
             self._connect_database(user=username,
                                    passwd=password,
@@ -70,7 +68,7 @@ class Database(QObject):
                 Database._connection.close()
 
     @staticmethod
-    def send_request(request, values=None):
+    def send_request(request, values=None, many=False):
         '''Execute database request'''
 
         cursor = None
@@ -78,9 +76,15 @@ class Database(QObject):
             Database._connection.begin()
             cursor = Database._connection.cursor()
             if values:
-                cursor.execute(request, values)
+                if many:
+                    cursor.executemany(request, values)
+                else:
+                    cursor.execute(request, values)
             else:
-                cursor.execute(request)
+                if many:
+                    cursor.executemany(request)
+                else:
+                    cursor.execute(request)
             Database._connection.commit()
         except OperationalError as e:
             print(e.args[0], e.args[1])
@@ -161,3 +165,61 @@ class Database(QObject):
         exist = True if data else False
         db_cursor.close()
         return exist
+
+    def update_categories(self, off_categories):
+        '''Will update categories table of openfoodfacts_substitutes
+        database'''
+
+        def db_categories_status(off_cat, cat):
+            '''Return status variables list:
+            "Missing", "Unknown" and "ToUpdate"
+            of categories table records'''
+
+            off_cat_id_list = []
+            missing_categories = []
+            categories_to_update = []
+            cat_id_list = [ category["item_id"] for category in cat ]
+            for off_category in off_cat:
+                flag_finder = False
+                is_fr = re.match(r'^fr:', off_category["id"])
+                is_en = re.match(r'^en:', off_category["id"])
+                is_latin_chars = re.match(r'[0-9a-zA-z\s]',
+                                          off_category["name"])
+                if is_latin_chars and ( is_fr or is_en ):
+                    off_cat_id_list.append(off_category["id"])
+                    for category in cat:
+                        if off_category["id"] == category["item_id"]:
+                            if off_category["name"] != category["item_name"]:
+                                categories_to_update.append(
+                                    { "id": category["item_id"],
+                                      "name" : category["item_name"]})
+                            flag_finder = True
+                    if not flag_finder:
+                        missing_categories.append( (off_category["id"],
+                                                    off_category["name"]) )
+            unknown_categories = [ cat_id for cat_id in cat_id_list if
+                                   cat_id not in off_cat_id_list ]
+            return (unknown_categories,
+                    missing_categories,
+                    categories_to_update)
+
+        categories = []
+        request = "SELECT item_id, item_name FROM categories;"
+        for row in self.ask_request(request):
+            categories.append(row)
+
+        unknown, missing, to_update = db_categories_status(off_categories,
+                                                           categories)
+        if to_update:
+            request = "UPDATE openfoodfacts_substitutes " \
+                      "SET item_name=%s WHERE item_id=%s ;"
+            for fields in to_update:
+                self.send_request(request, (fields["name"], fields["id"]))
+        if missing:
+            request = "INSERT INTO categories (item_id, item_name) " \
+                      "VALUES (%s, %s) ;"
+            self.send_request(request, missing, True)
+        if unknown:
+            request = "DELETE FROM categories WHERE item_id=%s ;"
+            for id in unknown:
+                self.send_request(request, (id))

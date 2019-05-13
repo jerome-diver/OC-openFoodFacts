@@ -35,8 +35,33 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_nickname">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Prénom</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nickname"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="password"/>
+     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_username">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Nom d'utilisateur</string>
        </property>
@@ -44,27 +69,29 @@
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_password">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Mot de passe</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_nickname">
-       <property name="text">
-        <string>Prénom</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_familyname">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Nom de famille</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="nickname"/>
      </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="familyname"/>
@@ -72,8 +99,21 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="username"/>
      </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="password"/>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="passwd_confirm"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <family>Ubuntu Condensed</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Confirmer mot de passe</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -136,6 +176,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="record">
+       <property name="font">
+        <font>
+         <family>Ubuntu</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>S'enregistrer</string>
        </property>
@@ -143,6 +191,14 @@
      </item>
      <item>
       <widget class="QPushButton" name="cancel">
+       <property name="font">
+        <font>
+         <family>Ubuntu</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>Annuler</string>
        </property>

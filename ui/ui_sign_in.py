@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'sign-in.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.12.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -24,9 +24,17 @@ class Ui_SignIn(object):
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
         self.label_username = QtWidgets.QLabel(SignIn)
+        font = QtGui.QFont()
+        font.setFamily("Ubuntu Condensed")
+        font.setPointSize(9)
+        self.label_username.setFont(font)
         self.label_username.setObjectName("label_username")
         self.gridLayout.addWidget(self.label_username, 0, 0, 1, 1)
         self.label_password = QtWidgets.QLabel(SignIn)
+        font = QtGui.QFont()
+        font.setFamily("Ubuntu Condensed")
+        font.setPointSize(9)
+        self.label_password.setFont(font)
         self.label_password.setObjectName("label_password")
         self.gridLayout.addWidget(self.label_password, 1, 0, 1, 1)
         self.username = QtWidgets.QLineEdit(SignIn)
@@ -63,9 +71,21 @@ class Ui_SignIn(object):
         self.horizontalLayout.addItem(spacerItem1)
         self.connection = QtWidgets.QPushButton(SignIn)
         self.connection.setMaximumSize(QtCore.QSize(100, 50))
+        font = QtGui.QFont()
+        font.setFamily("Ubuntu")
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.connection.setFont(font)
         self.connection.setObjectName("connection")
         self.horizontalLayout.addWidget(self.connection)
         self.cancel = QtWidgets.QPushButton(SignIn)
+        font = QtGui.QFont()
+        font.setFamily("Ubuntu")
+        font.setPointSize(9)
+        font.setBold(True)
+        font.setWeight(75)
+        self.cancel.setFont(font)
         self.cancel.setObjectName("cancel")
         self.horizontalLayout.addWidget(self.cancel)
         self.verticalLayout.addLayout(self.horizontalLayout)

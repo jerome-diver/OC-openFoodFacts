@@ -2,6 +2,7 @@
 
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QLineEdit
 from ui import Ui_SignIn
 from view.share_methods import Share
 
@@ -12,6 +13,7 @@ class SignIn(QDialog, Ui_SignIn, Share):
         super().__init__()
         self.controller = controller
         self.setupUi(self)
+        self.password.setEchoMode(QLineEdit.Password)
 
     @pyqtSlot()
     def on_reset_status(self):

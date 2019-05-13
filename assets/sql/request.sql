@@ -1,8 +1,7 @@
 CREATE DATABASE IF NOT EXISTS openfoodfacts_substitutes;
 USE openfoodfacts_substitutes;
 CREATE TABLE IF NOT EXISTS categories (
-    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    item_id VARCHAR(256),
+    item_id VARCHAR(256) NOT NULL PRIMARY KEY,
     item_name VARCHAR(256));
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
@@ -25,7 +24,7 @@ CREATE TABLE IF NOT EXISTS shops (
     url VARCHAR(256));
 CREATE TABLE IF NOT EXISTS food_categories (
     food_id INT,
-    category_id INT,
+    category_id VARCHAR(256),
     CONSTRAINT fk_food_categories__food_id
         FOREIGN KEY (food_id)
         REFERENCES foods (id)
@@ -33,7 +32,7 @@ CREATE TABLE IF NOT EXISTS food_categories (
             ON UPDATE CASCADE,
     CONSTRAINT fk_food_categories__categories_id
         FOREIGN KEY (category_id)
-        REFERENCES categories (id)
+        REFERENCES categories (item_id)
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     CONSTRAINT unique_food_categoriee

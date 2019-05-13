@@ -36,7 +36,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.foods_list.show()
 
     def show_substitutes(self, model):
-        '''Show moedl inside substitutes table view'''
+        '''Show model inside substitutes table view'''
 
         self.substitutes_list.setModel(model)
         self.statusBar.showMessage("Produits possibles de substitutions "
