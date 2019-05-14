@@ -53,6 +53,11 @@ class Database(QObject):
                 self.status_message.emit("Failed connection between", user,
                                          "and", db)
 
+    def disconnect_database(self):
+        '''Disconnect to the database'''
+
+        Database._connection.close()
+
     def _connect_to_off_db(self):
         '''Connect the current user on database'''
 

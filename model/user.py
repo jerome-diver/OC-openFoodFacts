@@ -31,6 +31,17 @@ class User(QObject):
             self.status_connected.emit(False, status)
         self._connected = True
         self.status_connected.emit(True, "Vous êtes connecté")
+        request = "SELECT nick_name, family_name FROM users " \
+                  "WHERE username = %s;"
+        for row in self._database.ask_request(request, self._username):
+            self._family = row["family_name"]
+            self._nick = row["nick_name"]
+        print(self._nick, self._family)
+
+    def disconnect(self):
+        '''disconnectuser to local database'''
+
+        self._database.disconnect_database()
 
     @property
     def connected(self):

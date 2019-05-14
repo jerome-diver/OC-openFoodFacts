@@ -51,7 +51,7 @@ class Authentication(QObject):
         self.status_message.connect(self.signup.on_status)
         self._user.status_connected.connect(self.on_connection_return)
 
-    @pyqtSlot()
+    #@pyqtSlot()
     def on_sign_in(self):
         '''Sing-in button slot'''
 
@@ -100,7 +100,6 @@ class Authentication(QObject):
 
         username = self.signin.username.text()
         password = self.signin.password.text()
-        print("try to connect user", username, "with password", password)
         self._user.connect(username, password)
 
     def new_user(self):

@@ -33,7 +33,7 @@ class Controller(QObject):
         '''Let's connect signals to slots for concerned controller'''
 
         self._window.quit.clicked.connect(self.on_quit)
-        self._window.signin.clicked.connect(self._authenticate.on_sign_in)
+        self._window.signin.clicked.connect(self.on_sign_in)
         self._window.signup.clicked.connect(self._authenticate.on_sign_up)
         self._window.openfoodfacts_mode.clicked.connect(
             self.on_openfoodfacts_mode)
@@ -49,6 +49,19 @@ class Controller(QObject):
         '''Close application slot'''
 
         self._app.closeAllWindows()
+
+    @pyqtSlot()
+    def on_sign_in(self):
+        '''Sing-in button slot'''
+
+        if self._window.signin.text() == "Sign-in":
+            self._authenticate.on_sign_in()
+        else:
+            self._authenticate.user.disconnect()
+            self.status_message.emit("Utilisateur {} {} déconnecté".
+                format(self._authenticate._user._family,
+                       self._authenticate._user._nick))
+            self._window.signin.setText("Sign-in")
 
     @pyqtSlot(bool)
     def on_local_mode(self, state):
@@ -98,6 +111,7 @@ class Controller(QObject):
         if self._off_mode:
             self.on_checked_substitutes(
                     bool(self._off_mode._model._selected_substitutes))
+        self._window.signin.setText("SignOut")
 
     @pyqtSlot(bool)
     def on_checked_substitutes(self, state):
