@@ -8,9 +8,15 @@ from PyQt5.QtCore import QObject, pyqtSignal
 class User(QObject):
     '''A user is connected to openfoodfacts_substitutes database'''
 
-    status_connected = pyqtSignal(bool)
+    status_connected = pyqtSignal(bool, str)
 
-    def __init__(self, username, password, family=None, nick=None):
+    def __init__(self):
+        super().__init__()
+        self._connected = False
+
+    def connect(self, username, password, family=None, nick=None):
+        '''Connect User'''
+
         self._family = family
         self._nick = nick
         self._username = username
@@ -21,8 +27,16 @@ class User(QObject):
                                 password,
                                 'openfoodfacts_substitutes')
         except pymysql.err.OperationalError as e:
-            self.status_connected.emit(False)
-        self.status_connected.emit(True)
+            status = "{}\n{}".format(e.args[0], e.args[1])
+            self.status_connected.emit(False, status)
+        self._connected = True
+        self.status_connected.emit(True, "Vous êtes connecté")
+
+    @property
+    def connected(self):
+        '''Said if User is connected'''
+
+        return self._connected
 
     @property
     def databse(self):

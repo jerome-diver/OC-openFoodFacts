@@ -12,6 +12,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.controller = controller
         self.setupUi(self)
+        self.record.setDisabled(True)
         self.openfoodfacts_mode.setChecked(False)
         self.local_mode.setChecked(False)
         self.substitutes_list.verticalHeader().setVisible(False)
@@ -27,14 +28,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar.showMessage("Catégories affichées")
         self.categories_list.show()
 
-    def show_foods(self, model):
-        '''Show model inside the foods list view'''
-
-        self.foods_list.setModel(model)
-        self.statusBar.showMessage("Liste des produits relatifs à la "
-                                   "catégorie sélectionnée affichées")
-        self.foods_list.show()
-
     def show_substitutes(self, model):
         '''Show model inside substitutes table view'''
 
@@ -47,12 +40,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.substitutes_list.resizeColumnsToContents()
         self.substitutes_list.show()
 
-    def show_product_details(self, model, state = False):
+    def show_product_details(self, model):
         '''Sow models for all details of product selected'''
 
-        if not state:
-            self.statusBar.showMessage("Détails du produit sélectionné "
-                                       "affichés")
+        self.statusBar.showMessage("Détails du produit sélectionné "
+                                   "affichés")
         self.product_name.setText(model["name"])
         self.product_brand.setText(model["brand"])
         self.product_packaging.setText(model["packaging"])

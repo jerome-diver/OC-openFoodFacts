@@ -38,6 +38,8 @@ class Controller(QObject):
         self._window.openfoodfacts_mode.clicked.connect(
             self.on_openfoodfacts_mode)
         self._window.local_mode.clicked.connect(self.on_local_mode)
+        self._window.record.clicked.connect(
+            self.on_record_substitutes)
         self.status_message.connect(self._window.on_status_message)
         self._authenticate.status_user_connected.connect(
             self.on_user_connected)
@@ -75,16 +77,39 @@ class Controller(QObject):
                 self._off_mode = OpenFoodFactsMode(
                     self._window,
                     self._authenticate.get_database())
+                self._off_mode.checked_substitutes_event.connect(
+                    self.on_checked_substitutes)
             else:
                 self._off_mode.on_load_categories_finished()
                 self._off_mode.on_load_foods_finished()
                 self._off_mode.show_substitutes()
                 self._off_mode.on_load_product_details_finished()
+                self._off_mode.checked_substitutes_event.disconnect(
+                    self.on_checked_substitutes)
         else:
             self._window.reset_views()
 
     @pyqtSlot()
     def on_user_connected(self):
         '''When user is connected to his local database'''
+
+        self.status_message.emit("L'utilisateur est connecté à "
+                                 "la base de donnée locale")
+        if self._off_mode:
+            self.on_checked_substitutes(
+                    bool(self._off_mode._model._selected_substitutes))
+
+    @pyqtSlot(bool)
+    def on_checked_substitutes(self, state):
+        '''When signal reset_substitutes from OpenFoodFactsMode is emit
+        button recorded for local database has to be disabled'''
+
+        result = not (bool(self._authenticate.user.connected) and state)
+        self._window.record.setDisabled(result)
+
+    @pyqtSlot()
+    def on_record_substitutes(self):
+        '''Record substitutes selected for product food selected inside
+        local database'''
 
         pass

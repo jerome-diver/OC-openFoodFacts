@@ -20,8 +20,15 @@ class Authentication(QObject):
         self.initialize_database()
         self.signin = SignIn(self)
         self.signup = SignUp(self)
+        self._user = User()
         self.connect_signals()
-        self._user = None
+
+    @property
+    def user(self):
+        '''self._user getter property'''
+
+        return self._user
+
 
     def initialize_database(self):
         '''Initialization of Open Food Facts database'''
@@ -42,6 +49,7 @@ class Authentication(QObject):
         self.signup.record.clicked.connect(self.new_user)
         self.status_message.connect(self.signin.on_status)
         self.status_message.connect(self.signup.on_status)
+        self._user.status_connected.connect(self.on_connection_return)
 
     @pyqtSlot()
     def on_sign_in(self):
@@ -67,19 +75,15 @@ class Authentication(QObject):
             self.signup.close()
         self.dialog_open = None
 
-    @pyqtSlot(bool)
-    def on_connection_return(self, connected):
+    @pyqtSlot(bool, str)
+    def on_connection_return(self, connected, status):
         if connected:
-            QMessageBox.information(None, "Connexion réussie",
-                                    "Vous êtes connecté à vôtre base de "
-                                    "donnée")
+            QMessageBox.information(None, "Connexion réussie", status)
             self.on_close()
-
             self.status_user_connected.emit()
         else:
             self.signin.status.setText("Username or password failed")
-            QMessageBox.information(None, "Problème de connexion",
-                                    "{}\n{}".format(e.args[0], e.args[1]))
+            QMessageBox.information(None, "Problème de connexion", status)
 
 
     @pyqtSlot(str)
@@ -96,8 +100,8 @@ class Authentication(QObject):
 
         username = self.signin.username.text()
         password = self.signin.password.text()
-        self._user = User(username, password)
-        self._user.status_connected.connect( self.on_connection_return)
+        print("try to connect user", username, "with password", password)
+        self._user.connect(username, password)
 
     def new_user(self):
         '''Create a new user'''

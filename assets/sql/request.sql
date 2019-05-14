@@ -1,15 +1,15 @@
 CREATE DATABASE IF NOT EXISTS openfoodfacts_substitutes;
 USE openfoodfacts_substitutes;
 CREATE TABLE IF NOT EXISTS categories (
-    item_id VARCHAR(256) NOT NULL PRIMARY KEY,
-    item_name VARCHAR(256));
+    id VARCHAR(256) NOT NULL PRIMARY KEY,
+    name VARCHAR(256));
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
     family_name VARCHAR(64), 
     nick_name VARCHAR(64), 
     username VARCHAR(16));
 CREATE TABLE IF NOT EXISTS foods (
-    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
+    code INT(13) AUTO_INCREMENT NOT NULL PRIMARY KEY,
     name_ VARCHAR(128), 
     description TINYTEXT,
     url_ VARCHAR(256),
@@ -23,56 +23,56 @@ CREATE TABLE IF NOT EXISTS shops (
     address TEXT,
     url VARCHAR(256));
 CREATE TABLE IF NOT EXISTS food_categories (
-    food_id INT,
+    food_code INT(13),
     category_id VARCHAR(256),
-    CONSTRAINT fk_food_categories__food_id
-        FOREIGN KEY (food_id)
-        REFERENCES foods (id)
+    CONSTRAINT fk_food_categories__food_code
+        FOREIGN KEY (food_code)
+        REFERENCES foods (code)
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     CONSTRAINT fk_food_categories__categories_id
         FOREIGN KEY (category_id)
-        REFERENCES categories (item_id)
+        REFERENCES categories (id)
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     CONSTRAINT unique_food_categoriee
-        UNIQUE (food_id, category_id));
+        UNIQUE (food_code, category_id));
 CREATE TABLE IF NOT EXISTS user_foods (
     user_id INT, 
-    food_id INT,
+    food_code INT(13),
     CONSTRAINT fk_user_foods__users_id 
         FOREIGN KEY (user_id) 
         REFERENCES users (id) 
             ON DELETE CASCADE 
             ON UPDATE CASCADE,
-    CONSTRAINT fk_user_foods__foods_id
-        FOREIGN KEY (food_id) 
-        REFERENCES foods (id) 
+    CONSTRAINT fk_user_foods__foods_code
+        FOREIGN KEY (food_code)
+        REFERENCES foods (code)
             ON DELETE CASCADE 
             ON UPDATE CASCADE,
     CONSTRAINT unique_user_foods
-        UNIQUE (user_id, food_id));
+        UNIQUE (user_id, food_code));
 CREATE TABLE IF NOT EXISTS food_substitutes (
-    food_id INT, 
-    substitute_id INT,
-    CONSTRAINT fk_food_substitutes__foods_id  
-        FOREIGN KEY (food_id) 
-        REFERENCES foods (id) 
+    food_code INT(13),
+    substitute_code INT(13),
+    CONSTRAINT fk_food_substitutes__foods_code
+        FOREIGN KEY (food_code)
+        REFERENCES foods (code)
             ON DELETE CASCADE 
             ON UPDATE CASCADE,
-    CONSTRAINT fk_food_substitutes__substitute_id
-        FOREIGN KEY (substitute_id)  
-        REFERENCES foods (id) 
+    CONSTRAINT fk_food_substitutes__substitute_code
+        FOREIGN KEY (substitute_code)
+        REFERENCES foods (code)
             ON DELETE CASCADE 
             ON UPDATE CASCADE,
     CONSTRAINT unique_food_substitutes
-        UNIQUE (food_id, substitute_id));
+        UNIQUE (food_code, substitute_code));
 CREATE TABLE IF NOT EXISTS food_shops (
-    food_id INT, 
+    food_code INT(13),
     shop_id INT, 
-    CONSTRAINT fk_food_shops__foods_id
-        FOREIGN KEY (food_id) 
-        REFERENCES foods (id) 
+    CONSTRAINT fk_food_shops__foods_code
+        FOREIGN KEY (food_code)
+        REFERENCES foods (code)
             ON DELETE CASCADE 
             ON UPDATE CASCADE,
     CONSTRAINT fk_user_foods__shops_id
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS food_shops (
             ON DELETE CASCADE 
             ON UPDATE CASCADE,
     CONSTRAINT unique_food_shops
-        UNIQUE (shop_id, food_id));
+        UNIQUE (shop_id, food_code));
 CREATE ROLE IF NOT EXISTS openfoodfacts_role;
 GRANT SELECT, INSERT, UPDATE, DELETE, SHOW VIEW
   ON openfoodfacts_substitutes.* TO openfoodfacts_role;

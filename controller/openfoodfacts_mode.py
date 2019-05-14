@@ -5,7 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
                          QModelIndex, Qt
 from PyQt5.QtGui import QBrush
 from controller import LoadCategories, LoadFoods, \
-                       LoadProductDetails, CheckProductCodeExist
+                       LoadProductDetails
 import webbrowser
 
 
@@ -14,6 +14,7 @@ class OpenFoodFactsMode(QObject):
     selected for category list and food list'''
 
     status_message = pyqtSignal(str)
+    checked_substitutes_event = pyqtSignal(bool)
 
     def __init__(self, window, database):
         super().__init__()
@@ -33,51 +34,35 @@ class OpenFoodFactsMode(QObject):
                        }
         self._model = OpenFoodFacts(self._views)
         self._load_categories = LoadCategories(self._model,self._database)
-        self._load_foods = LoadFoods(self._model)
         self._load_product_details = LoadProductDetails(self._model)
-        self._check_exist = CheckProductCodeExist(self._model)
+        self._load_foods = None
         self.connect_signals()
         self._load_categories.start()
-        self.status_message.emit("Patientez, recherche des catégories "
-                                 "disponibles en cours sur Open Food "
-                                 "Facts...")
 
 
     def connect_signals(self):
         '''Let's connect signals to slots for concerned controller'''
 
         self._window.categories_list.clicked.connect(
-            self._model.reset_substitute_list)
-        self._window.categories_list.clicked.connect(
             self.on_category_selected)
-        self._window.foods_list.clicked.connect(
-            self._model.reset_product_details)
         self._window.foods_list.clicked.connect(
             self.on_food_selected)
         self._window.substitutes_list.clicked.connect(
             self.on_product_selected)
-        self.status_message.connect(
-            self._window.on_status_message)
+        self._model._substitutes.itemChanged.connect(
+            self.on_substitute_checked)
+        self._window.product_url.clicked.connect(
+            self.on_product_url_clicked)
         self._load_categories.finished.connect(
             self.on_load_categories_finished)
-        self._load_foods.finished.connect(
-            self.on_load_foods_finished)
         self._load_product_details.finished.connect(
             self.on_load_product_details_finished)
-        self._model.error_signal.connect(
-            self._window.on_error_message)
-        self._model.status_message.connect(
+        self._load_product_details.status_message.connect(
             self._window.on_status_message)
-        self._model.update_details_view.connect(
-            self.update_product_details)
-        self._window.product_url.clicked.connect(
-            self.on_detail_product_url_clicked)
-        self._window.product_name.linkActivated.connect(
-            self.on_detail_product_url_clicked)
-        self._check_exist.empty_product.connect(
-            self.on_empty_product)
-        self._model.substitutes.itemChanged.connect(
-            self._model.on_substitute_selected)
+        self._load_product_details.error_signal.connect(
+            self._window.on_error_message)
+        self.status_message.connect(
+            self._window.on_status_message)
 
     @pyqtSlot()
     def on_load_categories_finished(self):
@@ -90,10 +75,20 @@ class OpenFoodFactsMode(QObject):
     def on_load_foods_finished(self):
         '''Show food's products from Open Food Facts'''
 
-        self._window.show_foods(self._model.foods)
-        if self._model._codes:
-            self._check_exist.codes = self._model._codes
-            self._check_exist.start()
+        self.status_message.emit("Tous les produits de la catégorie sont "
+                                 "affichés")
+        print("End process to load foods")
+
+    @pyqtSlot(int, int)
+    def on_new_food_page(self, page, total):
+        '''Reload the view for new page added'''
+
+        self._window.foods_list.setModel(self._model.foods)
+        self.status_message.emit("Affichage des produits en cours... "
+                                 "pages: {} affichées | {} restantes".
+                                format(page, total))
+        if self._model._selected_food:
+            self._model.populate_substitutes(self._model._selected_food, False)
 
     @pyqtSlot()
     def on_load_product_details_finished(self):
@@ -106,6 +101,18 @@ class OpenFoodFactsMode(QObject):
         '''Slot for next action on clicked category selection from
         category list view'''
 
+        if self._load_foods:
+            if self._load_foods.isRunning():
+                self._load_foods.terminate()
+                self._load_foods.wait()
+        if self._model.foods:
+            self._model.reset_foods_list()
+        if self._model.substitutes:
+            self._model.reset_substitutes_list()
+            self._model.reset_product_details()
+        self._load_foods = LoadFoods(self._model)
+        self._load_foods.finished.connect(self.on_load_foods_finished)
+        self._load_foods.get_a_page.connect(self.on_new_food_page)
         self.status_message.emit("Patientez, recherche des produits "
                                  "relatifs à la catégorie en cours "
                                  "sur Open Food Facts...")
@@ -121,7 +128,8 @@ class OpenFoodFactsMode(QObject):
         self.status_message.emit("Patientez, recherche des produits "
                                  "de substitutions proposés en cours "
                                  "sur Open Food Facts...")
-        food_selected = index.data
+        food_selected = index.data()
+        self._model._selected_food = index
         self._model.populate_substitutes(food_selected)
         self.show_substitutes()
 
@@ -134,40 +142,37 @@ class OpenFoodFactsMode(QObject):
     def on_product_selected(self, index):
         '''Slot for next action after selected a substitute's product'''
 
-        code = self._views["substitutes"].model().index(index.row(), 2).data()
+        sub_model = self._views["substitutes"].model()
+        index_code = sub_model.index(index.row(), 2)
+        index_name = sub_model.index(index.row(), 0)
+        code = index_code.data()
         self.status_message.emit("Patientez, recherche sur le code produit "
                                  "{}".format(code))
         self._load_product_details.code = code
         self._load_product_details.start()
 
     @pyqtSlot()
-    def update_product_details(self):
-        '''Update product selected details'''
-
-        self._window.show_product_details(self._model.details, True)
-
-    @pyqtSlot()
-    def on_detail_product_url_clicked(self):
+    def on_product_url_clicked(self):
         '''Go to url'''
 
         url = self._model.details["url"]
         webbrowser.open(url)
 
-    @pyqtSlot(str)
-    def on_empty_product(self, code):
-        '''Background red line for empty product searched from code'''
+    @pyqtSlot('QStandardItem*')
+    def on_substitute_checked(self, item):
+        '''From item checkbox selected, add selection to the selected
+        substitutes own list'''
 
-        item_index = self._model._foods.match(self._model._foods.index(0,1),
-                                              Qt.DisplayRole,
-                                              code,
-                                              Qt.MatchContains)
-        self._model._empty_product_code.append(code)
-        target = self._model._foods
-        t_index = target.index(item_index[0].row(),0)
-        target.setData(t_index, QBrush(Qt.red), Qt.BackgroundRole)
-        target.itemFromIndex(t_index).setEnabled(False)
-        if self._model._substitutes.rowCount() != 0:
-            selections = self._window.foods_list.selectionModel()
-            if selections.hasSelection():
-                indexes = selections.selectedIndexes()
-                self._model.populate_substitutes(indexes[0].data())
+        index = self._model._substitutes.indexFromItem(item)
+        code = self._model._substitutes.index(index.row(), 2).data()
+        state = item.checkState()
+        print("i checked this substitute index row:", index.row(),
+              " at column:", index.column(), " code is ", code,
+              "and item is checked: ", state)
+        if state == 2:
+            self._model._selected_substitutes.append(code)
+        else:
+            if code in self._model.selected_substitutes:
+                self._model._selected_substitutes.remove(code)
+        self.checked_substitutes_event.emit(
+            bool(self._model._selected_substitutes))
