@@ -137,10 +137,17 @@ class MainWindowModels(QObject):
                 item_grade = QStandardItem(_food["nutrition_grades_tags"][0])
                 item_code = QStandardItem(_food["codes_tags"][1])
                 if "brands_tags" not in _food.keys():
-                    if DEBUG_MODE:
-                        print("missing brands_tags for:", _food["codes_tags"][1])
                     item_name.setBackground(QColor(255,102,0))
                     item_code.setBackground(QColor(255,102,0))
+                    if DEBUG_MODE:
+                        print("missing brands_tags for:", _food["codes_tags"][1])
+                if "stores_tags" not in _food or not _food["stores_tags"]:
+                    item_name.setBackground(QColor(255,50,0))
+                    item_code.setBackground(QColor(255,50,0))
+                    if DEBUG_MODE:
+                        print("!!!! there is no shop for this product: ",
+                              _food["codes_tags"][1],
+                              "!!!!")
                 self._substitutes.appendRow([item_name, item_grade, item_code])
         self._substitutes.sort(1)
 

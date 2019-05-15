@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1050</width>
-    <height>1009</height>
+    <width>1144</width>
+    <height>1103</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,10 +24,10 @@
     <normaloff>:/images/assets/images/icon.png</normaloff>:/images/assets/images/icon.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">background-color: rgb(207, 234, 209);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_7">
+   <layout class="QVBoxLayout" name="verticalLayout_8">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_user_mode">
       <property name="sizeConstraint">
@@ -47,8 +47,25 @@
           <height>250</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <family>Ubuntu</family>
+          <pointsize>11</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+          <underline>false</underline>
+          <stylestrategy>PreferAntialias</stylestrategy>
+          <kerning>false</kerning>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.496, y1:0.494318, x2:0.975, y2:0.494318, stop:0.466102 rgba(243, 243, 243, 253), stop:0.707627 rgba(196, 192, 192, 255), stop:0.877119 rgba(117, 113, 113, 255), stop:1 rgba(74, 74, 74, 255));</string>
+        </property>
         <property name="title">
          <string>Utilisateur</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
@@ -57,6 +74,8 @@
             <font>
              <family>Ubuntu</family>
              <pointsize>10</pointsize>
+             <stylestrategy>PreferAntialias</stylestrategy>
+             <kerning>false</kerning>
             </font>
            </property>
            <property name="text">
@@ -70,6 +89,8 @@
             <font>
              <family>Ubuntu</family>
              <pointsize>10</pointsize>
+             <stylestrategy>PreferAntialias</stylestrategy>
+             <kerning>false</kerning>
             </font>
            </property>
            <property name="text">
@@ -102,7 +123,8 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">border-image: url(:/images/assets/images/openfoodfacts+oc.png);</string>
+         <string notr="true">border-image: url(:/images/assets/images/openfoodfacts+oc.png);
+background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:1, stop:0.0762712 rgba(243, 243, 243, 213), stop:0.423729 rgba(160, 160, 160, 212), stop:0.70339 rgba(84, 84, 84, 224), stop:1 rgba(37, 37, 37, 255));</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -128,15 +150,23 @@
         </property>
         <property name="font">
          <font>
-          <family>Ubuntu Condensed</family>
+          <family>Ubuntu</family>
           <pointsize>11</pointsize>
-          <underline>true</underline>
-          <stylestrategy>NoAntialias</stylestrategy>
+          <weight>75</weight>
+          <bold>true</bold>
+          <underline>false</underline>
+          <stylestrategy>PreferAntialias</stylestrategy>
           <kerning>true</kerning>
          </font>
         </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.496, y1:0.494318, x2:0.975, y2:0.494318, stop:0.466102 rgba(243, 243, 243, 253), stop:0.707627 rgba(196, 192, 192, 255), stop:0.877119 rgba(117, 113, 113, 255), stop:1 rgba(74, 74, 74, 255));</string>
+        </property>
         <property name="title">
          <string>Reherche de substitution d'aliment</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
@@ -163,8 +193,8 @@
              <weight>75</weight>
              <bold>true</bold>
              <underline>false</underline>
-             <stylestrategy>NoAntialias</stylestrategy>
-             <kerning>true</kerning>
+             <stylestrategy>PreferAntialias</stylestrategy>
+             <kerning>false</kerning>
             </font>
            </property>
            <property name="text">
@@ -218,8 +248,8 @@
              <weight>75</weight>
              <bold>true</bold>
              <underline>false</underline>
-             <stylestrategy>NoAntialias</stylestrategy>
-             <kerning>true</kerning>
+             <stylestrategy>PreferAntialias</stylestrategy>
+             <kerning>false</kerning>
             </font>
            </property>
            <property name="text">
@@ -272,6 +302,8 @@
          <family>Ubuntu Condensed</family>
          <pointsize>11</pointsize>
          <underline>true</underline>
+         <stylestrategy>PreferAntialias</stylestrategy>
+         <kerning>false</kerning>
         </font>
        </property>
        <property name="title">
@@ -282,9 +314,11 @@
          <widget class="QListView" name="categories_list">
           <property name="font">
            <font>
-            <family>Ubuntu</family>
+            <family>Ubuntu Condensed</family>
             <pointsize>10</pointsize>
             <underline>false</underline>
+            <stylestrategy>PreferAntialias</stylestrategy>
+            <kerning>false</kerning>
            </font>
           </property>
          </widget>
@@ -297,6 +331,7 @@
          <family>Ubuntu Condensed</family>
          <pointsize>11</pointsize>
          <underline>true</underline>
+         <stylestrategy>PreferAntialias</stylestrategy>
         </font>
        </property>
        <property name="title">
@@ -307,9 +342,11 @@
          <widget class="QListView" name="foods_list">
           <property name="font">
            <font>
-            <family>Ubuntu</family>
+            <family>Ubuntu Condensed</family>
             <pointsize>10</pointsize>
             <underline>false</underline>
+            <stylestrategy>PreferAntialias</stylestrategy>
+            <kerning>false</kerning>
            </font>
           </property>
          </widget>
@@ -325,30 +362,95 @@
         <family>Ubuntu Condensed</family>
         <pointsize>11</pointsize>
         <underline>true</underline>
+        <stylestrategy>PreferAntialias</stylestrategy>
+        <kerning>false</kerning>
        </font>
       </property>
       <property name="title">
        <string>Substituts proposés</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
         <widget class="QSplitter" name="splitter">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <widget class="QTableView" name="substitutes_list">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>0</height>
-           </size>
+         <widget class="QFrame" name="frame_3">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
           </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <underline>false</underline>
-           </font>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QTableView" name="substitutes_list">
+             <property name="minimumSize">
+              <size>
+               <width>400</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Ubuntu Condensed</family>
+               <pointsize>10</pointsize>
+               <underline>false</underline>
+               <stylestrategy>PreferAntialias</stylestrategy>
+               <kerning>false</kerning>
+              </font>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                 <underline>false</underline>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(255, 102, 0);</string>
+               </property>
+               <property name="text">
+                <string>Pas de marque</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                 <underline>false</underline>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: rgb(255, 50, 0);</string>
+               </property>
+               <property name="text">
+                <string>Pas de magasin</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
          <widget class="QGroupBox" name="substitute_selected_grp">
           <property name="maximumSize">
@@ -410,9 +512,11 @@
                 </property>
                 <property name="font">
                  <font>
-                  <family>Ubuntu</family>
-                  <pointsize>10</pointsize>
+                  <family>Ubuntu Condensed</family>
+                  <pointsize>9</pointsize>
                   <underline>false</underline>
+                  <stylestrategy>PreferAntialias</stylestrategy>
+                  <kerning>false</kerning>
                  </font>
                 </property>
                 <property name="text">
@@ -433,6 +537,8 @@
                   <family>Ubuntu</family>
                   <pointsize>10</pointsize>
                   <underline>false</underline>
+                  <stylestrategy>NoAntialias</stylestrategy>
+                  <kerning>false</kerning>
                  </font>
                 </property>
                </widget>
@@ -525,6 +631,8 @@
                   <family>Ubuntu</family>
                   <pointsize>10</pointsize>
                   <underline>false</underline>
+                  <stylestrategy>PreferAntialias</stylestrategy>
+                  <kerning>false</kerning>
                  </font>
                 </property>
                </widget>
@@ -642,6 +750,8 @@
                   <family>Ubuntu</family>
                   <pointsize>10</pointsize>
                   <underline>false</underline>
+                  <stylestrategy>PreferAntialias</stylestrategy>
+                  <kerning>false</kerning>
                  </font>
                 </property>
                </widget>
@@ -659,6 +769,8 @@
                   <family>Ubuntu</family>
                   <pointsize>10</pointsize>
                   <underline>false</underline>
+                  <stylestrategy>PreferAntialias</stylestrategy>
+                  <kerning>false</kerning>
                  </font>
                 </property>
                 <property name="acceptDrops">
@@ -743,7 +855,14 @@
            <weight>75</weight>
            <bold>true</bold>
            <underline>false</underline>
+           <stylestrategy>PreferAntialias</stylestrategy>
+           <kerning>false</kerning>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.496, y1:0.494318, x2:0.975, y2:0.494318, stop:0.29661 rgba(243, 107, 107, 103), stop:0.627119 rgba(201, 33, 33, 139), stop:0.860169 rgba(138, 91, 91, 235), stop:1 rgba(60, 60, 60, 255));
+color: rgb(155, 155, 155);
+selection-color: rgb(255, 255, 255);</string>
          </property>
          <property name="text">
           <string>Enregistrer dans ma base</string>
