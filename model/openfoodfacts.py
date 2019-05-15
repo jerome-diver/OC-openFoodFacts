@@ -1,9 +1,9 @@
 '''OpenFoodFacts link API of openFoodFacts online with application'''
 
 from model.mainwindow_models import MainWindowModels
-from PyQt5.QtCore import pyqtSlot, QModelIndex
+from PyQt5.QtCore import pyqtSlot, QModelIndex, Qt
 import openfoodfacts
-import requests
+from settings import DEBUG_MODE
 
 class OpenFoodFacts(MainWindowModels):
     '''Model for Open Food Facts data requests'''
@@ -11,6 +11,8 @@ class OpenFoodFacts(MainWindowModels):
     def __init__(self, views=None):
         super().__init__(views)
         self._products_count = 0
+        self._checked_substitutes_list = []
+        self._checked_details_dict = {}
 
     def download_categories(self):
         '''Download categories and return them sorted by name'''
@@ -49,7 +51,7 @@ class OpenFoodFacts(MainWindowModels):
 
         return self._products_count
 
-    def download_product(self, code):
+    def download_product(self, code, name):
         '''Return product for this code'''
 
         def normalize(product):
@@ -76,8 +78,45 @@ class OpenFoodFacts(MainWindowModels):
             if "stores_tags" not in product:
                 product["stores_tags"] = ""
 
-        product = openfoodfacts.products.get_by_facets({ "code" : code })
-        if product and len(product[0]) != 0:
-            normalize(product[0])
-            return product[0]
+        product = openfoodfacts.products.advanced_search( {
+                "search_terms" : name,
+                "tagtype_0": "codes_tags",
+                "tag_contains_0": "contains",
+                "tag_0": code,
+                "country": "france" })
+        if product["count"] == 1:
+            normalize(product["products"][0])
+            return product["products"][0]
+        elif product["count"] == 0 and DEBUG_MODE:
+            print("====== NO PRODUCT FOUND ======")
+        elif DEBUG_MODE:
+            print("====== FIND MANY PRODUCT FOR CODE:", code,
+                  "AND [product_name]:", name, "======")
         return None
+
+    def generate_checked_list(self):
+        '''Return list of checked item codes'''
+
+        checked_l = []
+        for index in range(self._substitutes.rowCount()):
+            item = self._substitutes.item(index, 0)
+            code = self._substitutes.item(index, 2).text()
+            if item.checkState() == Qt.Checked:
+                checked_l.append( code )
+        self._checked_substitutes_list = checked_l
+        if DEBUG_MODE:
+            print("checked list:", self._checked_substitutes_list)
+
+    @property
+    def checked_substitutes_list(self):
+        '''Return checked list containing list of codes of substitutes
+        validate for be recorded'''
+
+        return self._checked_substitutes_list
+
+    @property
+    def checked_details_dict(self):
+        '''Return details list as { code: (details) } list from selected
+        substitutes products to be recorded'''
+
+        return self._checked_details_dict

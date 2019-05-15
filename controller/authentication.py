@@ -4,7 +4,6 @@ from model import Database, User
 from view import SignUp, SignIn
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
-import pymysql
 
 
 class Authentication(QObject):

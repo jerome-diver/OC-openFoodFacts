@@ -5,7 +5,7 @@ from pymysql.err import OperationalError
 from PyQt5.QtCore import pyqtSignal, QObject
 from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
                      DB_SOCKET, DB_CONNECT_MODE, DB_HOSTNAME,\
-                     DB_INIT_FILE
+                     DB_INIT_FILE, DEBUG_MODE
 import re
 
 class Database(QObject):
@@ -92,7 +92,8 @@ class Database(QObject):
                     cursor.execute(request)
             Database._connection.commit()
         except OperationalError as e:
-            print(e.args[0], e.args[1])
+            if DEBUG_MODE:
+                print(e.args[0], e.args[1])
             Database._connection.rollback()
             Database.status_message.emit("Erreur lors de l'exécution de "
                                 "la requête SQL dans la base de donnée")
@@ -114,7 +115,8 @@ class Database(QObject):
                 cursor.execute(request)
             Database._connection.commit()
         except OperationalError as e:
-            print(e.args[0], e.args[1])
+            if DEBUG_MODE:
+                print(e.args[0], e.args[1])
             Database._connection.rollback()
         finally:
             if cursor:

@@ -4,10 +4,11 @@
         substitutes_list
         product_details'''
 
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QImage, QPixmap
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, \
+                        QImage, QPixmap, QColor
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
-    NUTRISCORE_D, NUTRISCORE_E
+    NUTRISCORE_D, NUTRISCORE_E, DEBUG_MODE
 from urllib.request import urlopen
 import re
 
@@ -18,7 +19,6 @@ class MainWindowModels(QObject):
     def __init__(self, views=None):
         super().__init__()
         self._views = views
-        self._selected_food = None
         if views != None:
             self._db_categories = []
             self._categories = QStandardItemModel(self._views['categories'])
@@ -30,13 +30,17 @@ class MainWindowModels(QObject):
                               "shops" : QStandardItemModel(self._views["shops"]),
                               "url" : "",
                               "score" : "",
+                              "score_data": "",
                               "brand" : "",
                               "packaging" : "",
                               "img_thumb" : "",
+                              "img_data": None,
+                              "code" : "",
                               }
             self._codes = []
-            self._foods_recorded = []
-            self._empty_product_code = []
+            self._foods_recorded = [] # [ [] ]  |as pages of foods
+            self._selected_categroy = None
+            self._selected_food = ()
             self._selected_substitutes = []
 
     @property
@@ -75,6 +79,12 @@ class MainWindowModels(QObject):
 
         self._selected_substitutes = value
 
+    @property
+    def selected_food(self):
+        '''Selected food (from food list view)'''
+
+        return self._selected_food
+
     def populate_categories(self, categories):
         '''Return all categories inside list categories view
         by openfoodfacts module helper'''
@@ -99,30 +109,38 @@ class MainWindowModels(QObject):
             self._foods.removeRows(0, self._foods.rowCount())
         for food in foods:
             key = "product_name_fr"
-            if food[key].strip().isspace() or food[key] == '':
-                print("no way for:", food[key])
+            if food[key].strip().isspace() or food[key] == '' and DEBUG_MODE:
+                print("no way (no product name) for:", food["codes_tags"][1])
             else:
                 item = QStandardItem(food[key].strip())
                 code = QStandardItem(food["codes_tags"][1])
-                self._foods.appendRow([item, code])
+                score = QStandardItem(food["nutrition_grades_tags"][0])
+                self._foods.appendRow([item, code, score])
             self._codes.append(food["codes_tags"][1])
         self._foods.sort(0)
 
 
-    def populate_substitutes(self, food, new=True):
+    def populate_substitutes(self, food, page=0, new=True):
         '''Return the list of possible substitution products inside
         substitutes list view'''
 
         if new:
             self._substitutes.removeRows(0, self._substitutes.rowCount())
-        for _food in self._foods_recorded: #foods_grade_sorted:
+        for _food in self._foods_recorded[page]:
             if _food["product_name_fr"] != food \
                     and _food["nutrition_grades_tags"][0] != "not-applicable" \
-                    and _food["codes_tags"][1] not in self._empty_product_code:
+                    and _food["codes_tags"][1] not in self._empty_product_code\
+                    and _food["nutrition_grades_tags"][0] <= \
+                        self._selected_food[1] :
                 item_name = QStandardItem(_food["product_name_fr"])
                 item_name.setCheckable(True)
                 item_grade = QStandardItem(_food["nutrition_grades_tags"][0])
                 item_code = QStandardItem(_food["codes_tags"][1])
+                if "brands_tags" not in _food.keys():
+                    if DEBUG_MODE:
+                        print("missing brands_tags for:", _food["codes_tags"][1])
+                    item_name.setBackground(QColor(255,102,0))
+                    item_code.setBackground(QColor(255,102,0))
                 self._substitutes.appendRow([item_name, item_grade, item_code])
         self._substitutes.sort(1)
 
@@ -130,15 +148,16 @@ class MainWindowModels(QObject):
         '''Return the full views models of views for show product details'''
 
         url = "<a href=\"" + food["url"] + "\" />"
-        self._details["shops"].removeRows(0,
-                                          self._details["shops"].rowCount())
+        self._details["code"] = food["codes_tags"][1]
+        self._details["shops"].removeRows(0, self._details["shops"].rowCount())
         self._details["name"] = url + food["product_name_fr"] + "</a>"
         self._details["description"] = food["ingredients_text"]
         for shop in food["stores_tags"]:
             item = QStandardItem(shop)
             self._details["shops"].appendRow(item)
         self._details["url"] = food["url"]
-        score = food["nutrition_grade_fr"]
+        score = food["nutrition_grades_tags"][0]
+        self._details["score_data"] = score
         if score == "a":
             self._details["score"] = QPixmap(NUTRISCORE_A)
         if score == "b":
@@ -149,12 +168,12 @@ class MainWindowModels(QObject):
             self._details["score"] = QPixmap(NUTRISCORE_D)
         if score == "e":
             self._details["score"] = QPixmap(NUTRISCORE_E)
-        #self._details["score"].scaled(32, 64)
         self._details["score"].scaledToWidth(64)
         self._details["packaging"] = food["packaging"]
         self._details["brand"] = food["brands_tags"]
         img_url = food["image_front_url"]
         data_front = urlopen(img_url).read()
+        self._details["img_data"] = data_front
         img_front = QImage()
         img_front.loadFromData(data_front)
         self._details["img_thumb"] = QPixmap(img_front)
@@ -163,7 +182,7 @@ class MainWindowModels(QObject):
     def reset_foods_list(self):
         '''Reset the foods list'''
 
-        self._selected_food = None
+        self._selected_food = ()
         self._foods.removeRows(0, self._foods.rowCount())
 
     def reset_substitutes_list(self):

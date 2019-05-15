@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 import sys
-import pymysql
 
 
 class Controller(QObject):
@@ -92,6 +91,8 @@ class Controller(QObject):
                     self._authenticate.get_database())
                 self._off_mode.checked_substitutes_event.connect(
                     self.on_checked_substitutes)
+                self._off_mode._load_product_details.finished.connect(
+                    self.on_load_details_finished)
             else:
                 self._off_mode.on_load_categories_finished()
                 self._off_mode.on_load_foods_finished()
@@ -99,6 +100,8 @@ class Controller(QObject):
                 self._off_mode.on_load_product_details_finished()
                 self._off_mode.checked_substitutes_event.disconnect(
                     self.on_checked_substitutes)
+                self._off_mode._load_product_details.finished.disconnect(
+                    self.on_load_details_finished)
         else:
             self._window.reset_views()
 
@@ -118,8 +121,13 @@ class Controller(QObject):
         '''When signal reset_substitutes from OpenFoodFactsMode is emit
         button recorded for local database has to be disabled'''
 
-        result = not (bool(self._authenticate.user.connected) and state)
-        self._window.record.setDisabled(result)
+        disable = not (bool(self._authenticate.user.connected) and state)
+        if self._off_mode._load_product_details.isFinished():
+            self._window.record.setText("Enregistrer")
+            self._window.record.setDisabled(disable)
+        elif not disable:
+            self._window.record.setText("Téléchargement des "
+                                        "produits sélectionnés")
 
     @pyqtSlot()
     def on_record_substitutes(self):
@@ -127,3 +135,9 @@ class Controller(QObject):
         local database'''
 
         pass
+
+    @pyqtSlot()
+    def on_load_details_finished(self):
+        '''When product substitutes checked details are loaded...'''
+
+        self.on_checked_substitutes(True)

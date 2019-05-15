@@ -7,6 +7,7 @@ from PyQt5.QtGui import QBrush
 from controller import LoadCategories, LoadFoods, \
                        LoadProductDetails
 import webbrowser
+from settings import DEBUG_MODE
 
 
 class OpenFoodFactsMode(QObject):
@@ -41,7 +42,7 @@ class OpenFoodFactsMode(QObject):
 
 
     def connect_signals(self):
-        '''Let's connect signals to slots for concerned controller'''
+        '''Connect signals to slots for concerned controller'''
 
         self._window.categories_list.clicked.connect(
             self.on_category_selected)
@@ -77,7 +78,8 @@ class OpenFoodFactsMode(QObject):
 
         self.status_message.emit("Tous les produits de la catégorie sont "
                                  "affichés")
-        print("End process to load foods")
+        if DEBUG_MODE:
+            print("End process to load foods")
 
     @pyqtSlot(int, int)
     def on_new_food_page(self, page, total):
@@ -88,7 +90,9 @@ class OpenFoodFactsMode(QObject):
                                  "pages: {} affichées | {} restantes".
                                 format(page, total))
         if self._model._selected_food:
-            self._model.populate_substitutes(self._model._selected_food, False)
+            self._model.generate_checked_list()
+            self._model.populate_substitutes(self._model._selected_food,
+                                             page - 1, False)
 
     @pyqtSlot()
     def on_load_product_details_finished(self):
@@ -128,9 +132,11 @@ class OpenFoodFactsMode(QObject):
         self.status_message.emit("Patientez, recherche des produits "
                                  "de substitutions proposés en cours "
                                  "sur Open Food Facts...")
-        food_selected = index.data()
-        self._model._selected_food = index
-        self._model.populate_substitutes(food_selected)
+        food_name = index.data()
+        food_code = self._model._foods.index(index.row(), 1).data()
+        food_score = self._model._foods.index(index.row(), 2).data()
+        self._model._selected_food = (food_code, food_score, food_name)
+        self._model.populate_substitutes(food_name)
         self.show_substitutes()
 
     def show_substitutes(self):
@@ -146,9 +152,11 @@ class OpenFoodFactsMode(QObject):
         index_code = sub_model.index(index.row(), 2)
         index_name = sub_model.index(index.row(), 0)
         code = index_code.data()
+        name = index_name.data()
         self.status_message.emit("Patientez, recherche sur le code produit "
                                  "{}".format(code))
         self._load_product_details.code = code
+        self._load_product_details.name = name
         self._load_product_details.start()
 
     @pyqtSlot()
@@ -166,9 +174,10 @@ class OpenFoodFactsMode(QObject):
         index = self._model._substitutes.indexFromItem(item)
         code = self._model._substitutes.index(index.row(), 2).data()
         state = item.checkState()
-        print("i checked this substitute index row:", index.row(),
-              " at column:", index.column(), " code is ", code,
-              "and item is checked: ", state)
+        if DEBUG_MODE:
+            print("i checked this substitute index row:", index.row(),
+                  "at column:", index.column(), "code is", code,
+                  "and item is checked:", state)
         if state == 2:
             self._model._selected_substitutes.append(code)
         else:

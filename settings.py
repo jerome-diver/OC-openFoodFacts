@@ -27,3 +27,8 @@ NUTRISCORE_D = os.path.join(CWD, "assets/images/nutriscore D.png")
 NUTRISCORE_E = os.path.join(CWD, "assets/images/nutriscore E.png")
 
 REQUEST_PAGE_SIZE = 20
+
+# Set debug mode to show print events on terminal if True
+# (False for no debug messages
+
+DEBUG_MODE = True

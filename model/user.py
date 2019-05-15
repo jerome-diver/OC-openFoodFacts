@@ -4,6 +4,7 @@ it empty if not'''
 import pymysql
 from model import Database
 from PyQt5.QtCore import QObject, pyqtSignal
+from settings import DEBUG_MODE
 
 class User(QObject):
     '''A user is connected to openfoodfacts_substitutes database'''
@@ -36,7 +37,8 @@ class User(QObject):
         for row in self._database.ask_request(request, self._username):
             self._family = row["family_name"]
             self._nick = row["nick_name"]
-        print(self._nick, self._family)
+        if DEBUG_MODE:
+            print(self._nick, self._family)
 
     def disconnect(self):
         '''disconnectuser to local database'''

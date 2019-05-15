@@ -48,6 +48,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.product_name.setText(model["name"])
         self.product_brand.setText(model["brand"])
         self.product_packaging.setText(model["packaging"])
+        self.product_code.setText(model["code"])
         if isinstance(model["score"], QPixmap):
             self.product_score.setPixmap(model["score"])
             self.product_score.setScaledContents(True)
