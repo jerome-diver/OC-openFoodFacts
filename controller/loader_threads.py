@@ -61,13 +61,13 @@ class LoadFoods(QThread):
         page = 1
         pages_to_end = 1
         while pages_to_end != 0:
-            state = True if page == 1 else False
+            first_page = bool(page == 1)
             foods = self._model.download_foods(self._category, page)
             self._model._foods_recorded.append(foods)
-            if page == 1:
+            if first_page:
                 products = self._model.products_count
                 pages_to_end = ceil(products / 20) - 1
-            self._model.populate_foods(foods, state)
+            self._model.populate_foods(foods, first_page)
             self.get_a_page.emit(page, pages_to_end)
             page += 1
             pages_to_end -= 1

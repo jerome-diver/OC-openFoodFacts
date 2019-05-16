@@ -37,9 +37,8 @@ class MainWindowModels(QObject):
                               "img_data": None,
                               "code" : "",
                               }
-            self._codes = []
             self._foods_recorded = [] # [ [] ]  |as pages of foods
-            self._selected_categroy = None
+            self._selected_category = None
             self._selected_food = ()
             self._selected_substitutes = []
 
@@ -72,6 +71,12 @@ class MainWindowModels(QObject):
         '''Selected substitutes list (checked from substitutes list view)'''
 
         return self._selected_substitutes
+
+    @property
+    def selected_category(self):
+        '''Return selected category'''
+
+        return self._selected_category
 
     @selected_substitutes.setter
     def selected_substitutes(self, value):
@@ -106,23 +111,23 @@ class MainWindowModels(QObject):
         with openfoodfacts library helper'''
 
         if new:
-            self._foods.removeRows(0, self._foods.rowCount())
+            self.reset_foods_list()
         for food in foods:
             key = "product_name_fr"
             if food[key].strip().isspace() or food[key] == '' and DEBUG_MODE:
                 print("no way (no product name) for:", food["codes_tags"][1])
             else:
-                item = QStandardItem(food[key].strip())
+                name = QStandardItem(food[key].strip())
                 code = QStandardItem(food["codes_tags"][1])
                 score = QStandardItem(food["nutrition_grades_tags"][0])
-                self._foods.appendRow([item, code, score])
-            self._codes.append(food["codes_tags"][1])
+                self._foods.appendRow([name, code, score])
         self._foods.sort(0)
 
 
     def populate_substitutes(self, food, page=0, new=True):
         '''Return the list of possible substitution products inside
-        substitutes list view'''
+        substitutes list view without the selected one and for score better
+        then selected one and without empty product_name foods'''
 
         if new:
             self._substitutes.removeRows(0, self._substitutes.rowCount())

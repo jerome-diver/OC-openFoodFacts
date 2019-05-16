@@ -85,12 +85,12 @@ class OpenFoodFactsMode(QObject):
     def on_new_food_page(self, page, total):
         '''Reload the view for new page added'''
 
-        self._window.foods_list.setModel(self._model.foods)
         self.status_message.emit("Affichage des produits en cours... "
                                  "pages: {} affichées | {} restantes".
-                                format(page, total))
+                                 format(page, total))
+        if page == 1:
+            self._window.foods_list.setModel(self._model.foods)
         if self._model._selected_food:
-            self._model.generate_checked_list()
             self._model.populate_substitutes(self._model._selected_food,
                                              page - 1, False)
 
@@ -173,6 +173,7 @@ class OpenFoodFactsMode(QObject):
 
         index = self._model._substitutes.indexFromItem(item)
         code = self._model._substitutes.index(index.row(), 2).data()
+        self._model.generate_checked_list()
         state = item.checkState()
         if DEBUG_MODE:
             print("i checked this substitute index row:", index.row(),
