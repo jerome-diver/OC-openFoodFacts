@@ -1,12 +1,14 @@
 '''Mainwindow Qt-5 application'''
 
+import re
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5.QtGui import QStandardItemModel, QPixmap
-from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtCore import pyqtSlot
+
 from ui import Ui_MainWindow
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    '''Main Window application''' 
+    """Main Window application"""
 
     def __init__(self, controller):
         super().__init__()
@@ -62,6 +64,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.product_img_thumb.setScaledContents(True)
 
     def reset_views(self, views=["all"]):
+        '''Reset all views of MainWindow'''
+
         empty_model = QStandardItemModel()
         if "categories" in views or "all" in views:
             self.categories_list.setModel(empty_model)
@@ -81,10 +85,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.product_score.setPixmap(QPixmap())
             self.product_img_thumb.setPixmap(QPixmap())
 
+    def get_bg_color(self):
+        '''Return stylesheet background color tuple of int'''
+
+        bg_isolate = re.sub(r'^background-color: rgb\((\d+)\,\s(\d+)\,'
+                            r'\s(\d+)\);',
+                            r'\1,\2,\3', self.styleSheet())
+        return tuple(int(x) for x in re.split(r'\,', bg_isolate))
+
     @pyqtSlot(str)
     def on_status_message(self, message):
+        '''Slot for status message signal emited from anywhere'''
+
         self.statusBar.showMessage(message)
 
     @pyqtSlot(str)
     def on_error_message(self, message):
+        '''Slot for error message signal send from anywhere'''
+
         QMessageBox.information(self, "Erreur de données", message)

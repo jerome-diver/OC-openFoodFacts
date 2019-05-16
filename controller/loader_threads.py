@@ -1,9 +1,10 @@
 '''Module For threads loaders to run Open Food Facts request call on
 background to not freeze application'''
 
-from PyQt5.QtCore import pyqtSignal, QThread
-from model import OpenFoodFacts
 from math import ceil
+from PyQt5.QtCore import pyqtSignal, QThread
+
+from model import OpenFoodFacts
 from settings import DEBUG_MODE
 
 class LoadCategories(QThread):
@@ -26,7 +27,7 @@ class LoadCategories(QThread):
         categories = []
         request = "SELECT id, name FROM categories ORDER BY name;"
         for row in  self._database.ask_request(request):
-            categories.append( row )
+            categories.append(row)
         if not categories:
             categories = self._model.download_categories()
         self._model.populate_categories(categories)
@@ -44,12 +45,15 @@ class LoadFoods(QThread):
 
     @property
     def category(self):
+        '''Return property of category name'''
+
         return self._category
 
     @category.setter
     def category(self, value):
+        '''Setter for property of category name'''
+
         self._category = value
-        self._model._selected_category = value
 
     def __del__(self):
         self.wait()
@@ -63,7 +67,7 @@ class LoadFoods(QThread):
         while pages_to_end != 0:
             first_page = bool(page == 1)
             foods = self._model.download_foods(self._category, page)
-            self._model._foods_recorded.append(foods)
+            self._model.foods_recorded.append(foods)
             if first_page:
                 products = self._model.products_count
                 pages_to_end = ceil(products / 20) - 1
@@ -88,14 +92,20 @@ class LoadProductDetails(QThread):
 
     @property
     def name(self):
+        '''Return property for product name substitute'''
+
         return self._name
 
     @name.setter
     def name(self, value):
+        '''Setter property for name of substitute product'''
+
         self._name = value
 
     @property
     def code(self):
+        '''Return property for code product substitute'''
+
         return self._code
 
     @code.setter
@@ -121,13 +131,13 @@ class LoadProductDetails(QThread):
                 print("search in list for:", food["codes_tags"][1])
             if food["codes_tags"][1] in self._model.checked_substitutes_list:
                 self._model.checked_details_dict[food["codes_tags"][1]] = (
-                              self._model.details["name"],
-                              self._model.details["description"],
-                              self._model.details["score_data"],
-                              self._model.details["brand"],
-                              self._model.details["packaging"],
-                              self._model.details["url"],
-                              self._model.details["img_data"] )
+                    self._model.details["name"],
+                    self._model.details["description"],
+                    self._model.details["score_data"],
+                    self._model.details["brand"],
+                    self._model.details["packaging"],
+                    self._model.details["url"],
+                    self._model.details["img_data"])
             else:
                 if food["codes_tags"][1] in self._model.checked_details_dict.keys():
                     del self._model.checked_details_dict[food["codes_tags"][1]]
@@ -144,9 +154,22 @@ class UpdateCategories(QThread):
     '''Load categories from Open Food Facts in background in categroies
     table of the openfoodfacts_substitutes database'''
 
-    def __init__(self, database):
+    def __init__(self, database, window):
         super().__init__()
         self._database = database
+        self._window = window
+        self._views = {"categories": self._window.categories_list,
+                       "foods": self._window.foods_list,
+                       "substitutes": self._window.substitutes_list,
+                       "name" : self._window.product_name,
+                       "brand" : self._window.product_brand,
+                       "packaging" : self._window.product_packaging,
+                       "score" : self._window.product_score,
+                       "shops" : self._window.product_shops,
+                       "description" : self._window.product_description,
+                       "url" : self._window.product_url,
+                       "img_thumb" : self._window.product_img_thumb,
+                      }
 
     def __del__(self):
         self.wait()
@@ -156,7 +179,7 @@ class UpdateCategories(QThread):
 
         if DEBUG_MODE:
             print("start to update categories table from OFF categories")
-        off_model = OpenFoodFacts()
+        off_model = OpenFoodFacts(self._views)
         categories = off_model.download_categories()
         self._database.update_categories(categories)
         if DEBUG_MODE:

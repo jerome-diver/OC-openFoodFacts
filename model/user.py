@@ -2,9 +2,10 @@
 it empty if not'''
 
 import pymysql
-from model import Database
 from PyQt5.QtCore import QObject, pyqtSignal
+
 from settings import DEBUG_MODE
+from model import Database
 
 class User(QObject):
     '''A user is connected to openfoodfacts_substitutes database'''
@@ -14,6 +15,10 @@ class User(QObject):
     def __init__(self):
         super().__init__()
         self._connected = False
+        self._family = ""
+        self._nick = ""
+        self._username = ""
+        self._database = None
 
     def connect(self, username, password, family=None, nick=None):
         '''Connect User'''
@@ -21,14 +26,13 @@ class User(QObject):
         self._family = family
         self._nick = nick
         self._username = username
-        self.substitutes_selections = []
         self._database = None
         try:
             self._database = Database(username,
-                                password,
-                                'openfoodfacts_substitutes')
-        except pymysql.err.OperationalError as e:
-            status = "{}\n{}".format(e.args[0], e.args[1])
+                                      password,
+                                      'openfoodfacts_substitutes')
+        except pymysql.err.OperationalError as error:
+            status = "{}\n{}".format(error.args[0], error.args[1])
             self.status_connected.emit(False, status)
         self._connected = True
         self.status_connected.emit(True, "Vous êtes connecté")
@@ -52,8 +56,25 @@ class User(QObject):
         return self._connected
 
     @property
-    def databse(self):
+    def database(self):
         '''Database property getter'''
 
         return self._database
 
+    @property
+    def family(self):
+        '''Return self._family'''
+
+        return self._family
+
+    @property
+    def nick(self):
+        '''Return self._nick'''
+
+        return self._nick
+
+    @property
+    def username(self):
+        '''Return self._username'''
+
+        return self._username

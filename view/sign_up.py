@@ -1,7 +1,7 @@
 '''Sign-up Qt-5 Dialog view'''
 
 from PyQt5.QtWidgets import QDialog, QLineEdit
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSlot
 from ui import Ui_SignUp
 from view.share_methods import Share
 

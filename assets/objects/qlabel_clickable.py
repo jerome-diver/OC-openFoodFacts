@@ -9,7 +9,7 @@ class QLabelClickable(QLabel):
     clicked = pyqtSignal()
 
     def __init__(self, parent=None):
-        super(QLabelClickable, self).__init__(parent)
+        super().__init__(parent)
 
     def mousePressEvent(self, ev):
         '''Event from mouse click'''

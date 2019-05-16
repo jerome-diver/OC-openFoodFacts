@@ -1,10 +1,10 @@
 '''Controller for authentication of user with local database'''
 
-from model import Database, User
-from view import SignUp, SignIn
-from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
 
+from model import Database, User
+from view import SignUp, SignIn
 
 class Authentication(QObject):
     '''Authenticate User on local database'''
@@ -32,9 +32,9 @@ class Authentication(QObject):
     def initialize_database(self):
         '''Initialization of Open Food Facts database'''
 
-        self._db._generateDatabase()
-        self._db._generate_users_role()
-        self._db._connect_to_off_db()
+        self._db.generate_database()
+        self._db.generate_users_role()
+        self._db.connect_to_off_db()
 
     def connect_signals(self):
         '''Let's connect signals to slots for concerned controller'''
@@ -76,6 +76,8 @@ class Authentication(QObject):
 
     @pyqtSlot(bool, str)
     def on_connection_return(self, connected, status):
+        '''Slot for connection action after signal emited'''
+
         if connected:
             QMessageBox.information(None, "Connexion réussie", status)
             self.on_close()
@@ -110,7 +112,7 @@ class Authentication(QObject):
         family_name = self.signup.familyname.text()
         if len(username) <= 6:
             self.status_message.emit("Nom d'utilisateur trop court "
-                                       "(+ de 8 lettres)")
+                                     "(+ de 8 lettres)")
         elif self._db.exist_username(username):
             self.status_message.emit("{} exite déjà".format(username))
         else:

@@ -1,17 +1,17 @@
 '''Controller for OpenFoodFacts API access mode'''
 
-from model import OpenFoodFacts
+import webbrowser
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
-                         QModelIndex, Qt
-from PyQt5.QtGui import QBrush
+                         QModelIndex
+
+from model import OpenFoodFacts
 from controller import LoadCategories, LoadFoods, \
                        LoadProductDetails
-import webbrowser
 from settings import DEBUG_MODE
 
 
 class OpenFoodFactsMode(QObject):
-    '''Print OpenFoodFacts substitutions food 
+    '''Print OpenFoodFacts substitutions food
     selected for category list and food list'''
 
     status_message = pyqtSignal(str)
@@ -21,20 +21,21 @@ class OpenFoodFactsMode(QObject):
         super().__init__()
         self._window = window
         self._database = database
-        self._views = { "categories": self._window.categories_list,
-                        "foods": self._window.foods_list,
-                        "substitutes": self._window.substitutes_list,
-                        "name" : self._window.product_name,
-                        "brand" : self._window.product_brand,
-                        "packaging" : self._window.product_packaging,
-                        "score" : self._window.product_score,
-                        "shops" : self._window.product_shops,
-                        "description" : self._window.product_description,
-                        "url" : self._window.product_url,
-                        "img_thumb" : self._window.product_img_thumb,
-                       }
+        self._views = {"categories": self._window.categories_list,
+                       "foods": self._window.foods_list,
+                       "substitutes": self._window.substitutes_list,
+                       "name" : self._window.product_name,
+                       "brand" : self._window.product_brand,
+                       "packaging" : self._window.product_packaging,
+                       "score" : self._window.product_score,
+                       "shops" : self._window.product_shops,
+                       "description" : self._window.product_description,
+                       "url" : self._window.product_url,
+                       "img_thumb" : self._window.product_img_thumb,
+                       "bg_color": self._window.get_bg_color()}
+
         self._model = OpenFoodFacts(self._views)
-        self._load_categories = LoadCategories(self._model,self._database)
+        self._load_categories = LoadCategories(self._model, self._database)
         self._load_product_details = LoadProductDetails(self._model)
         self._load_foods = None
         self.connect_signals()
@@ -50,7 +51,7 @@ class OpenFoodFactsMode(QObject):
             self.on_food_selected)
         self._window.substitutes_list.clicked.connect(
             self.on_product_selected)
-        self._model._substitutes.itemChanged.connect(
+        self._model.substitutes.itemChanged.connect(
             self.on_substitute_checked)
         self._window.product_url.clicked.connect(
             self.on_product_url_clicked)
@@ -81,19 +82,6 @@ class OpenFoodFactsMode(QObject):
         if DEBUG_MODE:
             print("End process to load foods")
 
-    @pyqtSlot(int, int)
-    def on_new_food_page(self, page, total):
-        '''Reload the view for new page added'''
-
-        self.status_message.emit("Affichage des produits en cours... "
-                                 "pages: {} affichées | {} restantes".
-                                 format(page, total))
-        if page == 1:
-            self._window.foods_list.setModel(self._model.foods)
-        if self._model._selected_food:
-            self._model.populate_substitutes(self._model._selected_food,
-                                             page - 1, False)
-
     @pyqtSlot()
     def on_load_product_details_finished(self):
         '''Show details of product from Open Food Facts'''
@@ -105,6 +93,7 @@ class OpenFoodFactsMode(QObject):
         '''Slot for next action on clicked category selection from
         category list view'''
 
+        self._model.selected_category = index.data()
         if self._load_foods:
             if self._load_foods.isRunning():
                 self._load_foods.terminate()
@@ -120,9 +109,23 @@ class OpenFoodFactsMode(QObject):
         self.status_message.emit("Patientez, recherche des produits "
                                  "relatifs à la catégorie en cours "
                                  "sur Open Food Facts...")
-        self._model._empty_product_code = []
         self._load_foods.category = index.data()
         self._load_foods.start()
+
+    @pyqtSlot(int, int)
+    def on_new_food_page(self, page, total):
+        '''Reload the view for new page added'''
+
+        self.status_message.emit("Affichage des produits en cours... "
+                                 "pages: {} affichées | {} restantes".
+                                 format(page, total))
+        if page == 1:
+            self._window.foods_list.setModel(self._model.foods)
+        if DEBUG_MODE:
+            print("selected food already for:", self._model.selected_food)
+        if self._model._selected_food:
+            self._model.populate_substitutes(self._model.selected_food,
+                                             page - 1, False)
 
     @pyqtSlot(QModelIndex)
     def on_food_selected(self, index):
@@ -133,9 +136,11 @@ class OpenFoodFactsMode(QObject):
                                  "de substitutions proposés en cours "
                                  "sur Open Food Facts...")
         food_name = index.data()
-        food_code = self._model._foods.index(index.row(), 1).data()
-        food_score = self._model._foods.index(index.row(), 2).data()
-        self._model._selected_food = (food_code, food_score, food_name)
+        food_code = self._model.foods.index(index.row(), 1).data()
+        food_score = self._model.foods.index(index.row(), 2).data()
+        self._model.selected_food = (food_code, food_score, food_name)
+        if DEBUG_MODE:
+            print("you are just selecting food:", self._model.selected_food)
         self._model.populate_substitutes(food_name)
         self.show_substitutes()
 
@@ -171,8 +176,8 @@ class OpenFoodFactsMode(QObject):
         '''From item checkbox selected, add selection to the selected
         substitutes own list'''
 
-        index = self._model._substitutes.indexFromItem(item)
-        code = self._model._substitutes.index(index.row(), 2).data()
+        index = self._model.substitutes.indexFromItem(item)
+        code = self._model.substitutes.index(index.row(), 2).data()
         self._model.generate_checked_list()
         state = item.checkState()
         if DEBUG_MODE:
@@ -180,9 +185,21 @@ class OpenFoodFactsMode(QObject):
                   "at column:", index.column(), "code is", code,
                   "and item is checked:", state)
         if state == 2:
-            self._model._selected_substitutes.append(code)
+            self._model.selected_substitutes.append(code)
         else:
             if code in self._model.selected_substitutes:
                 self._model._selected_substitutes.remove(code)
         self.checked_substitutes_event.emit(
-            bool(self._model._selected_substitutes))
+            bool(self._model.selected_substitutes))
+
+    @property
+    def load_product_details(self):
+        '''Return property for QThread instance of LoadProductDetails'''
+
+        return self._load_product_details
+
+    @property
+    def model(self):
+        '''Return model property for OpenFoodFacts instance model'''
+
+        return self._model

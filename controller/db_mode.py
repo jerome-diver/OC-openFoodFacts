@@ -9,4 +9,3 @@ class DatabaseMode():
     def __init__(self, window, database):
         self.window = window
         self.database = database
-

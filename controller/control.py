@@ -1,14 +1,12 @@
 '''Genral controller for the application'''
 
-from controller import DatabaseMode, OpenFoodFactsMode
-from controller import UpdateCategories
-from view import MainWindow
-from controller import Authentication
+import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
-import sys
-
+from controller import DatabaseMode, OpenFoodFactsMode, \
+                       UpdateCategories, Authentication
+from view import MainWindow
 
 class Controller(QObject):
     '''Control everything'''
@@ -24,7 +22,8 @@ class Controller(QObject):
         self._db_mode = None
         self._off_mode = None
         self.connect_signals()
-        loader = UpdateCategories(self._authenticate.get_database())
+        loader = UpdateCategories(self._authenticate.get_database(),
+                                  self._window)
         loader.start()
         sys.exit(self._app.exec_())
 
@@ -58,8 +57,8 @@ class Controller(QObject):
         else:
             self._authenticate.user.disconnect()
             self.status_message.emit("Utilisateur {} {} déconnecté".
-                format(self._authenticate._user._family,
-                       self._authenticate._user._nick))
+                                     format(self._authenticate.user.family,
+                                            self._authenticate.user.nick))
             self._window.signin.setText("Sign-in")
 
     @pyqtSlot(bool)
@@ -91,7 +90,7 @@ class Controller(QObject):
                     self._authenticate.get_database())
                 self._off_mode.checked_substitutes_event.connect(
                     self.on_checked_substitutes)
-                self._off_mode._load_product_details.finished.connect(
+                self._off_mode.load_product_details.finished.connect(
                     self.on_load_details_finished)
             else:
                 self._off_mode.on_load_categories_finished()
@@ -100,7 +99,7 @@ class Controller(QObject):
                 self._off_mode.on_load_product_details_finished()
                 self._off_mode.checked_substitutes_event.disconnect(
                     self.on_checked_substitutes)
-                self._off_mode._load_product_details.finished.disconnect(
+                self._off_mode.load_product_details.finished.disconnect(
                     self.on_load_details_finished)
         else:
             self._window.reset_views()
@@ -112,8 +111,9 @@ class Controller(QObject):
         self.status_message.emit("L'utilisateur est connecté à "
                                  "la base de donnée locale")
         if self._off_mode:
-            self.on_checked_substitutes(
-                    bool(self._off_mode._model._selected_substitutes))
+            self.on_checked_substitutes(bool(self._off_mode.
+                                             model.
+                                             selected_substitutes))
         self._window.signin.setText("SignOut")
 
     @pyqtSlot(bool)
@@ -122,7 +122,7 @@ class Controller(QObject):
         button recorded for local database has to be disabled'''
 
         disable = not (bool(self._authenticate.user.connected) and state)
-        if self._off_mode._load_product_details.isFinished():
+        if self._off_mode.load_product_details.isFinished():
             self._window.record.setText("Enregistrer")
             self._window.record.setDisabled(disable)
         elif not disable:
