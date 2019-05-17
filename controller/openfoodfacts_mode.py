@@ -203,13 +203,6 @@ class OpenFoodFactsMode(QObject):
         url = self._model.product_details.models["url"]
         webbrowser.open(url)
 
-
-    @property
-    def load_product_details(self):
-        '''Return property for QThread instance of LoadProductDetails'''
-
-        return self._load_product_details
-
     @property
     def model(self):
         '''Return model property for OpenFoodFacts instance model'''
