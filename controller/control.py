@@ -22,6 +22,9 @@ class Controller(QObject):
         self._window.show()
         self._db_mode = None
         self._off_mode = None
+        self._flag_user_connected = False
+        self._flag_checked_list = False
+        self._flag_checked_details = False
         self.connect_signals()
         off_model = OpenFoodFacts()
         loader = UpdateCategories(self._authenticate.get_database(),
@@ -40,8 +43,8 @@ class Controller(QObject):
         self._window.local_mode.clicked.connect(self.on_local_mode)
         self._window.record.clicked.connect(self.on_record_substitutes)
         self.status_message.connect(self._window.on_status_message)
-        self._authenticate.status_user_connected.connect(
-            self.on_user_connected)
+        self._authenticate.status_user_connection.connect(
+            self.on_user_connection)
 
     @pyqtSlot()
     def on_quit(self):
@@ -89,46 +92,69 @@ class Controller(QObject):
                 self._off_mode = OpenFoodFactsMode(
                     self._window,
                     self._authenticate.get_database())
-                self._off_mode.checked_substitutes_event.connect(
-                    self.on_checked_substitutes)
-                self._off_mode.load_product_details.finished.connect(
+                self._off_mode.load_details_finished.connect(
                     self.on_load_details_finished)
+                self._off_mode.checked_start.connect(self.on_checked_started)
             else:
                 self._off_mode.on_load_categories_finished()
                 self._off_mode.on_load_foods_finished()
                 self._off_mode.show_substitutes()
                 self._off_mode.on_load_product_details_finished()
-                self._off_mode.checked_substitutes_event.disconnect(
-                    self.on_checked_substitutes)
-                self._off_mode.load_product_details.finished.disconnect(
+                self._off_mode.load__details.finished.disconnect(
                     self.on_load_details_finished)
+                self._off_mode.checked_start.disconnect(
+                    self.on_checked_started)
         else:
             self._window.reset_views()
 
-    @pyqtSlot()
-    def on_user_connected(self):
-        '''When user is connected to his local database'''
-
-        self.status_message.emit("L'utilisateur est connecté à "
-                                 "la base de donnée locale")
-        if self._off_mode:
-            self.on_checked_substitutes(bool(self._off_mode.
-                                             model.
-                                             selected_substitutes))
-        self._window.signin.setText("SignOut")
-
-    @pyqtSlot(bool)
-    def on_checked_substitutes(self, state):
+    def checked_substitutes(self):
         '''When signal reset_substitutes from OpenFoodFactsMode is emit
         button recorded for local database has to be disabled'''
 
-        disable = not (bool(self._authenticate.user.connected) and state)
-        if self._off_mode.load_product_details.isFinished():
-            self._window.record.setText("Enregistrer")
-            self._window.record.setDisabled(disable)
-        elif not disable:
-            self._window.record.setText("Téléchargement des "
-                                        "produits sélectionnés")
+        self._window.record.setEnabled(False)
+        if not self._flag_user_connected:
+            self._window.record.setText("Aucun utilisateur connecté")
+        elif not self._flag_checked_list:
+            self._window.record.setText("Aucune sélection de substitut")
+        if not self._flag_checked_details:
+            self._window.record.setText("Attendez, recherche des détails "
+                                        "pour la sélection")
+        else:
+            self._window.record.setText("Enregistrer dans la base de donnée")
+
+    @pyqtSlot()
+    def on_load_details_finished(self):
+        '''When product substitutes checked details are loaded...'''
+
+        if self._off_mode:
+            self._flag_checked_list = bool(
+                self._off_mode.model.substitutes.checked)
+            self._flag_checked_details = bool(
+                self._off_mode.model.product_details.checked)
+        self.checked_substitutes()
+
+    @pyqtSlot()
+    def on_checked_started(self):
+        '''Slot for receipt signal to said if substitutes list any selection'''
+
+        self._flag_checked_list = True
+        self._flag_checked_details = False
+        self.checked_substitutes()
+
+    @pyqtSlot(bool)
+    def on_user_connection(self, connected):
+        '''When user is connected to his local database'''
+
+        self._flag_user_connected = connected
+        if connected:
+            self.status_message.emit("L'utilisateur est connecté à "
+                                 "la base de donnée locale")
+            self._window.signin.setText("Sign-out")
+        else:
+            self.status_message.emit("L'utilisateur est déconnecté de la base "
+                                     "de donnée locale")
+            self._window.signin.setText("Sign-in")
+        self.checked_substitutes()
 
     @pyqtSlot()
     def on_record_substitutes(self):
@@ -137,8 +163,3 @@ class Controller(QObject):
 
         pass
 
-    @pyqtSlot()
-    def on_load_details_finished(self):
-        '''When product substitutes checked details are loaded...'''
-
-        self.on_checked_substitutes(True)

@@ -61,7 +61,8 @@ class ProductDetailsModels():
         self._models["score"].scaledToWidth(64)
         self._models["packaging"] = food["packaging"]
         self._models["brand"] = food["brands_tags"]
-        img_url = food["image_front_url"]
+        img_url = food["image_front_url"] \
+            if "image_front_url" in food.keys() else ""
         data_front = urlopen(img_url).read()
         self._models["img_data"] = data_front
         img_front = QImage()
@@ -83,3 +84,19 @@ class ProductDetailsModels():
         self._models["brand"] = ""
         self._models["packaging"] = ""
         self._models["img_thumb"] = QPixmap()
+
+    def generate_checked(self, product, substitutes_checked):
+        '''Generate checked list of products details from products checked'''
+
+        if product["codes_tags"][1] in substitutes_checked:
+            self._checked[product["codes_tags"][1]] = (
+                self.models["name"],
+                self.models["description"],
+                self.models["score_data"],
+                self.models["brand"],
+                self.models["packaging"],
+                self.models["url"],
+                self.models["img_data"])
+        else:
+            if product["codes_tags"][1] in self._checked.keys():
+                del self._checked[product["codes_tags"][1]]

@@ -2,10 +2,18 @@
 background to not freeze application'''
 
 from math import ceil
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread
+from enum import Enum
+from PyQt5.QtCore import pyqtSignal, QThread, QObject
 
-from model import OpenFoodFacts
 from settings import DEBUG_MODE
+
+
+class Mode(Enum):
+    '''Enum mode list type'''
+
+    CHECKED = 1
+    SELECTED = 2
+
 
 class LoadCategories(QThread):
     '''Load Categories model in background process to not freeze
@@ -88,11 +96,12 @@ class LoadProductDetails(QThread):
     error_signal = pyqtSignal(str)
     status_message = pyqtSignal(str)
 
-    def __init__(self, model):
+    def __init__(self, model, mode=Mode.SELECTED):
         super().__init__()
         self._model = model
         self._code = ""
         self._name = ""
+        self._mode = mode
 
     @property
     def name(self):
@@ -126,28 +135,21 @@ class LoadProductDetails(QThread):
         mpd = self._model.product_details
         ms = self._model.substitutes
         mpd.reset()
+        if DEBUG_MODE:
+            print("LoadProductDetails start searching for product with "
+                  "code:", self._code, "and name:", self._name)
         self.status_message.emit("Patientez, recherche du produit "
                                  "(code {} ) en cours sur "
                                  "Open Food Facts...".format(self._code))
         food = self._model.download_product(self._code, self._name)
         if food:
-            mpd.populate(food)
-            if DEBUG_MODE:
-                print("search in list for:", food["codes_tags"][1])
-            if food["codes_tags"][1] in ms.checked:
-                mpd.checked[food["codes_tags"][1]] = (
-                    mpd.models["name"],
-                    mpd.models["description"],
-                    mpd.models["score_data"],
-                    mpd.models["brand"],
-                    mpd.models["packaging"],
-                    mpd.models["url"],
-                    mpd.models["img_data"])
-            else:
-                if food["codes_tags"][1] in mpd.checked.keys():
-                    del mpd.checked[food["codes_tags"][1]]
-            if DEBUG_MODE:
-                print("list checked:", mpd.checked)
+            if self._mode == Mode.SELECTED:
+                mpd.populate(food)
+            elif self._mode == Mode.CHECKED:
+                ms.generate_checked()
+                mpd.generate_checked(food, ms.checked)
+                if DEBUG_MODE:
+                    print("list checked:", mpd.checked)
         else:
             mpd.reset()
             self.error_signal.emit("Hélas, il n'y a aucun détail enregistré "
@@ -177,3 +179,74 @@ class UpdateCategories(QThread):
             self._database.update_categories(categories)
         if DEBUG_MODE:
             print("End of update categories table")
+
+
+class ThreadsControler(QObject):
+    '''Proxy class to control threads'''
+
+    def __init__(self, controler):
+        super().__init__()
+        self._controler = controler
+        self._model = controler.model
+        self._load_categories = LoadCategories(self._model, controler.database)
+        self._load_product_details = {Mode.CHECKED: [], Mode.SELECTED: []}
+        self._load_foods = None
+        self._load_categories.start()
+
+    def init_foods_thread(self):
+        '''Initialize foods thread call'''
+
+        self._load_foods = LoadFoods(self._model)
+        self._load_foods.finished.connect(
+            self._controler.on_load_foods_finished)
+        self._load_foods.no_product_found.connect(
+            self._controler.on_no_product_found)
+        self._load_foods.get_a_page.connect(self._controler.on_new_food_page)
+
+
+    def wash_foods_thread(self):
+        '''Cleaner thread for load foods'''
+
+        if self._load_foods:
+            if self._load_foods.isRunning():
+                self._load_foods.terminate()
+                self._load_foods.wait()
+
+    def init_product_details_thread(self, mode):
+        '''Initialize product_details thread call'''
+
+        thread = LoadProductDetails(self._model,mode)
+        self._load_product_details[mode].append(thread)
+        thread.finished.connect(
+            self._controler.on_load_product_details_finished)
+        thread.status_message.connect(self._controler.window.on_status_message)
+        thread.error_signal.connect(self._controler.window.on_error_message)
+        return thread
+
+    def wash_product_details_thread(self, mode):
+        '''Clean product_details thread'''
+
+        if self._load_product_details[mode]:
+            thread = self._load_product_details[mode].pop()
+            if thread:
+                if DEBUG_MODE:
+                    print("thread product details ", mode,
+                          "cleaning process is running")
+                if thread.isRunning():
+                    thread.terminate()
+                    thread.wait()
+
+    def _load_product_for(self, code, name, mode=Mode.SELECTED):
+        '''Request thread for load foods details with item and mode choosed'''
+
+        self.wash_product_details_thread(mode)
+        thread = self.init_product_details_thread(mode)
+        thread.code = code
+        thread.name = name
+        thread.start()
+
+    @property
+    def load_categories(self):
+        '''Property for self._load_categories access'''
+
+        return self._load_categories

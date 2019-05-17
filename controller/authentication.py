@@ -10,7 +10,7 @@ class Authentication(QObject):
     '''Authenticate User on local database'''
 
     status_message = pyqtSignal(str)
-    status_user_connected = pyqtSignal()
+    status_user_connection = pyqtSignal(bool)
 
     def __init__(self):
         super().__init__()
@@ -81,10 +81,10 @@ class Authentication(QObject):
         if connected:
             QMessageBox.information(None, "Connexion réussie", status)
             self.on_close()
-            self.status_user_connected.emit()
         else:
             self.signin.status.setText("Username or password failed")
             QMessageBox.information(None, "Problème de connexion", status)
+        self.status_user_connecton.emit(connected)
 
 
     @pyqtSlot(str)

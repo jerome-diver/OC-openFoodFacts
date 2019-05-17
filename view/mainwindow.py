@@ -3,7 +3,7 @@
 import re
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5.QtGui import QStandardItemModel, QPixmap
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QItemSelectionModel, QSortFilterProxyModel
 
 from ui import Ui_MainWindow
 
@@ -22,6 +22,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar.showMessage("Effectuez une recherche sur Open Food "
                                    "Facts ou authentifiez vous pour accéder "
                                    "à vôtre base de données")
+        self._proxy = QSortFilterProxyModel()
+        self.substitutes_list.setModel(self._proxy)
 
     def show_categories(self, model):
         '''Show model inside the categories list view'''
@@ -33,7 +35,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def show_substitutes(self, model):
         '''Show model inside substitutes table view'''
 
-        self.substitutes_list.setModel(model)
+        self._proxy.setSourceModel(model)
+        self.substitutes_list.setModel(self._proxy)
         self.statusBar.showMessage("Produits possibles de substitutions "
                                    "proposées avec leur score affichées")
         self.substitutes_list.setColumnHidden(2, True)
@@ -46,7 +49,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''Sow models for all details of product selected'''
 
         self.statusBar.showMessage("Détails du produit sélectionné "
-                                   "affichés")
+                                   "trouvés et affichés")
         self.product_name.setText(model["name"])
         self.product_brand.setText(model["brand"])
         self.product_packaging.setText(model["packaging"])
@@ -72,7 +75,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if "foods" in views or "all" in views:
             self.foods_list.setModel(empty_model)
         if "substitutes" in views or "all" in views:
-            self.substitutes_list.setModel(empty_model)
+            self._proxy.setSourceModel(empty_model)
+            self.substitutes_list.setModel(self._proxy)
         if "details" in views or "all" in views:
             self.product_name.setText("")
             self.product_brand.setText("")
