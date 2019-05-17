@@ -4,40 +4,53 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 from settings import DEBUG_MODE
 
-class FoodsModel():
+class FoodsModel(QStandardItemModel):
     '''Mainwindow foods view model'''
 
     def __init__(self, views):
-        super().__init__(views)
+        super().__init__(views["foods"])
         self._views = views
-        self._foods = QStandardItemModel(self._views["foods"])
-        self._foods_recorded = [] # [ [] ]  |as pages of foods
-        self._selected_food = ()
+        self._recorded = [] # [ [] ]  |as pages of foods
+        self._selected = ()
+        self._recorded = []
+        self._count = 0
 
     @property
-    def foods(self):
-        '''Foods list model'''
-
-        return self._foods
-
-    @property
-    def selected_food(self):
+    def selected(self):
         '''Selected food (from food list view)'''
 
-        return self._selected_food
+        return self._selected
 
-    @selected_food.setter
-    def selected_food(self, value):
+    @selected.setter
+    def selected(self, value):
         '''Setter for property of tuple selected_food'''
 
-        self._selected_food = value
+        self._selected = value
 
-    def populate_foods(self, foods, new=True):
+    @property
+    def recorded(self):
+        '''Recorded foods list by page found property'''
+
+        return self._recorded
+
+    @property
+    def count(self):
+        '''Count foods property'''
+
+        return self._count
+
+    @count.setter
+    def count(self, value):
+        '''Setter count property'''
+
+        self._count = value
+
+    def populate(self, foods, new=True):
         '''Return the list wiew of foods for give category string
         with openfoodfacts library helper'''
 
         if new:
-            self.reset_foods_list()
+            self.reset()
         for food in foods:
             key = "product_name_fr"
             if food[key].strip().isspace() or food[key] == '' and DEBUG_MODE:
@@ -46,11 +59,11 @@ class FoodsModel():
                 name = QStandardItem(food[key].strip())
                 code = QStandardItem(food["codes_tags"][1])
                 score = QStandardItem(food["nutrition_grades_tags"][0])
-                self._foods.appendRow([name, code, score])
-        self._foods.sort(0)
+                self.appendRow([name, code, score])
+        self.sort(0)
 
-    def reset_foods_list(self):
+    def reset(self):
         '''Reset the foods list'''
 
-        self._selected_food = ()
-        self._foods.removeRows(0, self._foods.rowCount())
+        self._selected = ()
+        self.removeRows(0, self.rowCount())

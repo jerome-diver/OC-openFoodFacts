@@ -21,6 +21,7 @@ class OpenFoodFactsMode(QObject):
         super().__init__()
         self._window = window
         self._database = database
+        self._internet_flag = False
         self._views = {"categories": self._window.categories_list,
                        "foods": self._window.foods_list,
                        "substitutes": self._window.substitutes_list,
@@ -38,6 +39,7 @@ class OpenFoodFactsMode(QObject):
         self._load_categories = LoadCategories(self._model, self._database)
         self._load_product_details = LoadProductDetails(self._model)
         self._load_foods = None
+        self._no_product = False
         self.connect_signals()
         self._load_categories.start()
 
@@ -45,16 +47,12 @@ class OpenFoodFactsMode(QObject):
     def connect_signals(self):
         '''Connect signals to slots for concerned controller'''
 
-        self._window.categories_list.clicked.connect(
-            self.on_category_selected)
-        self._window.foods_list.clicked.connect(
-            self.on_food_selected)
+        self._window.categories_list.clicked.connect(self.on_category_selected)
+        self._window.foods_list.clicked.connect(self.on_food_selected)
         self._window.substitutes_list.clicked.connect(
             self.on_product_selected)
-        self._model.substitutes.itemChanged.connect(
-            self.on_substitute_checked)
-        self._window.product_url.clicked.connect(
-            self.on_product_url_clicked)
+        self._model.substitutes.itemChanged.connect(self.on_substitute_checked)
+        self._window.product_url.clicked.connect(self.on_product_url_clicked)
         self._load_categories.finished.connect(
             self.on_load_categories_finished)
         self._load_product_details.finished.connect(
@@ -63,8 +61,8 @@ class OpenFoodFactsMode(QObject):
             self._window.on_status_message)
         self._load_product_details.error_signal.connect(
             self._window.on_error_message)
-        self.status_message.connect(
-            self._window.on_status_message)
+        self._model.internet_access.connect(self.on_internet_access)
+        self.status_message.connect(self._window.on_status_message)
 
     @pyqtSlot()
     def on_load_categories_finished(self):
@@ -77,8 +75,9 @@ class OpenFoodFactsMode(QObject):
     def on_load_foods_finished(self):
         '''Show food's products from Open Food Facts'''
 
-        self.status_message.emit("Tous les produits de la catégorie sont "
-                                 "affichés")
+        if not self._no_product:
+            self.status_message.emit("Tous les produits de la catégorie sont "
+                                     "affichés")
         if DEBUG_MODE:
             print("End process to load foods")
 
@@ -86,25 +85,27 @@ class OpenFoodFactsMode(QObject):
     def on_load_product_details_finished(self):
         '''Show details of product from Open Food Facts'''
 
-        self._window.show_product_details(self._model.details)
+        self._window.show_product_details(self._model.product_details.models)
 
     @pyqtSlot(QModelIndex)
     def on_category_selected(self, index):
         '''Slot for next action on clicked category selection from
         category list view'''
 
-        self._model.selected_category = index.data()
+        self._no_product = False
+        self._model.categories.selected = index.data()
         if self._load_foods:
             if self._load_foods.isRunning():
                 self._load_foods.terminate()
                 self._load_foods.wait()
         if self._model.foods:
-            self._model.reset_foods_list()
+            self._model.foods.reset()
         if self._model.substitutes:
-            self._model.reset_substitutes_list()
-            self._model.reset_product_details()
+            self._model.substitutes.reset()
+            self._model.product_details.reset()
         self._load_foods = LoadFoods(self._model)
         self._load_foods.finished.connect(self.on_load_foods_finished)
+        self._load_foods.no_product_found.connect(self.on_no_product_found)
         self._load_foods.get_a_page.connect(self.on_new_food_page)
         self.status_message.emit("Patientez, recherche des produits "
                                  "relatifs à la catégorie en cours "
@@ -122,10 +123,29 @@ class OpenFoodFactsMode(QObject):
         if page == 1:
             self._window.foods_list.setModel(self._model.foods)
         if DEBUG_MODE:
-            print("selected food already for:", self._model.selected_food)
-        if self._model._selected_food:
-            self._model.populate_substitutes(self._model.selected_food,
+            print("selected food already for:", self._model.foods.selected)
+        if self._model.foods.selected:
+            self._model.substitutes.populate(self._model.foods.selected,
+                                             self._model.foods.recorded,
                                              page - 1, False)
+
+    @pyqtSlot()
+    def on_no_product_found(self):
+        '''When no product found for category selected happening...'''
+
+        if self._internet_flag:
+            self.status_message.emit("Il n'y a aucun produit pour cette catégorie")
+        self._no_product = True
+
+    @pyqtSlot(bool)
+    def on_internet_access(self, status):
+        '''When no internet access is happening...'''
+
+        self._internet_flag = status
+        if not status:
+            self.status_message.emit("Il n'y a pas d'accès à internet")
+            if DEBUG_MODE:
+                print("there is no internet access")
 
     @pyqtSlot(QModelIndex)
     def on_food_selected(self, index):
@@ -138,10 +158,11 @@ class OpenFoodFactsMode(QObject):
         food_name = index.data()
         food_code = self._model.foods.index(index.row(), 1).data()
         food_score = self._model.foods.index(index.row(), 2).data()
-        self._model.selected_food = (food_code, food_score, food_name)
+        self._model.foods.selected = (food_code, food_score, food_name)
         if DEBUG_MODE:
-            print("you are just selecting food:", self._model.selected_food)
-        self._model.populate_substitutes(food_name)
+            print("you are just selecting food:", self._model.foods.selected)
+        self._model.substitutes.populate(self._model.foods.selected,
+                                         self._model.foods.recorded)
         self.show_substitutes()
 
     def show_substitutes(self):
@@ -168,7 +189,7 @@ class OpenFoodFactsMode(QObject):
     def on_product_url_clicked(self):
         '''Go to url'''
 
-        url = self._model.details["url"]
+        url = self._model.product_details.models["url"]
         webbrowser.open(url)
 
     @pyqtSlot('QStandardItem*')
@@ -178,19 +199,19 @@ class OpenFoodFactsMode(QObject):
 
         index = self._model.substitutes.indexFromItem(item)
         code = self._model.substitutes.index(index.row(), 2).data()
-        self._model.generate_checked_list()
+        self._model.substitutes.generate_checked()
         state = item.checkState()
         if DEBUG_MODE:
             print("i checked this substitute index row:", index.row(),
                   "at column:", index.column(), "code is", code,
                   "and item is checked:", state)
         if state == 2:
-            self._model.selected_substitutes.append(code)
+            self._model.substitutes.selected.append(code)
         else:
-            if code in self._model.selected_substitutes:
-                self._model._selected_substitutes.remove(code)
+            if code in self._model.substitutes.selected:
+                self._model.substitutes.selected.remove(code)
         self.checked_substitutes_event.emit(
-            bool(self._model.selected_substitutes))
+            bool(self._model.substitutes.selected))
 
     @property
     def load_product_details(self):

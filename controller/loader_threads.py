@@ -2,7 +2,7 @@
 background to not freeze application'''
 
 from math import ceil
-from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread
 
 from model import OpenFoodFacts
 from settings import DEBUG_MODE
@@ -30,13 +30,14 @@ class LoadCategories(QThread):
             categories.append(row)
         if not categories:
             categories = self._model.download_categories()
-        self._model.populate_categories(categories)
+        self._model.categories.populate(categories)
 
 
 class LoadFoods(QThread):
     '''Load foods model in background to not freeze application'''
 
     get_a_page = pyqtSignal(int, int)
+    no_product_found = pyqtSignal()
 
     def __init__(self, model):
         super().__init__()
@@ -67,12 +68,15 @@ class LoadFoods(QThread):
         while pages_to_end != 0:
             first_page = bool(page == 1)
             foods = self._model.download_foods(self._category, page)
-            self._model.foods_recorded.append(foods)
-            if first_page:
-                products = self._model.products_count
-                pages_to_end = ceil(products / 20) - 1
-            self._model.populate_foods(foods, first_page)
-            self.get_a_page.emit(page, pages_to_end)
+            if foods:
+                self._model.foods.recorded.append(foods)
+                if first_page:
+                    products = self._model.foods.count
+                    pages_to_end = ceil(products / 20) - 1
+                self._model.foods.populate(foods, first_page)
+                self.get_a_page.emit(page, pages_to_end)
+            else:
+                self.no_product_found.emit()
             page += 1
             pages_to_end -= 1
 
@@ -119,32 +123,33 @@ class LoadProductDetails(QThread):
         '''Start to load details of product in background from Open Food
         Facts'''
 
-        self._model.reset_product_details()
+        mpd = self._model.product_details
+        ms = self._model.substitutes
+        mpd.reset()
         self.status_message.emit("Patientez, recherche du produit "
                                  "(code {} ) en cours sur "
                                  "Open Food Facts...".format(self._code))
         food = self._model.download_product(self._code, self._name)
         if food:
-            self._model.populate_product_details(food)
-            # record details if caller is checked...
+            mpd.populate(food)
             if DEBUG_MODE:
                 print("search in list for:", food["codes_tags"][1])
-            if food["codes_tags"][1] in self._model.checked_substitutes_list:
-                self._model.checked_details_dict[food["codes_tags"][1]] = (
-                    self._model.details["name"],
-                    self._model.details["description"],
-                    self._model.details["score_data"],
-                    self._model.details["brand"],
-                    self._model.details["packaging"],
-                    self._model.details["url"],
-                    self._model.details["img_data"])
+            if food["codes_tags"][1] in ms.checked:
+                mpd.checked[food["codes_tags"][1]] = (
+                    mpd.models["name"],
+                    mpd.models["description"],
+                    mpd.models["score_data"],
+                    mpd.models["brand"],
+                    mpd.models["packaging"],
+                    mpd.models["url"],
+                    mpd.models["img_data"])
             else:
-                if food["codes_tags"][1] in self._model.checked_details_dict.keys():
-                    del self._model.checked_details_dict[food["codes_tags"][1]]
+                if food["codes_tags"][1] in mpd.checked.keys():
+                    del mpd.checked[food["codes_tags"][1]]
             if DEBUG_MODE:
-                print("list checked:", self._model.checked_details_dict)
+                print("list checked:", mpd.checked)
         else:
-            self._model.reset_product_details()
+            mpd.reset()
             self.error_signal.emit("Hélas, il n'y a aucun détail enregistré "
                                    "pour ce code produit")
             self.status_message.emit("Aucun détail cohérent n'est fourni")
@@ -154,22 +159,10 @@ class UpdateCategories(QThread):
     '''Load categories from Open Food Facts in background in categroies
     table of the openfoodfacts_substitutes database'''
 
-    def __init__(self, database, window):
+    def __init__(self, database, off_model):
         super().__init__()
         self._database = database
-        self._window = window
-        self._views = {"categories": self._window.categories_list,
-                       "foods": self._window.foods_list,
-                       "substitutes": self._window.substitutes_list,
-                       "name" : self._window.product_name,
-                       "brand" : self._window.product_brand,
-                       "packaging" : self._window.product_packaging,
-                       "score" : self._window.product_score,
-                       "shops" : self._window.product_shops,
-                       "description" : self._window.product_description,
-                       "url" : self._window.product_url,
-                       "img_thumb" : self._window.product_img_thumb,
-                      }
+        self._off_model = off_model
 
     def __del__(self):
         self.wait()
@@ -179,8 +172,8 @@ class UpdateCategories(QThread):
 
         if DEBUG_MODE:
             print("start to update categories table from OFF categories")
-        off_model = OpenFoodFacts(self._views)
-        categories = off_model.download_categories()
-        self._database.update_categories(categories)
+        categories = self._off_model.download_categories()
+        if categories:
+            self._database.update_categories(categories)
         if DEBUG_MODE:
             print("End of update categories table")

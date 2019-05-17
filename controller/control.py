@@ -6,6 +6,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from controller import DatabaseMode, OpenFoodFactsMode, \
                        UpdateCategories, Authentication
+from model import OpenFoodFacts
 from view import MainWindow
 
 class Controller(QObject):
@@ -22,8 +23,9 @@ class Controller(QObject):
         self._db_mode = None
         self._off_mode = None
         self.connect_signals()
+        off_model = OpenFoodFacts()
         loader = UpdateCategories(self._authenticate.get_database(),
-                                  self._window)
+                                  off_model)
         loader.start()
         sys.exit(self._app.exec_())
 
@@ -36,8 +38,7 @@ class Controller(QObject):
         self._window.openfoodfacts_mode.clicked.connect(
             self.on_openfoodfacts_mode)
         self._window.local_mode.clicked.connect(self.on_local_mode)
-        self._window.record.clicked.connect(
-            self.on_record_substitutes)
+        self._window.record.clicked.connect(self.on_record_substitutes)
         self.status_message.connect(self._window.on_status_message)
         self._authenticate.status_user_connected.connect(
             self.on_user_connected)

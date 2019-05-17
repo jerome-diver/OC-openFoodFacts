@@ -1,6 +1,6 @@
 '''OpenFoodFacts link API of openFoodFacts online with application'''
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QObject, Qt, pyqtSignal
 import openfoodfacts
 
 from settings import DEBUG_MODE
@@ -9,48 +9,58 @@ from . import FoodsModel
 from . import SubstitutesModel
 from . import ProductDetailsModels
 
-class OpenFoodFacts(CategoriesModel, FoodsModel,
-                    SubstitutesModel, ProductDetailsModels):
+class OpenFoodFacts(QObject):
     '''Model for Open Food Facts data requests'''
 
-    def __init__(self, views):
-        super().__init__(views)
-        self._products_count = 0
-        self._checked_substitutes_list = []
-        self._checked_details_dict = {}
-        self._foods_recorded = []
+    internet_access = pyqtSignal(bool)
+
+    def __init__(self, views=None):
+        super().__init__()
+        if views:
+            self._categories = CategoriesModel(views)
+            self._foods = FoodsModel(views)
+            self._substitutes = SubstitutesModel(views)
+            self._product_details = ProductDetailsModels(views)
+        else:
+            self._substitutes = None
+            self._foods = None
+            self._categories = None
+            self._product_details = None
 
     @property
-    def products_count(self):
-        '''Return products count number from last products search'''
+    def categories(self):
+        '''Categories property'''
 
-        return self._products_count
-
-    @property
-    def checked_substitutes_list(self):
-        '''Return checked list containing list of codes of substitutes
-        validate for be recorded'''
-
-        return self._checked_substitutes_list
+        return self._categories
 
     @property
-    def checked_details_dict(self):
-        '''Return details list as { code: (details) } list from selected
-        substitutes products to be recorded'''
+    def foods(self):
+        '''Foods property'''
 
-        return self._checked_details_dict
+        return self._foods
 
     @property
-    def foods_recorded(self):
-        '''Return property for foods recorded'''
+    def substitutes(self):
+        '''Substitutes property'''
 
-        return self._foods_recorded
+        return self._substitutes
 
-    @staticmethod
-    def download_categories():
+    @property
+    def product_details(self):
+        '''Product details property'''
+
+        return self._product_details
+
+    def download_categories(self):
         '''Download categories and return them sorted by name'''
 
-        categories = openfoodfacts.facets.get_categories()
+        categories = None
+        try:
+            categories = openfoodfacts.facets.get_categories()
+        except:
+            self.internet_access.emit(False)
+            return categories
+        self.internet_access.emit(True)
         return sorted(categories, key= lambda kv: kv["name"])
 
     def download_foods(self, category, page=1):
@@ -63,20 +73,25 @@ class OpenFoodFacts(CategoriesModel, FoodsModel,
                 if "product_name_fr" not in food:
                     food["product_name_fr"] = food["product_name"]
 
-        foods = openfoodfacts.products.advanced_search(
-            {"search_terms" : category,
-             "search_tag" : "categories_tags",
-             "country" : "france",
-             "page": page}
-        )
+        foods = None
+        try:
+            foods = openfoodfacts.products.advanced_search(
+                {"search_terms" : category,
+                 "search_tag" : "categories_tags",
+                 "country" : "france",
+                 "page": page}
+            )
+        except:
+            self.internet_access.emit(False)
+            return foods
+        self.internet_access.emit(True)
         normalize_foods_products(foods["products"])
         if page == 1:
-            self._products_count = foods["count"]
+            self._foods.count = foods["count"]
         return sorted(foods["products"],
                       key= lambda kv: kv["product_name_fr"])
 
-    @staticmethod
-    def download_product(code, name):
+    def download_product(self, code, name):
         '''Return product for this code'''
 
         def normalize(product):
@@ -103,12 +118,18 @@ class OpenFoodFacts(CategoriesModel, FoodsModel,
             if "stores_tags" not in product:
                 product["stores_tags"] = ""
 
-        product = openfoodfacts.products.advanced_search({
-            "search_terms" : name,
-            "tagtype_0": "codes_tags",
-            "tag_contains_0": "contains",
-            "tag_0": code,
-            "country": "france"})
+        product = None
+        try:
+            product = openfoodfacts.products.advanced_search({
+                "search_terms" : name,
+                "tagtype_0": "codes_tags",
+                "tag_contains_0": "contains",
+                "tag_0": code,
+                "country": "france"})
+        except:
+            self.internet_access.emit(False)
+            return product
+        self.internet_access.emit(True)
         if product["count"] == 1:
             normalize(product["products"][0])
             return product["products"][0]
@@ -119,15 +140,3 @@ class OpenFoodFacts(CategoriesModel, FoodsModel,
                   "AND [product_name]:", name, "======")
         return None
 
-    def generate_checked_list(self):
-        '''Update list of checked item codes'''
-
-        checked_l = []
-        for index in range(self._substitutes.rowCount()):
-            item = self._substitutes.item(index, 0)
-            code = self._substitutes.item(index, 2).text()
-            if item.checkState() == Qt.Checked:
-                checked_l.append(code)
-        self._checked_substitutes_list = checked_l
-        if DEBUG_MODE:
-            print("checked list:", self._checked_substitutes_list)
