@@ -3,7 +3,8 @@ background to not freeze application'''
 
 from math import ceil
 from enum import Enum
-from PyQt5.QtCore import pyqtSignal, QThread, QObject
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, \
+                         QThread
 
 from settings import DEBUG_MODE
 
@@ -51,6 +52,10 @@ class LoadFoods(QThread):
         super().__init__()
         self._model = model
         self._category = ''
+        self._on_air = True
+
+    def __del__(self):
+        self.wait()
 
     @property
     def category(self):
@@ -64,8 +69,11 @@ class LoadFoods(QThread):
 
         self._category = value
 
-    def __del__(self):
-        self.wait()
+    @pyqtSlot()
+    def end_process(self):
+        '''End of the loop, then thread will die'''
+
+        self._on_air = False
 
     def run(self):
         '''Start running thread to load model for foods list from
@@ -73,14 +81,15 @@ class LoadFoods(QThread):
 
         page = 1
         pages_to_end = 1
-        while pages_to_end != 0:
+        while pages_to_end != 0 and self._on_air:
             first_page = bool(page == 1)
             foods = self._model.download_foods(self._category, page)
             if foods:
                 self._model.foods.recorded.append(foods)
                 if first_page:
                     products = self._model.foods.count
-                    pages_to_end = ceil(products / 20) - 1
+                    pages_to_end = ceil(products / 20) - 1 \
+                        if products >= 21 else 1
                 self._model.foods.populate(foods, first_page)
                 self.get_a_page.emit(page, pages_to_end)
             else:
@@ -195,57 +204,53 @@ class ThreadsControler(QObject):
         self._load_foods = None
         self._load_categories.start()
 
-    def init_foods_thread(self):
+    def init_foods_thread(self, category):
         '''Initialize foods thread call'''
 
         self._load_foods = LoadFoods(self._model)
+        self._controler.kill_foods_thread.connect(
+            self._load_foods.end_process)
         self._load_foods.finished.connect(
             self._controler.on_load_foods_finished)
         self._load_foods.no_product_found.connect(
             self._controler.on_no_product_found)
         self._load_foods.get_a_page.connect(self._controler.on_new_food_page)
+        self._load_foods.category = category
+        self._load_foods.start()
 
 
     def wash_foods_thread(self):
         '''Cleaner thread for load foods'''
 
         if self._load_foods:
+            if DEBUG_MODE:
+                print("thread foods cleaning process is running")
             if self._load_foods.isRunning():
                 self._load_foods.terminate()
-                self._load_foods.wait()
 
-    def init_product_details_thread(self, mode):
+    def init_product_details_thread(self, code, name, mode):
         '''Initialize product_details thread call'''
 
-        thread = LoadProductDetails(self._model,mode)
-        self._load_product_details[mode].append(thread)
-        thread.finished.connect(
+        self._load_product_details[mode] = LoadProductDetails(self._model,mode)
+        self._load_product_details[mode].finished.connect(
             self._controler.on_load_product_details_finished)
-        thread.status_message.connect(self._controler.window.on_status_message)
-        thread.error_signal.connect(self._controler.window.on_error_message)
-        return thread
+        self._load_product_details[mode].status_message.connect(
+            self._controler.window.on_status_message)
+        self._load_product_details[mode].error_signal.connect(
+            self._controler.window.on_error_message)
+        self._load_product_details[mode].code = code
+        self._load_product_details[mode].name = name
+        self._load_product_details[mode].start()
 
     def wash_product_details_thread(self, mode):
         '''Clean product_details thread'''
 
         if self._load_product_details[mode]:
-            thread = self._load_product_details[mode].pop()
-            if thread:
-                if DEBUG_MODE:
-                    print("thread product details ", mode,
-                          "cleaning process is running")
-                if thread.isRunning():
-                    thread.terminate()
-                    thread.wait()
-
-    def _load_product_for(self, code, name, mode=Mode.SELECTED):
-        '''Request thread for load foods details with item and mode choosed'''
-
-        self.wash_product_details_thread(mode)
-        thread = self.init_product_details_thread(mode)
-        thread.code = code
-        thread.name = name
-        thread.start()
+            if DEBUG_MODE:
+                print("thread product details ", mode,
+                      "cleaning process is running")
+            if self._load_product_details[mode].isRunning():
+                self._load_product_details[mode].terminate()
 
     @property
     def load_categories(self):

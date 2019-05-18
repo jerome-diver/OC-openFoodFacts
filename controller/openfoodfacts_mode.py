@@ -15,6 +15,9 @@ class OpenFoodFactsMode(QObject):
     status_message = pyqtSignal(str)
     checked_start = pyqtSignal()
     load_details_finished = pyqtSignal()
+    kill_foods_thread = pyqtSignal()
+    kill_details_show_thread = pyqtSignal()
+    kill_details_checked_thread = pyqtSignal()
 
     def __init__(self, window, database):
         super().__init__()
@@ -133,13 +136,11 @@ class OpenFoodFactsMode(QObject):
         if self._model.substitutes:
             self._model.substitutes.reset()
             self._model.product_details.reset()
-        self._threads.wash_foods_thread()
-        self._threads.init_foods_thread()
+        self.kill_foods_thread.emit()
+        self._threads.init_foods_thread(index.data())
         self.status_message.emit("Patientez, recherche des produits "
                                  "relatifs à la catégorie en cours "
                                  "sur Open Food Facts...")
-        self._threads._load_foods.category = index.data()
-        self._threads._load_foods.start()
 
     @pyqtSlot(QModelIndex)
     def on_food_selected(self, index):
@@ -179,7 +180,7 @@ class OpenFoodFactsMode(QObject):
                 print("now searching product for code", code, "name", name)
             self.status_message.emit("Patientez, recherche sur le code produit "
                                      "{} sélectionné".format(code))
-            self._threads._load_product_for(code, name, Mode.SELECTED)
+            self._threads.init_product_details_thread(code, name, Mode.SELECTED)
 
     @pyqtSlot('QStandardItem*')
     def on_substitute_checked(self, item):
@@ -194,7 +195,7 @@ class OpenFoodFactsMode(QObject):
             print("now searching product for code", code, "name", name)
         self.status_message.emit("Patientez, recherche sur le code produit "
                                  "{} à ajouter dans la base".format(code))
-        self._threads._load_product_for(code, name, Mode.CHECKED)
+        self._threads.init_product_details_thread(code, name, Mode.CHECKED)
         self.checked_start.emit()
 
     @pyqtSlot()

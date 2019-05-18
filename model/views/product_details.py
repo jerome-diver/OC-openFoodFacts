@@ -3,6 +3,7 @@
 from urllib.request import urlopen
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, \
                         QImage, QPixmap
+from PyQt5.QtCore import QDataStream
 
 from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
     NUTRISCORE_D, NUTRISCORE_E
@@ -87,8 +88,10 @@ class ProductDetailsModels():
         var["brand"] = food["brands_tags"]
         img_url = food["image_front_url"] \
             if "image_front_url" in food.keys() else ""
-        data_front = urlopen(img_url).read()
-        var["img_data"] = data_front
+        # case of blob data insertion is not fixed there :
+        #data_front = urlopen(img_url).read()
+        #stream = QDataStream(data_front)
+        var["img_url"] = img_url
         
 
     def reset(self):
@@ -119,7 +122,7 @@ class ProductDetailsModels():
                 datas["brand"],
                 datas["packaging"],
                 datas["url"],
-                datas["img_data"],
+                datas["img_url"],
                 datas["shops_names"])
         else:
             if product["codes_tags"][1] in self._checked.keys():

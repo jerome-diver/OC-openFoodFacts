@@ -132,6 +132,8 @@ class Database(QObject):
             sql_requests = requests_file.read()
             for request in sql_requests.split(';'):
                 if request != "":
+                    if DEBUG_MODE:
+                        print(request)
                     self.send_request(request)
 
     def generate_users_role(self):
@@ -241,8 +243,10 @@ class Database(QObject):
                           "(food_code, category_id) VALUES (%s, %s);",
             "food": "INSERT INTO foods "
                     "(code, name_, description, score, brand, packaging, "
-                    "url_, image) VALUES (%s, %s, %s, %, %s, %s, %s, %S);",
-            "shop": "INSERT INTO shops (name) VALUES (%s) RETURNING id;",
+                    "url_, image_url) VALUES (%s, %s, %s, %s, %s, %s, %s, "
+                    "%s);",
+            "shop": "INSERT INTO shops (name) VALUES (%s);",
+            "shop_id": "SELECT id FROM shops WHERE name = %s;",
             "f_shops": "INSERT INTO food_shops (food_code, shop_id) "
                        "VALUES (%s, %s);",
             "f_substit": "INSERT INTO food_substitutes "
@@ -253,14 +257,25 @@ class Database(QObject):
         for code, details in substitutes_details.items():
             # food record :
             values = (code,) + details[0:7]
+            if DEBUG_MODE:
+                print("request :", req["food"])
+                print("for values:", values)
             self.send_request(req["food"], values)
             # shops records :
             for shop in details[7]:
-                value = shop
+                value = (shop,)
                 fs_values = None # will be tuple with food.code
                                  # and the return new id shop inserted
-                for row in self.ask_request(req["shop"], value):
-                    fs_values = (code, row["id"])
+                # check if shop name exist already :
+                for row in self.ask_request((req["shop_id"], shop)):
+                    fs_values = row["id"]
+                if not fs_values:   # shop name does not exist
+                    self.send_request(req["shop"], value)
+                    # get the id of the shop name inserted below :
+                    for row in self.ask_request((req["shop_id"], shop)):
+                        fs_values = (code, row["id"])
+                else: # shop name exist already, just use id
+                    fs_values = (code, fs_values)
                 # food_shops record (one shop loop => one shop):
                 self.send_request(req["f_shops"], fs_values)
         # add food_categories record :

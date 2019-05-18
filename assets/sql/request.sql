@@ -1,30 +1,28 @@
 CREATE DATABASE IF NOT EXISTS openfoodfacts_substitutes;
 USE openfoodfacts_substitutes;
 CREATE TABLE IF NOT EXISTS categories (
-    id VARCHAR(256) NOT NULL PRIMARY KEY,
-    name VARCHAR(256));
+    id VARCHAR(255) NOT NULL PRIMARY KEY,
+    name VARCHAR(255));
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
-    family_name VARCHAR(64), 
-    nick_name VARCHAR(64), 
-    username VARCHAR(16));
+    family_name VARCHAR(63), 
+    nick_name VARCHAR(63), 
+    username VARCHAR(15));
 CREATE TABLE IF NOT EXISTS foods (
-    code INT(13) AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    name_ VARCHAR(128), 
-    description TINYTEXT,
-    url_ VARCHAR(256),
+    code VARCHAR(13) NOT NULL PRIMARY KEY,
+    name_ VARCHAR(127), 
+    description TEXT,
+    url_ VARCHAR(255),
     score ENUM('a','b','c','d','e') NOT NULL,
-    brand VARCHAR(64),
-    packaging VARCHAR(256),
-    image BLOB);
+    brand VARCHAR(63),
+    packaging VARCHAR(255),
+    image_url VARCHAR(255));
 CREATE TABLE IF NOT EXISTS shops (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY, 
-    name_ VARCHAR(128),
-    address TEXT,
-    url VARCHAR(256));
+    name_ VARCHAR(127));
 CREATE TABLE IF NOT EXISTS food_categories (
-    food_code INT(13),
-    category_id VARCHAR(256),
+    food_code VARCHAR(13),
+    category_id VARCHAR(255),
     CONSTRAINT fk_food_categories__food_code
         FOREIGN KEY (food_code)
         REFERENCES foods (code)
@@ -39,7 +37,7 @@ CREATE TABLE IF NOT EXISTS food_categories (
         UNIQUE (food_code, category_id));
 CREATE TABLE IF NOT EXISTS user_foods (
     user_id INT, 
-    food_code INT(13),
+    food_code VARCHAR(13),
     CONSTRAINT fk_user_foods__users_id 
         FOREIGN KEY (user_id) 
         REFERENCES users (id) 
@@ -53,8 +51,8 @@ CREATE TABLE IF NOT EXISTS user_foods (
     CONSTRAINT unique_user_foods
         UNIQUE (user_id, food_code));
 CREATE TABLE IF NOT EXISTS food_substitutes (
-    food_code INT(13),
-    substitute_code INT(13),
+    food_code VARCHAR(13),
+    substitute_code varchar(13),
     CONSTRAINT fk_food_substitutes__foods_code
         FOREIGN KEY (food_code)
         REFERENCES foods (code)
@@ -68,7 +66,7 @@ CREATE TABLE IF NOT EXISTS food_substitutes (
     CONSTRAINT unique_food_substitutes
         UNIQUE (food_code, substitute_code));
 CREATE TABLE IF NOT EXISTS food_shops (
-    food_code INT(13),
+    food_code VARCHAR(13),
     shop_id INT, 
     CONSTRAINT fk_food_shops__foods_code
         FOREIGN KEY (food_code)
