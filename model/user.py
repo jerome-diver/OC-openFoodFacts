@@ -18,6 +18,7 @@ class User(QObject):
         self._family = ""
         self._nick = ""
         self._username = ""
+        self._id = ""
         self._database = None
 
     def connect(self, username, password, family=None, nick=None):
@@ -36,9 +37,10 @@ class User(QObject):
             self.status_connected.emit(False, status)
         self._connected = True
         self.status_connected.emit(True, "Vous êtes connecté")
-        request = "SELECT nick_name, family_name FROM users " \
+        request = "SELECT id, nick_name, family_name FROM users " \
                   "WHERE username = %s;"
         for row in self._database.ask_request(request, self._username):
+            self._id = row["id"]
             self._family = row["family_name"]
             self._nick = row["nick_name"]
         if DEBUG_MODE:
@@ -60,6 +62,12 @@ class User(QObject):
         '''Database property getter'''
 
         return self._database
+
+    @property
+    def id(self):
+        '''Return id of user'''
+
+        return self._id
 
     @property
     def family(self):

@@ -11,7 +11,6 @@ class CategoriesModel(QStandardItemModel):
         super().__init__(views["categories"])
         self._views = views
         self._selected = None
-        #self._categories = QStandardItemModel(self._views['categories'])
 
     @property
     def selected(self):

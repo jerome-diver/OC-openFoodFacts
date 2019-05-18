@@ -30,6 +30,7 @@ class Controller(QObject):
         loader = UpdateCategories(self._authenticate.get_database(),
                                   off_model)
         loader.start()
+        self.checked_substitutes()
         sys.exit(self._app.exec_())
 
     def connect_signals(self):
@@ -112,15 +113,17 @@ class Controller(QObject):
         button recorded for local database has to be disabled'''
 
         self._window.record.setEnabled(False)
+        self._window.record.setDisabled(True)
         if not self._flag_user_connected:
             self._window.record.setText("Aucun utilisateur connecté")
         elif not self._flag_checked_list:
             self._window.record.setText("Aucune sélection de substitut")
-        if not self._flag_checked_details:
+        elif not self._flag_checked_details:
             self._window.record.setText("Attendez, recherche des détails "
                                         "pour la sélection")
         else:
             self._window.record.setText("Enregistrer dans la base de donnée")
+            self._window.record.setEnabled(True)
 
     @pyqtSlot()
     def on_load_details_finished(self):
@@ -161,5 +164,12 @@ class Controller(QObject):
         '''Record substitutes selected for product food selected inside
         local database'''
 
-        pass
+        database = self._authenticate.get_user_database()
+        if database:
+            user_id = self._authenticate.user.id
+            database.new_record(self._off_mode.model.categories.selected,
+                                self._off_mode.model.foods.selected,
+                                self._off_mode.model.substitutes.checked,
+                                self._off_mode.model.product_details.checked,
+                                user_id)
 

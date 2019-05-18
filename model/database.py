@@ -6,8 +6,9 @@ from pymysql.err import OperationalError
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
-                     DB_SOCKET, DB_CONNECT_MODE, DB_HOSTNAME,\
-                     DB_INIT_FILE, DEBUG_MODE
+    DB_SOCKET, DB_CONNECT_MODE, DB_HOSTNAME, \
+    DB_INIT_FILE, DEBUG_MODE
+
 
 class Database(QObject):
     '''Database model for user to be abee to record Open Food Facts data
@@ -16,7 +17,7 @@ class Database(QObject):
     _connection = None
     status_message = pyqtSignal(str)
 
-    def __init__(self, username=None, password=None, databaseb=None):
+    def __init__(self, username=None, password=None, database=None):
         super().__init__()
         if Database._connection:
             if Database._connection.open:
@@ -29,7 +30,7 @@ class Database(QObject):
             self._connect_database(user=username,
                                    passwd=password,
                                    database=database)
-            self._connect_to_off_db()
+            self.connect_to_off_db()
 
     def _connect_database(self, user=None, passwd=None,
                           database=None):
@@ -62,11 +63,10 @@ class Database(QObject):
     def connect_to_off_db(self):
         '''Connect the current user on database'''
 
-        #request = "SET ROLE openfoodfacts_role;"
-        #self.send_request(request)
+        # request = "SET ROLE openfoodfacts_role;"
+        # self.send_request(request)
         request = "USE openfoodfacts_substitutes;"
         self.send_request(request)
-
 
     def __del__(self):
         if Database._connection:
@@ -124,7 +124,6 @@ class Database(QObject):
             if cursor:
                 cursor.close()
         return cursor
-
 
     def generate_database(self):
         '''Create database, tables and roles'''
@@ -201,7 +200,7 @@ class Database(QObject):
                             if off_category["name"] != category["name"]:
                                 categories_to_update.append(
                                     {"id": category["id"],
-                                     "name" : category["name"]})
+                                     "name": category["name"]})
                             flag_finder = True
                     if not flag_finder:
                         missing_categories.append((off_category["id"],
@@ -231,3 +230,47 @@ class Database(QObject):
             request = "DELETE FROM categories WHERE id=%s ;"
             for id in unknown:
                 self.send_request(request, (id))
+
+    def new_record(self, category, food, substitutes, substitutes_details,
+                   user_id):
+        '''Record new entry for selected substitutes and linked
+        correspondant category and food selected and products details'''
+
+        req = {
+            "f_category": "INSERT INTO food_categories "
+                          "(food_code, category_id) VALUES (%s, %s);",
+            "food": "INSERT INTO foods "
+                    "(code, name_, description, score, brand, packaging, "
+                    "url_, image) VALUES (%s, %s, %s, %, %s, %s, %s, %S);",
+            "shop": "INSERT INTO shops (name) VALUES (%s) RETURNING id;",
+            "f_shops": "INSERT INTO food_shops (food_code, shop_id) "
+                       "VALUES (%s, %s);",
+            "f_substit": "INSERT INTO food_substitutes "
+                         "(food_code, substitute_code) VALUES (%s, %s);",
+            "u_foods": "INSERT INTO user_foods (user_id, food_code) "
+                       "VALUES (%s, %s);", }
+        # add foods, shops, food_shops records :
+        for code, details in substitutes_details.items():
+            # food record :
+            values = (code,) + details[0:7]
+            self.send_request(req["food"], values)
+            # shops records :
+            for shop in details[7]:
+                value = shop
+                fs_values = None # will be tuple with food.code
+                                 # and the return new id shop inserted
+                for row in self.ask_request(req["shop"], value):
+                    fs_values = (code, row["id"])
+                # food_shops record (one shop loop => one shop):
+                self.send_request(req["f_shops"], fs_values)
+        # add food_categories record :
+        values = (food[0], category)
+        self.send_request(req["f_category"], values)
+        # add food_substitutes record :
+        for code in substitutes:
+            values = (food[0], code)
+            self.send_request(req["f_substit"], values)
+        # add user_foods record :
+        values = (user_id, food[0])
+        self.send_request(req["u_foods"], values)
+

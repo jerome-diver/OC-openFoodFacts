@@ -84,7 +84,7 @@ class Authentication(QObject):
         else:
             self.signin.status.setText("Username or password failed")
             QMessageBox.information(None, "Problème de connexion", status)
-        self.status_user_connecton.emit(connected)
+        self.status_user_connection.emit(connected)
 
 
     @pyqtSlot(str)

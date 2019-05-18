@@ -123,6 +123,8 @@ class LoadProductDetails(QThread):
 
     @code.setter
     def code(self, value):
+        ''' Setter property for code'''
+
         self._code = value
 
     def __del__(self):

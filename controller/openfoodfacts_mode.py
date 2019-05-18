@@ -128,7 +128,8 @@ class OpenFoodFactsMode(QObject):
         category list view'''
 
         self._no_product = False
-        self._model.categories.selected = index.data()
+        index_id = self._model.categories.index(index.row(), 1)
+        self._model.categories.selected = index_id.data()
         if self._model.substitutes:
             self._model.substitutes.reset()
             self._model.product_details.reset()
