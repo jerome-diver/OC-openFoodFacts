@@ -49,7 +49,7 @@ class LocalDatabaseModel(QObject):
         '''Get categories from local  database'''
 
         categories = []
-        request = "SELECT id, name FROM categories;"
+        request = "SELECT * FROM categories;"
         for row in self._database.ask_request(request):
             categories.append({ "id": row["id"], "name": row["name"]})
         return categories
@@ -58,10 +58,10 @@ class LocalDatabaseModel(QObject):
         '''Get foods for current categrory'''
 
         foods = []
-        request = "SELECT foods.name_, foods.code, foods.score " \
-                  "FROM foods, food_categories, categories " \
-                  "WHERE food_category.food_code = foods.code " \
-                  "AND food_categories.category_id = %s ;"
+        request = "SELECT f.name_, f.code, f.score " \
+                  "FROM foods AS f, food_categories AS fc " \
+                  "WHERE fc.food_code = f.code " \
+                  "AND fc.category_id = %s ;"
         values = (category, )
         for row in self._database.ask_request(request, values):
             food = {}

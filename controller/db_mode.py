@@ -7,10 +7,13 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
 from model import LocalDatabaseModel
 from settings import DEBUG_MODE
 
-class DatabaseMode():
+class DatabaseMode(QObject):
     ''' Print/record data inside local database'''
 
+    status_message = pyqtSignal(str)
+
     def __init__(self, window, database):
+        super().__init__()
         self._window = window
         self._database = database
         self._views = {"categories": self._window.categories_list,
@@ -32,13 +35,20 @@ class DatabaseMode():
     def _connect_signals(self):
         '''Connect signals with slots'''
 
-        pass
+        self._views["categories"].clicked.connect(self.on_category_selected)
+        self._views["foods"].clicked.connect(self.on_food_selected)
+        self._views["substitutes"].clicked.connect(self.on_substitute_selected)
+        self._views["url"].clicked.connect(self.on_product_url_clicked)
+        self.status_message.connect(self._window.on_status_message)
 
     def _initialize(self):
         '''Show categories first'''
 
         categories = self._model.get_categories()
+        if DEBUG_MODE:
+            print("get", len(categories), "categories found in database")
         self._model._categories.populate(categories)
+        self._window.show_categories(self._model.categories)
 
     @pyqtSlot(QModelIndex)
     def on_category_selected(self, index):

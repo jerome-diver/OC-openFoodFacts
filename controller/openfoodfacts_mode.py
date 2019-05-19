@@ -44,12 +44,12 @@ class OpenFoodFactsMode(QObject):
     def connect_signals(self):
         '''Connect signals to slots for concerned controller'''
 
-        self._window.categories_list.clicked.connect(self.on_category_selected)
-        self._window.foods_list.clicked.connect(self.on_food_selected)
-        self._window.substitutes_list.selectionModel().selectionChanged.connect(
+        self._views["categories"].clicked.connect(self.on_category_selected)
+        self._views["foods"].clicked.connect(self.on_food_selected)
+        self._views["substitutes"].selectionModel().selectionChanged.connect(
             self.on_substitute_selection_changed)
         self._model.substitutes.itemChanged.connect(self.on_substitute_checked)
-        self._window.product_url.clicked.connect(self.on_product_url_clicked)
+        self._views["url"].clicked.connect(self.on_product_url_clicked)
         self._threads.load_categories.finished.connect(
             self.on_load_categories_finished)
         self._model.internet_access.connect(self.on_internet_access)
