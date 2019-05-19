@@ -145,13 +145,14 @@ class OpenFoodFactsMode(QObject):
         foods list view'''
 
         self._model.substitutes.reset()
+        self._model.product_details.reset()
         self.status_message.emit("Patientez, recherche des produits "
                                  "de substitutions proposés en cours "
                                  "sur Open Food Facts...")
-        food_name = index.data()
-        food_code = self._model.foods.index(index.row(), 1).data()
-        food_score = self._model.foods.index(index.row(), 2).data()
-        self._model.foods.selected = (food_code, food_score, food_name)
+        name = index.data()
+        code = self._model.foods.index(index.row(), 1).data()
+        score = self._model.foods.index(index.row(), 2).data()
+        self._model.foods.selected = (code, score, name)
         if DEBUG_MODE:
             print("you are just selecting food:", self._model.foods.selected)
         self._model.substitutes.populate(self._model.foods.selected,

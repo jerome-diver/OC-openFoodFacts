@@ -1,4 +1,4 @@
-'''module import file'''
+"""module import file"""
 
 from .views import CategoriesModel
 from .views import FoodsModel

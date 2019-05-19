@@ -1,4 +1,4 @@
-'''View Module file linker'''
+"""View Module file linker"""
 
 from .mainwindow import MainWindow
 from .sign_in import SignIn

@@ -1,4 +1,4 @@
-'''Genral controller for the application'''
+"""Genral controller for the application"""
 
 import sys
 from PyQt5.QtWidgets import QApplication
@@ -8,9 +8,11 @@ from controller import DatabaseMode, OpenFoodFactsMode, \
                        UpdateCategories, Authentication
 from model import OpenFoodFacts
 from view import MainWindow
+from settings import DEBUG_MODE
+
 
 class Controller(QObject):
-    '''Control everything'''
+    """Control everything"""
 
     status_message = pyqtSignal(str)
 
@@ -34,7 +36,7 @@ class Controller(QObject):
         sys.exit(self._app.exec_())
 
     def connect_signals(self):
-        '''Let's connect signals to slots for concerned controller'''
+        """Let's connect signals to slots for concerned controller"""
 
         self._window.quit.clicked.connect(self.on_quit)
         self._window.signin.clicked.connect(self.on_sign_in)
@@ -49,13 +51,13 @@ class Controller(QObject):
 
     @pyqtSlot()
     def on_quit(self):
-        '''Close application slot'''
+        """Close application slot"""
 
         self._app.closeAllWindows()
 
     @pyqtSlot()
     def on_sign_in(self):
-        '''Sing-in button slot'''
+        """Sing-in button slot"""
 
         if self._window.signin.text() == "Sign-in":
             self._authenticate.on_sign_in()
@@ -68,7 +70,7 @@ class Controller(QObject):
 
     @pyqtSlot(bool)
     def on_local_mode(self, state):
-        '''OpenFoodFacts list button slot'''
+        """OpenFoodFacts list button slot"""
 
         self._window.openfoodfacts_mode.setChecked(False)
         if state:
@@ -83,7 +85,7 @@ class Controller(QObject):
 
     @pyqtSlot(bool)
     def on_openfoodfacts_mode(self, state):
-        '''Local list slot'''
+        """Local list slot"""
 
         if state:
             self._window.local_mode.setChecked(False)
@@ -109,8 +111,8 @@ class Controller(QObject):
             self._window.reset_views()
 
     def checked_substitutes(self):
-        '''When signal reset_substitutes from OpenFoodFactsMode is emit
-        button recorded for local database has to be disabled'''
+        """When signal reset_substitutes from OpenFoodFactsMode is emit
+        button recorded for local database has to be disabled"""
 
         self._window.record.setEnabled(False)
         self._window.record.setDisabled(True)
@@ -127,7 +129,7 @@ class Controller(QObject):
 
     @pyqtSlot()
     def on_load_details_finished(self):
-        '''When product substitutes checked details are loaded...'''
+        """When product substitutes checked details are loaded..."""
 
         if self._off_mode:
             self._flag_checked_list = bool(
@@ -138,7 +140,7 @@ class Controller(QObject):
 
     @pyqtSlot()
     def on_checked_started(self):
-        '''Slot for receipt signal to said if substitutes list any selection'''
+        """Slot for receipt signal to said if substitutes list any selection"""
 
         self._flag_checked_list = True
         self._flag_checked_details = False
@@ -146,7 +148,7 @@ class Controller(QObject):
 
     @pyqtSlot(bool)
     def on_user_connection(self, connected):
-        '''When user is connected to his local database'''
+        """When user is connected to his local database"""
 
         self._flag_user_connected = connected
         if connected:
@@ -161,12 +163,14 @@ class Controller(QObject):
 
     @pyqtSlot()
     def on_record_substitutes(self):
-        '''Record substitutes selected for product food selected inside
-        local database'''
+        """Record substitutes selected for product food selected inside
+        local database"""
 
         database = self._authenticate.get_user_database()
         if database:
             user_id = self._authenticate.user.id
+            if DEBUG_MODE:
+                print("user id:", user_id)
             database.new_record(self._off_mode.model.categories.selected,
                                 self._off_mode.model.foods.selected,
                                 self._off_mode.model.substitutes.checked,

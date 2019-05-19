@@ -1,4 +1,4 @@
-'''Local Database mode model'''
+"""Local Database mode model"""
 
 
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
@@ -9,8 +9,9 @@ from . import FoodsModel
 from . import SubstitutesModel
 from . import ProductDetailsModels
 
+
 class LocalDatabaseModel(QObject):
-    '''Local Database model Object'''
+    """Local Database model Object"""
 
     def __init__(self, views, database):
         super().__init__()
@@ -23,39 +24,39 @@ class LocalDatabaseModel(QObject):
 
     @property
     def categories(self):
-        '''Categories property'''
+        """Categories property"""
 
         return self._categories
 
     @property
     def foods(self):
-        '''Foods property'''
+        """Foods property"""
 
         return self._foods
 
     @property
     def substitutes(self):
-        '''Substitutes property'''
+        """Substitutes property"""
 
         return self._substitutes
 
     @property
     def product_details(self):
-        '''Product details property'''
+        """Product details property"""
 
         return self._product_details
 
     def get_categories(self):
-        '''Get categories from local  database'''
+        """Get categories from local  database"""
 
         categories = []
         request = "SELECT * FROM categories;"
         for row in self._database.ask_request(request):
-            categories.append({ "id": row["id"], "name": row["name"]})
+            categories.append({"id": row["id"], "name": row["name"]})
         return categories
 
     def get_foods(self, category):
-        '''Get foods for current categrory'''
+        """Get foods for current category"""
 
         foods = []
         request = "SELECT f.name_, f.code, f.score " \
@@ -64,15 +65,14 @@ class LocalDatabaseModel(QObject):
                   "AND fc.category_id = %s ;"
         values = (category, )
         for row in self._database.ask_request(request, values):
-            food = {}
-            food["product_name_fr"] = row["name_"]
-            food["codes_tags"] = [None, row["code"]]
-            food["nutrition_grades_tags"] = [row["score"]]
+            food = {"product_name_fr": row["name_"],
+                    "codes_tags": [None, row["code"]],
+                    "nutrition_grades_tags": [row["score"]]}
             foods.append(food)
         return foods
 
     def get_substitutes(self, code, name):
-        '''Get product details from code and name'''
+        """Get product details from code and name"""
 
         substitutes = []
         request = "SELECT f.brand, f.store, f.name_, f.score, f.code " \
@@ -82,7 +82,7 @@ class LocalDatabaseModel(QObject):
                   "AND f.name_ = %s ;"
         values = (code, name)
         for row in self._database.ask_request(request, values):
-            substitute = {}
+            substitute = dict()
             substitute["product_name_fr"] = row["name_"]
             substitute["nutrition_grades_tags"] = [row["score"]]
             substitute["codes_tags"] = [None, row["code"]]
@@ -101,7 +101,7 @@ class LocalDatabaseModel(QObject):
 
 
     def get_substitute_details(self, code, name):
-        '''Get product details from code and name'''
+        """Get product details from code and name"""
 
         product_details = {}
         request = "SELECT f.* FROM foods AS f, food_substitutes AS fs " \

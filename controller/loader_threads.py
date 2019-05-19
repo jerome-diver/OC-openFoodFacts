@@ -1,5 +1,5 @@
-'''Module For threads loaders to run Open Food Facts request call on
-background to not freeze application'''
+"""Module For threads loaders to run Open Food Facts request call on
+background to not freeze application"""
 
 from math import ceil
 from enum import Enum
@@ -10,15 +10,15 @@ from settings import DEBUG_MODE
 
 
 class Mode(Enum):
-    '''Enum mode list type'''
+    """Enum mode list type"""
 
     CHECKED = 1
     SELECTED = 2
 
 
 class LoadCategories(QThread):
-    '''Load Categories model in background process to not freeze
-    thz application'''
+    """Load Categories model in background process to not freeze
+    thz application"""
 
     def __init__(self, model, database):
         super().__init__()
@@ -29,9 +29,9 @@ class LoadCategories(QThread):
         self.wait()
 
     def run(self):
-        '''Start running the thread for populate model of Open Food Facts
+        """Start running the thread for populate model of Open Food Facts
         categories list from local database or from Open Food Facts API
-        online'''
+        online"""
 
         categories = []
         request = "SELECT id, name FROM categories ORDER BY name;"
@@ -43,7 +43,7 @@ class LoadCategories(QThread):
 
 
 class LoadFoods(QThread):
-    '''Load foods model in background to not freeze application'''
+    """Load foods model in background to not freeze application"""
 
     get_a_page = pyqtSignal(int, int)
     no_product_found = pyqtSignal()
@@ -59,25 +59,25 @@ class LoadFoods(QThread):
 
     @property
     def category(self):
-        '''Return property of category name'''
+        """Return property of category name"""
 
         return self._category
 
     @category.setter
     def category(self, value):
-        '''Setter for property of category name'''
+        """Setter for property of category name"""
 
         self._category = value
 
     @pyqtSlot()
     def end_process(self):
-        '''End of the loop, then thread will die'''
+        """End of the loop, then thread will die"""
 
         self._on_air = False
 
     def run(self):
-        '''Start running thread to load model for foods list from
-        Open Food Facts'''
+        """Start running thread to load model for foods list from
+        Open Food Facts"""
 
         page = 1
         pages_to_end = 1
@@ -99,8 +99,8 @@ class LoadFoods(QThread):
 
 
 class LoadProductDetails(QThread):
-    '''Load product selected from substitutes list to create model
-    for details'''
+    """Load product selected from substitutes list to create model
+    for details"""
 
     error_signal = pyqtSignal(str)
     status_message = pyqtSignal(str)
@@ -115,25 +115,25 @@ class LoadProductDetails(QThread):
 
     @property
     def name(self):
-        '''Return property for product name substitute'''
+        """Return property for product name substitute"""
 
         return self._name
 
     @name.setter
     def name(self, value):
-        '''Setter property for name of substitute product'''
+        """Setter property for name of substitute product"""
 
         self._name = value
 
     @property
     def code(self):
-        '''Return property for code product substitute'''
+        """Return property for code product substitute"""
 
         return self._code
 
     @code.setter
     def code(self, value):
-        ''' Setter property for code'''
+        """ Setter property for code"""
 
         self._code = value
 
@@ -142,13 +142,13 @@ class LoadProductDetails(QThread):
 
     @pyqtSlot()
     def end_process(self):
-        '''End of the loop, then thread will die'''
+        """End of the loop, then thread will die"""
 
         self._on_air = False
 
     def run(self):
-        '''Start to load details of product in background from Open Food
-        Facts'''
+        """Start to load details of product in background from Open Food
+        Facts"""
 
         mpd = self._model.product_details
         ms = self._model.substitutes
@@ -175,8 +175,8 @@ class LoadProductDetails(QThread):
 
 
 class UpdateCategories(QThread):
-    '''Load categories from Open Food Facts in background in categroies
-    table of the openfoodfacts_substitutes database'''
+    """Load categories from Open Food Facts in background in categories
+    table of the Open Food Facts_substitutes database"""
 
     def __init__(self, database, off_model):
         super().__init__()
@@ -187,7 +187,7 @@ class UpdateCategories(QThread):
         self.wait()
 
     def run(self):
-        '''Start thread job'''
+        """Start thread job"""
 
         if DEBUG_MODE:
             print("start to update categories table from OFF categories")
@@ -199,7 +199,7 @@ class UpdateCategories(QThread):
 
 
 class ThreadsControler(QObject):
-    '''Proxy class to control threads'''
+    """Proxy class to control threads"""
 
     kill_details_show_thread = pyqtSignal()
     kill_details_checked_thread = pyqtSignal()
@@ -214,7 +214,7 @@ class ThreadsControler(QObject):
         self._load_categories.start()
 
     def init_foods_thread(self, category):
-        '''Initialize foods thread call'''
+        """Initialize foods thread call"""
 
         self._load_foods = LoadFoods(self._model)
         self._controler.kill_foods_thread.connect(
@@ -229,7 +229,7 @@ class ThreadsControler(QObject):
 
 
     def wash_foods_thread(self):
-        '''Cleaner thread for load foods'''
+        """Cleaner thread for load foods"""
 
         if self._load_foods:
             if DEBUG_MODE:
@@ -238,7 +238,7 @@ class ThreadsControler(QObject):
                 self._load_foods.terminate()
 
     def init_product_details_thread(self, code, name, mode):
-        '''Initialize product_details thread call'''
+        """Initialize product_details thread call"""
 
         self._load_product_details[mode] = LoadProductDetails(self._model,mode)
         if mode == Mode.CHECKED:
@@ -258,7 +258,7 @@ class ThreadsControler(QObject):
         self._load_product_details[mode].start()
 
     def wash_product_details_thread(self, mode):
-        '''Clean product_details thread'''
+        """Clean product_details thread"""
 
         if self._load_product_details[mode]:
             if DEBUG_MODE:
@@ -269,6 +269,6 @@ class ThreadsControler(QObject):
 
     @property
     def load_categories(self):
-        '''Property for self._load_categories access'''
+        """Property for self._load_categories access"""
 
         return self._load_categories

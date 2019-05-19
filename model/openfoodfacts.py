@@ -1,4 +1,4 @@
-'''OpenFoodFacts link API of openFoodFacts online with application'''
+"""OpenFoodFacts link API of openFoodFacts online with application"""
 
 from PyQt5.QtCore import QObject, Qt, pyqtSignal
 import openfoodfacts
@@ -9,8 +9,9 @@ from . import FoodsModel
 from . import SubstitutesModel
 from . import ProductDetailsModels
 
+
 class OpenFoodFacts(QObject):
-    '''Model for Open Food Facts data requests'''
+    """Model for Open Food Facts data requests"""
 
     internet_access = pyqtSignal(bool)
 
@@ -29,30 +30,30 @@ class OpenFoodFacts(QObject):
 
     @property
     def categories(self):
-        '''Categories property'''
+        """Categories property"""
 
         return self._categories
 
     @property
     def foods(self):
-        '''Foods property'''
+        """Foods property"""
 
         return self._foods
 
     @property
     def substitutes(self):
-        '''Substitutes property'''
+        """Substitutes property"""
 
         return self._substitutes
 
     @property
     def product_details(self):
-        '''Product details property'''
+        """Product details property"""
 
         return self._product_details
 
     def download_categories(self):
-        '''Download categories and return them sorted by name'''
+        """Download categories and return them sorted by name"""
 
         categories = None
         try:
@@ -61,13 +62,13 @@ class OpenFoodFacts(QObject):
             self.internet_access.emit(False)
             return categories
         self.internet_access.emit(True)
-        return sorted(categories, key= lambda kv: kv["name"])
+        return sorted(categories, key=lambda kv: kv["name"])
 
     def download_foods(self, category, page=1):
-        '''Return foods from category'''
+        """Return foods from category"""
 
         def normalize_foods_products(foods_products):
-            '''Normalize data products content by adding missing keys'''
+            """Normalize data products content by adding missing keys"""
 
             for food in foods_products:
                 if "product_name_fr" not in food:
@@ -76,9 +77,9 @@ class OpenFoodFacts(QObject):
         foods = None
         try:
             foods = openfoodfacts.products.advanced_search(
-                {"search_terms" : category,
-                 "search_tag" : "categories_tags",
-                 "country" : "france",
+                {"search_terms": category,
+                 "search_tag": "categories_tags",
+                 "country": "france",
                  "page": page}
             )
         except:
@@ -89,13 +90,13 @@ class OpenFoodFacts(QObject):
         if page == 1:
             self._foods.count = foods["count"]
         return sorted(foods["products"],
-                      key= lambda kv: kv["product_name_fr"])
+                      key=lambda kv: kv["product_name_fr"])
 
     def download_product(self, code, name):
-        '''Return product for this code'''
+        """Return product for this code"""
 
         def normalize(product):
-            '''Normalize API keys'''
+            """Normalize API keys"""
 
             if "product_name_fr" not in product:
                 product["product_name_fr"] = product["product_name"]
@@ -121,7 +122,7 @@ class OpenFoodFacts(QObject):
         product = None
         try:
             product = openfoodfacts.products.advanced_search({
-                "search_terms" : name,
+                "search_terms": name,
                 "tagtype_0": "codes_tags",
                 "tag_contains_0": "contains",
                 "tag_0": code,
@@ -139,4 +140,3 @@ class OpenFoodFacts(QObject):
             print("====== FIND MANY PRODUCT FOR CODE:", code,
                   "AND [product_name]:", name, "======")
         return None
-

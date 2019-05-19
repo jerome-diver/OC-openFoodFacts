@@ -2,7 +2,7 @@
 
 import re
 import pymysql
-from pymysql.err import OperationalError
+from pymysql.err import *
 from PyQt5.QtCore import pyqtSignal, QObject
 
 from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
@@ -81,7 +81,11 @@ class Database(QObject):
         try:
             Database._connection.begin()
             cursor = Database._connection.cursor()
+            if DEBUG_MODE:
+                print("request :", request)
             if values:
+                if DEBUG_MODE:
+                    print("for values:", values)
                 if many:
                     cursor.executemany(request, values)
                 else:
@@ -99,6 +103,10 @@ class Database(QObject):
             Database.status_message.emit("Erreur lors de l'exécution de "
                                          "la requête SQL dans la base de "
                                          "donnée")
+        except IntegrityError as e:
+            if DEBUG_MODE:
+                print(e.args[0], e.args[1])
+            Database._connection.rollback()
         finally:
             if cursor:
                 cursor.close()
@@ -111,12 +119,20 @@ class Database(QObject):
         try:
             Database._connection.begin()
             cursor = Database._connection.cursor(pymysql.cursors.DictCursor)
+            if DEBUG_MODE:
+                print("request :", request)
             if values:
+                if DEBUG_MODE:
+                    print("for values:", values)
                 cursor.execute(request, values)
             else:
                 cursor.execute(request)
             Database._connection.commit()
         except OperationalError as e:
+            if DEBUG_MODE:
+                print(e.args[0], e.args[1])
+            Database._connection.rollback()
+        except IntegrityError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
             Database._connection.rollback()
@@ -245,8 +261,8 @@ class Database(QObject):
                     "(code, name_, description, score, brand, packaging, "
                     "url_, image_url) VALUES (%s, %s, %s, %s, %s, %s, %s, "
                     "%s);",
-            "shop": "INSERT INTO shops (name) VALUES (%s);",
-            "shop_id": "SELECT id FROM shops WHERE name = %s;",
+            "shop": "INSERT INTO shops (name_) VALUES (%s);",
+            "shop_id": "SELECT id FROM shops WHERE name_ = %s;",
             "f_shops": "INSERT INTO food_shops (food_code, shop_id) "
                        "VALUES (%s, %s);",
             "f_substit": "INSERT INTO food_substitutes "
@@ -257,27 +273,25 @@ class Database(QObject):
         for code, details in substitutes_details.items():
             # food record :
             values = (code,) + details[0:7]
-            if DEBUG_MODE:
-                print("request :", req["food"])
-                print("for values:", values)
             self.send_request(req["food"], values)
             # shops records :
-            for shop in details[7]:
-                value = (shop,)
-                fs_values = None # will be tuple with food.code
-                                 # and the return new id shop inserted
-                # check if shop name exist already :
-                for row in self.ask_request((req["shop_id"], shop)):
-                    fs_values = row["id"]
-                if not fs_values:   # shop name does not exist
-                    self.send_request(req["shop"], value)
-                    # get the id of the shop name inserted below :
-                    for row in self.ask_request((req["shop_id"], shop)):
-                        fs_values = (code, row["id"])
-                else: # shop name exist already, just use id
-                    fs_values = (code, fs_values)
-                # food_shops record (one shop loop => one shop):
-                self.send_request(req["f_shops"], fs_values)
+            if details[7]:      # if any shop there
+                for shop in details[7]:
+                    value = (shop,)
+                    fs_values = None    # will be tuple with food.code
+                                        # and the return new id shop inserted
+                                        # check if shop name exist already :
+                    for row in self.ask_request(req["shop_id"], value):
+                        fs_values = row["id"]
+                    if not fs_values:   # shop name does not exist
+                        self.send_request(req["shop"], value)
+                        # get the id of the shop name inserted below :
+                        for row in self.ask_request(req["shop_id"], value):
+                            fs_values = (code, row["id"])
+                    else: # shop name exist already, just use id
+                        fs_values = (code, fs_values)
+                    # food_shops record (one shop loop => one shop):
+                    self.send_request(req["f_shops"], fs_values)
         # add food_categories record :
         values = (food[0], category)
         self.send_request(req["f_category"], values)
