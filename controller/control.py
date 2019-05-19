@@ -72,8 +72,8 @@ class Controller(QObject):
 
         self._window.openfoodfacts_mode.setChecked(False)
         if state:
-            if self._off_mode:
-                self._off_mode = None
+            if self._db_mode:
+                self._db_mode = None
             if not self._db_mode:
                 self._db_mode = DatabaseMode(
                     self._window,

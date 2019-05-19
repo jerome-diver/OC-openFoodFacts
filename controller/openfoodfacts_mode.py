@@ -16,8 +16,6 @@ class OpenFoodFactsMode(QObject):
     checked_start = pyqtSignal()
     load_details_finished = pyqtSignal()
     kill_foods_thread = pyqtSignal()
-    kill_details_show_thread = pyqtSignal()
-    kill_details_checked_thread = pyqtSignal()
 
     def __init__(self, window, database):
         super().__init__()
@@ -71,7 +69,6 @@ class OpenFoodFactsMode(QObject):
         if not self._no_product:
             self.status_message.emit("Tous les produits de la catégorie sont "
                                      "affichés")
-        self._threads.wash_foods_thread()
         if DEBUG_MODE:
             print("End process to load foods")
 

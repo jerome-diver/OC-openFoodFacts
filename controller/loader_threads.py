@@ -111,6 +111,7 @@ class LoadProductDetails(QThread):
         self._code = ""
         self._name = ""
         self._mode = mode
+        self._on_air = True
 
     @property
     def name(self):
@@ -139,6 +140,12 @@ class LoadProductDetails(QThread):
     def __del__(self):
         self.wait()
 
+    @pyqtSlot()
+    def end_process(self):
+        '''End of the loop, then thread will die'''
+
+        self._on_air = False
+
     def run(self):
         '''Start to load details of product in background from Open Food
         Facts'''
@@ -153,16 +160,15 @@ class LoadProductDetails(QThread):
                                  "(code {} ) en cours sur "
                                  "Open Food Facts...".format(self._code))
         food = self._model.download_product(self._code, self._name)
-        if food:
-            if self._mode == Mode.SELECTED:
+        if food and self._on_air:
+            if self._mode == Mode.SELECTED and self._on_air:
                 mpd.populate(food)
-            elif self._mode == Mode.CHECKED:
+            elif self._mode == Mode.CHECKED and self._on_air:
                 ms.generate_checked()
                 mpd.generate_checked(food, ms.checked)
                 if DEBUG_MODE:
                     print("list checked:", mpd.checked)
         else:
-            mpd.reset()
             self.error_signal.emit("Hélas, il n'y a aucun détail enregistré "
                                    "pour ce code produit")
             self.status_message.emit("Aucun détail cohérent n'est fourni")
@@ -194,6 +200,9 @@ class UpdateCategories(QThread):
 
 class ThreadsControler(QObject):
     '''Proxy class to control threads'''
+
+    kill_details_show_thread = pyqtSignal()
+    kill_details_checked_thread = pyqtSignal()
 
     def __init__(self, controler):
         super().__init__()
@@ -232,6 +241,12 @@ class ThreadsControler(QObject):
         '''Initialize product_details thread call'''
 
         self._load_product_details[mode] = LoadProductDetails(self._model,mode)
+        if mode == Mode.CHECKED:
+            self.kill_details_checked_thread.connect(
+                self._load_product_details[mode].end_process)
+        elif mode == Mode.SELECTED:
+            self.kill_details_show_thread.connect(
+                self._load_product_details[mode].end_process)
         self._load_product_details[mode].finished.connect(
             self._controler.on_load_product_details_finished)
         self._load_product_details[mode].status_message.connect(

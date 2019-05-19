@@ -12,20 +12,7 @@ class SubstitutesModel(QStandardItemModel):
         super().__init__(views["substitutes"])
         self._views = views
         self.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
-        self._selected = []
         self._checked = []
-
-    @property
-    def selected(self):
-        '''Selected substitutes list (checked from substitutes list view)'''
-
-        return self._selected
-
-    @selected.setter
-    def selected(self, value):
-        '''Set self._selected_substitutes'''
-
-        self._selected = value
 
     @property
     def checked(self):
