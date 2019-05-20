@@ -176,7 +176,10 @@ class Database(QObject):
     def record_user(self, username, nick_name, family_name):
         '''Record an entry inside Table Users'''
 
-        request = "INSERT INTO users (family_name, nick_name, username) VALUES (%s, %s, %s);"
+        request = """
+            INSERT INTO users 
+                (family_name, nick_name, username) 
+                VALUES (%s, %s, %s);"""
         values = (family_name, nick_name, username)
         self.send_request(request, values)
 
@@ -249,57 +252,84 @@ class Database(QObject):
             for id in unknown:
                 self.send_request(request, (id))
 
-    def new_record(self, category, food, substitutes, substitutes_details,
+    def new_record(self, category_id, food, substitutes_details,
                    user_id):
         '''Record new entry for selected substitutes and linked
         correspondant category and food selected and products details'''
 
-        req = {
-            "f_category": "INSERT INTO food_categories "
-                          "(food_code, category_id) VALUES (%s, %s);",
-            "food": "INSERT INTO foods "
-                    "(code, name_, description, score, brand, packaging, "
-                    "url_, image_url) VALUES (%s, %s, %s, %s, %s, %s, %s, "
-                    "%s);",
-            "shop": "INSERT INTO shops (name_) VALUES (%s);",
-            "shop_id": "SELECT id FROM shops WHERE name_ = %s;",
-            "f_shops": "INSERT INTO food_shops (food_code, shop_id) "
-                       "VALUES (%s, %s);",
-            "f_substit": "INSERT INTO food_substitutes "
-                         "(food_code, substitute_code) VALUES (%s, %s);",
-            "u_foods": "INSERT INTO user_foods (user_id, food_code) "
-                       "VALUES (%s, %s);", }
+        request = """
+                INSERT IGNORE INTO food_substitutes 
+                    (food_code, substitute_code) 
+                    VALUES (%s, %s);"""
         # add foods, shops, food_shops records :
-        for code, details in substitutes_details.items():
-            # food record :
-            values = (code,) + details[0:7]
-            self.send_request(req["food"], values)
-            # shops records :
-            if details[7]:      # if any shop there
+        food_selected_code = food["codes_tags"][1]
+        shops = []
+        for shop in food["stores_tags"]:
+            shops.append(shop)
+        food_selected_details = (
+            food["product_name_fr"],
+            food["ingredients_text"],
+            food["nutrition_grades_tags"][0],
+            food["brands_tags"],
+            food["packaging"],
+            food["url"],
+            food["image_front_url"],
+            shops
+        )
+        try:
+            self._record_product(user_id, category_id, food_selected_code,
+                                 food_selected_details)
+            for code, details in substitutes_details.items():
+                    self._record_product(user_id, category_id, code, details)
+                    values = (food_selected_code, code)
+                    self.send_request(request, values)
+            return True
+        except Error as error:
+            self.status_message.emit("Il y a eu un problème d'enregistrement "
+                                     "des données dans la base")
+            return False
+
+    def _record_product(self, user_id, category_id, food_code, details):
+        """Record a full detailed content for tables:
+        foods, shops, food_shops, user_foods, food_categories"""
+
+        request = {
+            "food_categories": """
+                INSERT INTO food_categories 
+                        (food_code, category_id) 
+                        VALUES (%s, %s);""",
+            "foods": """
+                INSERT INTO foods 
+                    (code, name, description, score, 
+                    brand, packaging, url, image_url) 
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s);""",
+            "shops": """
+                INSERT INTO shops (name) VALUES (%s) 
+                    ON DUPLICATE KEY UPDATE name=VALUE(name);""",
+            "food_shops": """
+                INSERT IGNORE INTO food_shops 
+                    (food_code, shop_name) 
+                    VALUES (%s, %s);""",
+            "user_foods": """
+                INSERT INTO user_foods 
+                    (user_id, food_code) 
+                    VALUES (%s, %s);""" }
+        try:
+            values = (food_code,) + details[0:7]
+            self.send_request(request["foods"], values)
+            values = (user_id, food_code)
+            self.send_request(request["user_foods"], values)
+            values = (food_code, category_id)
+            self.send_request(request["food_categories"], values)
+            if details[7]:
                 for shop in details[7]:
                     value = (shop,)
-                    fs_values = None    # will be tuple with food.code
-                                        # and the return new id shop inserted
-                                        # check if shop name exist already :
-                    for row in self.ask_request(req["shop_id"], value):
-                        fs_values = row["id"]
-                    if not fs_values:   # shop name does not exist
-                        self.send_request(req["shop"], value)
-                        # get the id of the shop name inserted below :
-                        for row in self.ask_request(req["shop_id"], value):
-                            fs_values = (code, row["id"])
-                    else: # shop name exist already, just use id
-                        fs_values = (code, fs_values)
-                    # food_shops record (one shop loop => one shop):
-                    self.send_request(req["f_shops"], fs_values)
-        # add food_categories record :
-        values = (food[0], category)
-        self.send_request(req["f_category"], values)
-        # add food_substitutes record :
-        for code in substitutes:
-            values = (food[0], code)
-            self.send_request(req["f_substit"], values)
-        # add user_foods record :
-        values = (user_id, food[0])
-        self.send_request(req["u_foods"], values)
+                    self.send_request(request["shops"], value)
+                    values = (food_code, shop)
+                    self.send_request(request["food_shops"], values)
+        except Error as error:
+            if DEBUG_MODE:
+                print("problem for record in database")
+
+
 

@@ -103,6 +103,7 @@ class LoadProductDetails(QThread):
         self._name = ""
         self._mode = mode
         self._on_air = True
+        self._get_selection = dict()
 
     @property
     def name(self):
@@ -128,6 +129,18 @@ class LoadProductDetails(QThread):
 
         self._code = value
 
+    @property
+    def get_selection(self):
+        """Property for get selection product details"""
+
+        return self._get_selection
+
+    @get_selection.setter
+    def get_selection(self, value):
+        """Setter property for pass ref of variable to get details selection"""
+
+        self._get_selection = value
+
     def __del__(self):
         self.wait()
 
@@ -152,6 +165,8 @@ class LoadProductDetails(QThread):
                                  "Open Food Facts...".format(self._code))
         food = self._model.download_product(self._code, self._name)
         if food and self._on_air:
+            if self._mode == Mode.GET:
+                self._get_selection = food
             if self._mode == Mode.SELECTED and self._on_air:
                 mpd.populate(food)
             elif self._mode == Mode.CHECKED and self._on_air:
@@ -194,13 +209,16 @@ class ThreadsControler(QObject):
 
     kill_details_show_thread = pyqtSignal()
     kill_details_checked_thread = pyqtSignal()
+    kill_details_get_thread = pyqtSignal()
 
     def __init__(self, controler):
         super().__init__()
         self._controler = controler
         self._model = controler.model
         self._load_categories = LoadCategories(self._model, controler.database)
-        self._load_product_details = {Mode.CHECKED: [], Mode.SELECTED: []}
+        self._load_product_details = {Mode.CHECKED: [],
+                                      Mode.SELECTED: [],
+                                      Mode.GET: []}
         self._load_foods = None
         self._load_categories.start()
 
@@ -228,7 +246,8 @@ class ThreadsControler(QObject):
             if self._load_foods.isRunning():
                 self._load_foods.terminate()
 
-    def init_product_details_thread(self, code, name, mode):
+    def init_product_details_thread(self, code, name, mode,
+                                    get_selection=None):
         """Initialize product_details thread call"""
 
         self._load_product_details[mode] = LoadProductDetails(self._model,mode)
@@ -237,6 +256,10 @@ class ThreadsControler(QObject):
                 self._load_product_details[mode].end_process)
         elif mode == Mode.SELECTED:
             self.kill_details_show_thread.connect(
+                self._load_product_details[mode].end_process)
+        elif mode == Mode.GET:
+            self._load_product_details[mode].get_selection = get_selection
+            self.kill_details_get_thread.connect(
                 self._load_product_details[mode].end_process)
         self._load_product_details[mode].finished.connect(
             self._controler.on_load_product_details_finished)

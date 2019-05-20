@@ -34,12 +34,13 @@ class OpenFoodFactsMode(QObject):
                        "url" : self._window.product_url,
                        "img_thumb" : self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
-        self._model = OpenFoodFacts(self._views)
+        self._model = OpenFoodFacts(self._views, database)
         self._threads = ThreadsControler(self)
         self._flags = {"product": True,
                        "internet": True,
                        "call_mode": Mode.SELECTED}
         self._messenger = Messenger(self, self._flags)
+        self._get_selection = dict()
         self.connect_signals()
 
 
@@ -150,8 +151,8 @@ class OpenFoodFactsMode(QObject):
         self._window.reset_views((Widget.FOODS,
                                   Widget.SUBSTITUTES,
                                   Widget.DETAILS))
-        index_id = self._model.categories.index(index.row(), 1)
-        self._model.categories.selected = index_id.data()
+        id = self._model.categories.index(index.row(), 1).data()
+        self._model.foods.category_id = id
         self._threads.init_foods_thread(index.data())
 
     @pyqtSlot(QModelIndex)
@@ -172,6 +173,8 @@ class OpenFoodFactsMode(QObject):
             print("and foods pages is", len(self._model.foods.recorded))
         self._model.substitutes.populate(self._model.foods.selected,
                                          self._model.foods.recorded)
+        self._threads.init_product_details_thread(code, name, Mode.GET,
+                                                  self._get_selection)
         self.show_substitutes()
 
     def show_substitutes(self):
@@ -189,7 +192,8 @@ class OpenFoodFactsMode(QObject):
             sub_model = self._views["substitutes"].model()
             code = sub_model.index(index_select.row(), 2).data()
             name = sub_model.index(index_select.row(), 0).data()
-            self._threads.init_product_details_thread(code, name, Mode.SELECTED)
+            self._threads.init_product_details_thread(code, name,
+                                                      Mode.SELECTED)
 
     @pyqtSlot('QStandardItem*')
     def on_substitute_checked(self, item):
@@ -227,3 +231,9 @@ class OpenFoodFactsMode(QObject):
         """Window access property"""
 
         return self._window
+
+    @property
+    def get_selection(self):
+        """Property for selection details product getter"""
+
+        return self._get_selection

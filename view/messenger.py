@@ -98,7 +98,7 @@ class Messenger(QObject):
 
         if selected.indexes():
             index = selected.indexes()[0]
-            sub_model = self._views["substitutes"].model()
+            sub_model = self._gm._views["substitutes"].model()
             code = sub_model.index(index.row(), 2).data()
             name = sub_model.index(index.row(), 0).data()
             if DEBUG_MODE:
@@ -113,7 +113,7 @@ class Messenger(QObject):
 
         index = self._gm.model.substitutes.indexFromItem(item)
         code = self._gm.model.substitutes.index(index.row(), 2).data()
-        name = self._model.substitutes.index(index.row(), 0).data()
+        name = self._gm._model.substitutes.index(index.row(), 0).data()
         if DEBUG_MODE:
             print("now searching product for code", code, "name", name)
         self.status_message.emit("Patientez, recherche sur le code produit "

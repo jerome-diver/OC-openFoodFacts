@@ -1,13 +1,13 @@
 """OpenFoodFacts link API of openFoodFacts online with application"""
 
-from PyQt5.QtCore import QObject, Qt, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 import openfoodfacts
 
 from settings import DEBUG_MODE
-from . import CategoriesModel
-from . import FoodsModel
-from . import SubstitutesModel
-from . import ProductDetailsModels
+from model import User
+from . import CategoriesModel, FoodsModel, \
+              SubstitutesModel, ProductDetailsModels
+from . import CategoriesHelper, FoodsHelper, SubstitutesHelper
 from controller import Widget
 
 
@@ -16,42 +16,24 @@ class OpenFoodFacts(QObject):
 
     internet_access = pyqtSignal(bool)
 
-    def __init__(self, views=None):
+    def __init__(self, views=None, database=None):
         super().__init__()
-        if views:
-            self._categories = CategoriesModel(views)
-            self._foods = FoodsModel(views)
-            self._substitutes = SubstitutesModel(views)
+        self._user = None
+        if views and database:
+            self._categories = CategoriesModel(views,
+                                               CategoriesHelper(database,
+                                                                self._user))
+            self._foods = FoodsModel(views,
+                                     FoodsHelper(database, self._user))
+            self._substitutes = SubstitutesModel(views,
+                                                 SubstitutesHelper(database,
+                                                                   self._user))
             self._product_details = ProductDetailsModels(views)
         else:
             self._substitutes = None
             self._foods = None
             self._categories = None
             self._product_details = None
-
-    @property
-    def categories(self):
-        """Categories property"""
-
-        return self._categories
-
-    @property
-    def foods(self):
-        """Foods property"""
-
-        return self._foods
-
-    @property
-    def substitutes(self):
-        """Substitutes property"""
-
-        return self._substitutes
-
-    @property
-    def product_details(self):
-        """Product details property"""
-
-        return self._product_details
 
     def download_categories(self):
         """Download categories and return them sorted by name"""
@@ -150,3 +132,34 @@ class OpenFoodFacts(QObject):
             self._substitutes.reset()
         if Widget.DETAILS in models or Widget.ALL in models:
             self._product_details.reset()
+
+    @pyqtSlot(User)
+    def on_user_connected(self, user):
+        """When a user is connected"""
+
+        self._user = user
+
+    @property
+    def categories(self):
+        """Categories property"""
+
+        return self._categories
+
+    @property
+    def foods(self):
+        """Foods property"""
+
+        return self._foods
+
+    @property
+    def substitutes(self):
+        """Substitutes property"""
+
+        return self._substitutes
+
+    @property
+    def product_details(self):
+        """Product details property"""
+
+        return self._product_details
+

@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from controller import DatabaseMode, OpenFoodFactsMode, \
                        UpdateCategories, Authentication
-from model import OpenFoodFacts
+from model import OpenFoodFacts, User
 from view import MainWindow
 from settings import DEBUG_MODE
 
@@ -15,6 +15,7 @@ class Controller(QObject):
     """Control everything"""
 
     status_message = pyqtSignal(str)
+    user_connected = pyqtSignal(User)
 
     def __init__(self):
         super().__init__()
@@ -101,6 +102,8 @@ class Controller(QObject):
                 self._off_mode.load_details_finished.connect(
                     self.on_load_details_finished)
                 self._off_mode.checked_start.connect(self.on_checked_started)
+                self.user_connected.connect(
+                    self._off_mode.model.on_user_connected)
             else:
                 self._window.show_categories()
                 self._window.show_foods()
@@ -110,6 +113,8 @@ class Controller(QObject):
                     self.on_load_details_finished)
                 self._off_mode.checked_start.disconnect(
                     self.on_checked_started)
+                self.user_connected.disconnect(
+                    self._off_mode.model.on_user_connected)
         else:
             self._window.reset_views()
 
@@ -155,6 +160,7 @@ class Controller(QObject):
 
         self._flags["user_connected"] = connected
         if connected:
+            self.user_connected.emit(self._authenticate.user)
             self.status_message.emit("L'utilisateur est connecté à "
                                  "la base de donnée locale")
             self._window.signin.setText("Sign-out")
@@ -174,9 +180,12 @@ class Controller(QObject):
             user_id = self._authenticate.user.id
             if DEBUG_MODE:
                 print("user id:", user_id)
-            database.new_record(self._off_mode.model.categories.selected,
-                                self._off_mode.model.foods.selected,
-                                self._off_mode.model.substitutes.checked,
-                                self._off_mode.model.product_details.checked,
-                                user_id)
+            ok = database.new_record(
+                self._off_mode.model.foods.category_id,
+                self._off_mode.model.get_selection,
+                self._off_mode.model.product_details.checked,
+                user_id)
+            if ok:
+                self._off_mode.model.substitutes.reset_checkboxes()
+
 

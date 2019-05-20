@@ -64,12 +64,12 @@ class DatabaseMode(QObject):
     def on_category_selected(self, index):
         """Slot when an element of categories list is selected"""
 
-        index_id = self._model.categories.index(index.row(), 1)
-        self._model.categories.selected = index.data()
+        id = self._model.categories.index(index.row(), 1).data()
+        self._model.foods.category_id = id
         self._model.foods.reset()
         self._model.substitutes.reset()
         self._model.product_details.reset()
-        foods = self._model.get_foods(index_id.data())
+        foods = self._model.get_foods(id)
         self._model.foods.populate(foods)
 
 

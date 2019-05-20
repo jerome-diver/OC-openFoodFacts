@@ -8,6 +8,7 @@ class Mode(Enum):
 
     CHECKED = 1
     SELECTED = 2
+    GET = 3
 
 
 class Widget(Enum):
