@@ -1,4 +1,4 @@
-'''Model for substitutes list view of Mainwindow'''
+"""Model for substitutes list view of Mainwindow"""
 
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt5.QtCore import Qt
@@ -6,27 +6,29 @@ from PyQt5.QtCore import Qt
 from settings import DEBUG_MODE
 
 class SubstitutesModel(QStandardItemModel):
-    '''Mainwindow substitutess view model'''
+    """MainWindow substitutes view model"""
 
     def __init__(self, views):
         super().__init__(views["substitutes"])
-        self._views = views
         self.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
+        self._views = views
         self._checked = []
 
     @property
     def checked(self):
-        '''Checked list of substitutes products property'''
+        """Checked list of substitutes products property"""
 
         return self._checked
 
     def populate(self, selected, foods, page=0, new=True):
-        '''Return the list of possible substitution products inside
+        """Return the list of possible substitution products inside
         substitutes list view without the selected one and for score better
-        then selected one and without empty product_name foods'''
+        then selected one and without empty product_name foods"""
 
         if new:
             self.reset()
+            if DEBUG_MODE:
+                print("foods length:", len(foods))
         for food in foods[page]:
             if food["product_name_fr"] != selected \
                     and food["nutrition_grades_tags"][0] != "not-applicable" \
@@ -51,13 +53,13 @@ class SubstitutesModel(QStandardItemModel):
         self.sort(1)
 
     def reset(self):
-        '''Reset model for substitutes_list view'''
+        """Reset model for substitutes_list view"""
 
-        self._selected = []
+        self._checked = []
         self.removeRows(0, self.rowCount())
 
     def generate_checked(self):
-        '''Update list of checked item codes'''
+        """Update list of checked item codes"""
 
         self._checked = []
         for index in range(self.rowCount()):

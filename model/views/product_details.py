@@ -1,4 +1,4 @@
-'''Models for product details views of Mainwindow'''
+"""Models for product details views of Mainwindow"""
 
 from urllib.request import urlopen
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, \
@@ -9,40 +9,40 @@ from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
     NUTRISCORE_D, NUTRISCORE_E
 
 class ProductDetailsModels():
-    '''Mainwindow product details views models'''
+    """Mainwindow product details views models"""
 
     def __init__(self, views):
         #super().__init__()
         self._views = views
         self._models = {"name": "",
-                         "description" : "",
-                         "shops" : QStandardItemModel(self._views["shops"]),
-                         "shops_names" : [],
-                         "url" : "",
-                         "score" : "",
-                         "score_data": "",
-                         "brand" : "",
-                         "packaging" : "",
-                         "img_thumb" : "",
-                         "img_data": None,
-                         "code" : "",
+                        "description": "",
+                        "shops": QStandardItemModel(self._views["shops"]),
+                        "shops_names": [],
+                        "url": "",
+                        "score": "",
+                        "score_data": "",
+                        "brand": "",
+                        "packaging": "",
+                        "img_thumb": "",
+                        "img_data": None,
+                        "code": "",
                         }
         self._checked = {}
 
     @property
     def models(self):
-        '''Details of selected product models'''
+        """Details of selected product models"""
 
         return self._models
 
     @property
     def checked(self):
-        '''Checked list of substitutes products property'''
+        """Checked list of substitutes products property"""
 
         return self._checked
 
     def populate(self, food):
-        '''Return the full views models of views for show product details'''
+        """Return the full views models of views for show product details"""
 
         url = "<a href=\"" + food["url"] + "\" />"
         self._models["code"] = food["codes_tags"][1]
@@ -72,9 +72,10 @@ class ProductDetailsModels():
         img_front.loadFromData(data_front)
         self._models["img_thumb"] = QPixmap(img_front)
         self._models["img_thumb"].scaledToWidth(150)
-        
-    def define_with(self, var, food):
-        '''define variables records datas'''
+
+    @staticmethod
+    def define_with(var, food):
+        """define variables records datas"""
 
         var["code"] = food["codes_tags"][1]
         var["name"] = food["product_name_fr"]
@@ -88,14 +89,14 @@ class ProductDetailsModels():
         var["brand"] = food["brands_tags"]
         img_url = food["image_front_url"] \
             if "image_front_url" in food.keys() else ""
-        # case of blob data insertion is not fixed there :
+        # case of blob field format for data insertion in database:
         #data_front = urlopen(img_url).read()
-        #stream = QDataStream(data_front)
+        #var["image"] = data_front
         var["img_url"] = img_url
         
 
     def reset(self):
-        '''Reset models for product details views'''
+        """Reset models for product details views"""
 
         if self._models["shops"]:
             self._models["shops"].removeRows(0,
@@ -108,22 +109,23 @@ class ProductDetailsModels():
         self._models["brand"] = ""
         self._models["packaging"] = ""
         self._models["img_thumb"] = QPixmap()
+        self._checked = {}
 
     def generate_checked(self, product, substitutes_checked):
-        '''Generate checked list of products details from products checked'''
+        """Generate checked list of products details from products checked"""
 
-        datas = {}
-        self.define_with(datas, product)
+        data = {}
+        self.define_with(data, product)
         if product["codes_tags"][1] in substitutes_checked:
-            self._checked[datas["code"]] = (
-                datas["name"],
-                datas["description"],
-                datas["score_data"],
-                datas["brand"],
-                datas["packaging"],
-                datas["url"],
-                datas["img_url"],
-                datas["shops_names"])
+            self._checked[data["code"]] = (
+                data["name"],
+                data["description"],
+                data["score_data"],
+                data["brand"],
+                data["packaging"],
+                data["url"],
+                data["img_url"],
+                data["shops_names"])
         else:
             if product["codes_tags"][1] in self._checked.keys():
                 del self._checked[product["codes_tags"][1]]

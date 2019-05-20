@@ -24,9 +24,9 @@ class Controller(QObject):
         self._window.show()
         self._db_mode = None
         self._off_mode = None
-        self._flag_user_connected = False
-        self._flag_checked_list = False
-        self._flag_checked_details = False
+        self._flags = dict(user_connected=False,
+                           checked_product=False,
+                           checked_details=False)
         self.connect_signals()
         off_model = OpenFoodFacts()
         loader = UpdateCategories(self._authenticate.get_database(),
@@ -74,8 +74,10 @@ class Controller(QObject):
 
         self._window.openfoodfacts_mode.setChecked(False)
         if state:
-            if self._db_mode:
-                self._db_mode = None
+            if self._off_mode:
+                self._off_mode.disconnect_signals()
+                self._window.reset_views()
+                self._off_mode = None
             if not self._db_mode:
                 self._db_mode = DatabaseMode(
                     self._window,
@@ -90,6 +92,7 @@ class Controller(QObject):
         if state:
             self._window.local_mode.setChecked(False)
             if self._db_mode:
+                self._db_mode.disconnect_signals()
                 self._db_mode = None
             if not self._off_mode:
                 self._off_mode = OpenFoodFactsMode(
@@ -99,10 +102,10 @@ class Controller(QObject):
                     self.on_load_details_finished)
                 self._off_mode.checked_start.connect(self.on_checked_started)
             else:
-                self._off_mode.on_load_categories_finished()
-                self._off_mode.on_load_foods_finished()
-                self._off_mode.show_substitutes()
-                self._off_mode.on_load_product_details_finished()
+                self._window.show_categories()
+                self._window.show_foods()
+                self._window.show_substitutes()
+                self._window.show_product_details()
                 self._off_mode.load__details.finished.disconnect(
                     self.on_load_details_finished)
                 self._off_mode.checked_start.disconnect(
@@ -116,11 +119,11 @@ class Controller(QObject):
 
         self._window.record.setEnabled(False)
         self._window.record.setDisabled(True)
-        if not self._flag_user_connected:
+        if not self._flags["user_connected"]:
             self._window.record.setText("Aucun utilisateur connecté")
-        elif not self._flag_checked_list:
+        elif not self._flags["checked_product"]:
             self._window.record.setText("Aucune sélection de substitut")
-        elif not self._flag_checked_details:
+        elif not self._flags["checked_details"]:
             self._window.record.setText("Attendez, recherche des détails "
                                         "pour la sélection")
         else:
@@ -132,9 +135,9 @@ class Controller(QObject):
         """When product substitutes checked details are loaded..."""
 
         if self._off_mode:
-            self._flag_checked_list = bool(
+            self._flags["checked_product"] = bool(
                 self._off_mode.model.substitutes.checked)
-            self._flag_checked_details = bool(
+            self._flags["checked_details"] = bool(
                 self._off_mode.model.product_details.checked)
         self.checked_substitutes()
 
@@ -142,15 +145,15 @@ class Controller(QObject):
     def on_checked_started(self):
         """Slot for receipt signal to said if substitutes list any selection"""
 
-        self._flag_checked_list = True
-        self._flag_checked_details = False
+        self._flags["checked_product"] = True
+        self._flags["checked_details"] = False
         self.checked_substitutes()
 
     @pyqtSlot(bool)
     def on_user_connection(self, connected):
         """When user is connected to his local database"""
 
-        self._flag_user_connected = connected
+        self._flags["user_connected"] = connected
         if connected:
             self.status_message.emit("L'utilisateur est connecté à "
                                  "la base de donnée locale")

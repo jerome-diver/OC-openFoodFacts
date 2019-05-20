@@ -8,6 +8,7 @@ from . import CategoriesModel
 from . import FoodsModel
 from . import SubstitutesModel
 from . import ProductDetailsModels
+from controller import Widget
 
 
 class OpenFoodFacts(QObject):
@@ -62,6 +63,7 @@ class OpenFoodFacts(QObject):
             self.internet_access.emit(False)
             return categories
         self.internet_access.emit(True)
+        categories = [c for c in categories if c["products"] >= 2]
         return sorted(categories, key=lambda kv: kv["name"])
 
     def download_foods(self, category, page=1):
@@ -72,25 +74,20 @@ class OpenFoodFacts(QObject):
 
             for food in foods_products:
                 if "product_name_fr" not in food:
-                    food["product_name_fr"] = food["product_name"]
+                    if "product_name" in food:
+                        food["product_name_fr"] = food["product_name"]
+                    else:
+                        foods_products.remove(food)
 
         foods = None
         try:
-            foods = openfoodfacts.products.advanced_search(
-                {"search_terms": category,
-                 "search_tag": "categories_tags",
-                 "country": "france",
-                 "page": page}
-            )
+            foods = openfoodfacts.products.get_by_category(category, page=page)
         except:
             self.internet_access.emit(False)
             return foods
         self.internet_access.emit(True)
-        normalize_foods_products(foods["products"])
-        if page == 1:
-            self._foods.count = foods["count"]
-        return sorted(foods["products"],
-                      key=lambda kv: kv["product_name_fr"])
+        normalize_foods_products(foods)
+        return sorted(foods, key=lambda kv: kv["product_name_fr"])
 
     def download_product(self, code, name):
         """Return product for this code"""
@@ -140,3 +137,16 @@ class OpenFoodFacts(QObject):
             print("====== FIND MANY PRODUCT FOR CODE:", code,
                   "AND [product_name]:", name, "======")
         return None
+
+    def reset_models(self, models=(Widget.ALL,)):
+        """Reset all models or elected ones"""
+
+
+        if Widget.CATEGORIES in models or Widget.ALL in models:
+            self._categories.reset()
+        if Widget.FOODS in models or Widget.ALL in models:
+            self._foods.reset()
+        if Widget.SUBSTITUTES in models or Widget.ALL in models:
+            self._substitutes.reset()
+        if Widget.DETAILS in models or Widget.ALL in models:
+            self._product_details.reset()

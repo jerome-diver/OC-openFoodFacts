@@ -1,19 +1,11 @@
 """Module For threads loaders to run Open Food Facts request call on
 background to not freeze application"""
 
-from math import ceil
-from enum import Enum
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, \
                          QThread
 
 from settings import DEBUG_MODE
-
-
-class Mode(Enum):
-    """Enum mode list type"""
-
-    CHECKED = 1
-    SELECTED = 2
+from controller import Mode
 
 
 class LoadCategories(QThread):
@@ -80,22 +72,21 @@ class LoadFoods(QThread):
         Open Food Facts"""
 
         page = 1
-        pages_to_end = 1
-        while pages_to_end != 0 and self._on_air:
+        have_more_product = True
+        self._model.foods.recorded = []
+        while have_more_product and self._on_air:
             first_page = bool(page == 1)
             foods = self._model.download_foods(self._category, page)
+            have_more_product = bool(len(foods) >= 21)
             if foods:
+                if DEBUG_MODE:
+                    print("there is foods to add...")
                 self._model.foods.recorded.append(foods)
-                if first_page:
-                    products = self._model.foods.count
-                    pages_to_end = ceil(products / 20) - 1 \
-                        if products >= 21 else 1
                 self._model.foods.populate(foods, first_page)
-                self.get_a_page.emit(page, pages_to_end)
+                self.get_a_page.emit(page, "?")
             else:
                 self.no_product_found.emit()
             page += 1
-            pages_to_end -= 1
 
 
 class LoadProductDetails(QThread):

@@ -42,6 +42,15 @@ class DatabaseMode(QObject):
         self._views["url"].clicked.connect(self.on_product_url_clicked)
         self.status_message.connect(self._window.on_status_message)
 
+    def disconnect_signals(self):
+        """Disconnect signals with slots"""
+
+        self._views["categories"].clicked.disconnect(self.on_category_selected)
+        self._views["foods"].clicked.disconnect(self.on_food_selected)
+        self._views["substitutes"].clicked.disconnect(self.on_substitute_selected)
+        self._views["url"].clicked.disconnect(self.on_product_url_clicked)
+        self.status_message.disconnect(self._window.on_status_message)
+
     def _initialize(self):
         """Show categories first"""
 

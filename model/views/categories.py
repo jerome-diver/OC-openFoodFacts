@@ -1,11 +1,11 @@
-'''Model of "categories" Mainwindow view'''
+"""Model of "categories" Mainwindow view"""
 
 import re
 
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 class CategoriesModel(QStandardItemModel):
-    '''categories view model'''
+    """categories view model"""
 
     def __init__(self, views):
         super().__init__(views["categories"])
@@ -14,24 +14,23 @@ class CategoriesModel(QStandardItemModel):
 
     @property
     def selected(self):
-        '''Return selected category'''
+        """Return selected category"""
 
         return self._selected
 
     @selected.setter
     def selected(self, value):
-        '''Setter property for _selected_category'''
+        """Setter property for _selected_category"""
 
         self._selected = value
 
 
     def populate(self, categories):
-        '''Return all categories inside list categories view
-        by openfoodfacts module helper'''
+        """Return all categories inside list categories view
+        by openfoodfacts module helper"""
 
         self.removeRows(0, self.rowCount())
         self._selected = None
-        self._foods_recorded = []
         for category in categories:
             is_fr = re.match(r'^fr:', category["name"])
             is_latin_chars = re.match(r'[0-9a-zA-z\s]', category["name"])
@@ -42,3 +41,9 @@ class CategoriesModel(QStandardItemModel):
                 item_id = QStandardItem(category["id"])
                 item_off_name = QStandardItem(category["name"])
                 self.appendRow([item_name, item_id, item_off_name])
+
+    def reset(self):
+        """Reset the foods list"""
+
+        self._selected = None
+        self.removeRows(0, self.rowCount())
