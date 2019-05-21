@@ -15,12 +15,6 @@ class SubstitutesModel(QStandardItemModel):
         self._helper = helper
         self._checked = []
 
-    @property
-    def checked(self):
-        """Checked list of substitutes products property"""
-
-        return self._checked
-
     def populate(self, selected, foods, page=0, new=True):
         """Return the list of possible substitution products inside
         substitutes list view without the selected one and for score better
@@ -52,9 +46,6 @@ class SubstitutesModel(QStandardItemModel):
                 item_name.setBackground(color)
                 item_code.setBackground(color)
                 if food["codes_tags"][1] in ldb_substitutes:
-                    if DEBUG_MODE:
-                        print("this product", food["product_name_fr"],
-                              "is in the local database")
                     item_name.setForeground(QColor(0, 250, 0))
                 self.appendRow([item_name, item_grade, item_code])
         self.sort(1)
@@ -86,8 +77,28 @@ class SubstitutesModel(QStandardItemModel):
             if item.checkState() == Qt.Checked:
                 item.setCheckState(Qt.Unchecked)
 
+    def find_substitutes_in_database(self, selected):
+        """Find and colored in green foods for user connected inside local
+        database"""
+
+        ldb_substitutes = self._helper.records_concerned(selected)
+        for index in range(self.rowCount()):
+            item_name = self.item(index, 0)
+            item_code = self.item(index, 2)
+            if DEBUG_MODE:
+                print("search for item code:",
+                      item_code.data(Qt.DisplayRole))
+            if item_code.data(Qt.DisplayRole) in ldb_substitutes:
+                item_name.setForeground(QColor(16, 133, 22))
+
     @property
     def helper(self):
         """Property helper access"""
 
         return self._helper
+
+    @property
+    def checked(self):
+        """Checked list of substitutes products property"""
+
+        return self._checked

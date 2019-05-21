@@ -2,7 +2,11 @@
 
 import re
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
+
+from settings import DEBUG_MODE
+
 
 class CategoriesModel(QStandardItemModel):
     """categories view model"""
@@ -35,6 +39,20 @@ class CategoriesModel(QStandardItemModel):
         """Reset the foods list"""
 
         self.removeRows(0, self.rowCount())
+
+    def find_categories_in_database(self):
+        """Find and colored in green foods for user connected inside local
+        database"""
+
+        ldb_categories = self._helper.records_concerned()
+        for index in range(self.rowCount()):
+            item_name = self.item(index, 0)
+            item_code = self.item(index, 1)
+            if DEBUG_MODE:
+                print("search for item code:",
+                      item_code.data(Qt.DisplayRole))
+            if item_code.data(Qt.DisplayRole) in ldb_categories:
+                item_name.setForeground(QColor(16, 133, 22))
 
     @property
     def helper(self):

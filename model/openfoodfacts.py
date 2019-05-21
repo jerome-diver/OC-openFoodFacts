@@ -141,8 +141,13 @@ class OpenFoodFacts(QObject):
         self.categories.helper.user = user
         self.foods.helper.user = user
         self.substitutes.helper.user = user
+        if self.categories.rowCount():
+            self.categories.find_categories_in_database()
         if self.foods.rowCount():
             self.foods.find_foods_in_database()
+        if self.substitutes.rowCount():
+            self.substitutes.find_substitutes_in_database(
+                self.foods.selected[0])
         if DEBUG_MODE:
             print("get user", self._user.username, "connected")
 
