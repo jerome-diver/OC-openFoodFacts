@@ -182,7 +182,7 @@ class Controller(QObject):
                 print("user id:", user_id)
             ok = database.new_record(
                 self._off_mode.model.foods.category_id,
-                self._off_mode.model.get_selection,
+                self._off_mode.model.foods.selected_details,
                 self._off_mode.model.product_details.checked,
                 user_id)
             if ok:

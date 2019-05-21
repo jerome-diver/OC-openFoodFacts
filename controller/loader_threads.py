@@ -77,14 +77,15 @@ class LoadFoods(QThread):
         while have_more_product and self._on_air:
             first_page = bool(page == 1)
             foods = self._model.download_foods(self._category, page)
-            have_more_product = bool(len(foods) >= 21)
             if foods:
+                have_more_product = bool(len(foods) >= 21)
                 if DEBUG_MODE:
                     print("there is foods to add...")
                 self._model.foods.recorded.append(foods)
                 self._model.foods.populate(foods, first_page)
                 self.get_a_page.emit(page, "?")
             else:
+                have_more_product = False
                 self.no_product_found.emit()
             page += 1
 
@@ -103,7 +104,6 @@ class LoadProductDetails(QThread):
         self._name = ""
         self._mode = mode
         self._on_air = True
-        self._get_selection = dict()
 
     @property
     def name(self):
@@ -129,18 +129,6 @@ class LoadProductDetails(QThread):
 
         self._code = value
 
-    @property
-    def get_selection(self):
-        """Property for get selection product details"""
-
-        return self._get_selection
-
-    @get_selection.setter
-    def get_selection(self, value):
-        """Setter property for pass ref of variable to get details selection"""
-
-        self._get_selection = value
-
     def __del__(self):
         self.wait()
 
@@ -155,6 +143,7 @@ class LoadProductDetails(QThread):
         Facts"""
 
         mpd = self._model.product_details
+        mf = self._model.foods
         ms = self._model.substitutes
         mpd.reset()
         if DEBUG_MODE:
@@ -166,7 +155,8 @@ class LoadProductDetails(QThread):
         food = self._model.download_product(self._code, self._name)
         if food and self._on_air:
             if self._mode == Mode.GET:
-                self._get_selection = food
+                mpd.populate(food)
+                mf.selected_details = food
             if self._mode == Mode.SELECTED and self._on_air:
                 mpd.populate(food)
             elif self._mode == Mode.CHECKED and self._on_air:
@@ -246,8 +236,7 @@ class ThreadsControler(QObject):
             if self._load_foods.isRunning():
                 self._load_foods.terminate()
 
-    def init_product_details_thread(self, code, name, mode,
-                                    get_selection=None):
+    def init_product_details_thread(self, code, name, mode):
         """Initialize product_details thread call"""
 
         self._load_product_details[mode] = LoadProductDetails(self._model,mode)
@@ -258,7 +247,6 @@ class ThreadsControler(QObject):
             self.kill_details_show_thread.connect(
                 self._load_product_details[mode].end_process)
         elif mode == Mode.GET:
-            self._load_product_details[mode].get_selection = get_selection
             self.kill_details_get_thread.connect(
                 self._load_product_details[mode].end_process)
         self._load_product_details[mode].finished.connect(

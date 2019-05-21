@@ -83,6 +83,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.substitutes_list.setModel(self._proxy)
         if Widget.DETAILS in views or Widget.ALL in views:
             self.product_name.setText("")
+            self.product_code.setText("")
             self.product_brand.setText("")
             self.product_packaging.setText("")
             self.product_shops.setModel(empty_model)

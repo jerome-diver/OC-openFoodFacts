@@ -79,6 +79,6 @@ class SubstitutesModel(QStandardItemModel):
         of view"""
 
         for index in range(self.rowCount()):
-            item = self.index(index, 0)
+            item = self.item(index, 0)
             if item.checkState() == Qt.Checked:
                 item.setCheckState(Qt.Unchecked)

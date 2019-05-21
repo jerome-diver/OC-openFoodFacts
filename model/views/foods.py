@@ -13,6 +13,7 @@ class FoodsModel(QStandardItemModel):
         self._helper = helper
         self._recorded = [] # [ [] ]  |as pages of foods
         self._selected = ()
+        self._selected_details = dict()
         self._category_id = None
         self._count = 0
 
@@ -43,6 +44,18 @@ class FoodsModel(QStandardItemModel):
         self._selected = ()
         self._count = 0
         self.removeRows(0, self.rowCount())
+
+    @property
+    def selected_details(self):
+        """Selected food details food (from food list view)"""
+
+        return self._selected_details
+
+    @selected_details.setter
+    def selected_details(self, value):
+        """Setter for property of dict selected food details"""
+
+        self._selected_details = value
 
     @property
     def selected(self):

@@ -40,7 +40,6 @@ class OpenFoodFactsMode(QObject):
                        "internet": True,
                        "call_mode": Mode.SELECTED}
         self._messenger = Messenger(self, self._flags)
-        self._get_selection = dict()
         self.connect_signals()
 
 
@@ -173,8 +172,7 @@ class OpenFoodFactsMode(QObject):
             print("and foods pages is", len(self._model.foods.recorded))
         self._model.substitutes.populate(self._model.foods.selected,
                                          self._model.foods.recorded)
-        self._threads.init_product_details_thread(code, name, Mode.GET,
-                                                  self._get_selection)
+        self._threads.init_product_details_thread(code, name, Mode.GET)
         self.show_substitutes()
 
     def show_substitutes(self):
@@ -231,9 +229,3 @@ class OpenFoodFactsMode(QObject):
         """Window access property"""
 
         return self._window
-
-    @property
-    def get_selection(self):
-        """Property for selection details product getter"""
-
-        return self._get_selection

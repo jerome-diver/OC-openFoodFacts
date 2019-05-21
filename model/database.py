@@ -262,6 +262,8 @@ class Database(QObject):
                     (food_code, substitute_code) 
                     VALUES (%s, %s);"""
         # add foods, shops, food_shops records :
+        if DEBUG_MODE:
+            print("get this product:", food)
         food_selected_code = food["codes_tags"][1]
         shops = []
         for shop in food["stores_tags"]:
