@@ -29,6 +29,11 @@ class Authentication(QObject):
 
         return self._user
 
+    @user.setter
+    def user(self, value):
+        """User setter property access"""
+
+        self._user = value
 
     def initialize_database(self):
         """Initialization of Open Food Facts database"""

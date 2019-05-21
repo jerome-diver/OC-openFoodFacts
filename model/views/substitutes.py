@@ -52,6 +52,9 @@ class SubstitutesModel(QStandardItemModel):
                 item_name.setBackground(color)
                 item_code.setBackground(color)
                 if food["codes_tags"][1] in ldb_substitutes:
+                    if DEBUG_MODE:
+                        print("this product", food["product_name_fr"],
+                              "is in the local database")
                     item_name.setForeground(QColor(0, 250, 0))
                 self.appendRow([item_name, item_grade, item_code])
         self.sort(1)
@@ -82,3 +85,9 @@ class SubstitutesModel(QStandardItemModel):
             item = self.item(index, 0)
             if item.checkState() == Qt.Checked:
                 item.setCheckState(Qt.Unchecked)
+
+    @property
+    def helper(self):
+        """Property helper access"""
+
+        return self._helper

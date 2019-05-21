@@ -138,6 +138,13 @@ class OpenFoodFacts(QObject):
         """When a user is connected"""
 
         self._user = user
+        self.categories.helper.user = user
+        self.foods.helper.user = user
+        self.substitutes.helper.user = user
+        if self.foods.rowCount():
+            self.foods.find_foods_in_database()
+        if DEBUG_MODE:
+            print("get user", self._user.username, "connected")
 
     @property
     def categories(self):

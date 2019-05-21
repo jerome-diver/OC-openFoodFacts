@@ -29,6 +29,8 @@ class Controller(QObject):
                            checked_product=False,
                            checked_details=False)
         self.connect_signals()
+        self._window.local_mode.setDisabled(True)
+        self._window.remove.setDisabled(True)
         off_model = OpenFoodFacts()
         loader = UpdateCategories(self._authenticate.get_database(),
                                   off_model)
@@ -46,6 +48,7 @@ class Controller(QObject):
             self.on_openfoodfacts_mode)
         self._window.local_mode.clicked.connect(self.on_local_mode)
         self._window.record.clicked.connect(self.on_record_substitutes)
+        self._window.remove.clicked.connect(self.on_remove_substitutes)
         self.status_message.connect(self._window.on_status_message)
         self._authenticate.status_user_connection.connect(
             self.on_user_connection)
@@ -58,16 +61,41 @@ class Controller(QObject):
 
     @pyqtSlot()
     def on_sign_in(self):
-        """Sing-in button slot"""
+        """Sign-In / Sign-Out button slot"""
 
         if self._window.signin.text() == "Sign-in":
             self._authenticate.on_sign_in()
-        else:
+        else:   # Sign-Out
             self._authenticate.user.disconnect()
-            self.status_message.emit("Utilisateur {} {} déconnecté".
-                                     format(self._authenticate.user.family,
-                                            self._authenticate.user.nick))
             self._window.signin.setText("Sign-in")
+            self._authenticate.user = None
+
+    @pyqtSlot(bool)
+    def on_user_connection(self, connected):
+        """When user is connected (or failed to be connected)
+         to his local database"""
+
+        self._flags["user_connected"] = connected
+        if connected:
+            self.user_connected.emit(self._authenticate.user)
+            self.status_message.emit("L'utilisateur est connecté à "
+                                     "la base de donnée locale")
+            self._window.signup.setHidden(True)
+            self._window.signin.setText("Sign-out {}".format(
+                self._authenticate.user.username))
+            self._window.user_informations.setText(
+                "{} {}".format(self._authenticate.user.family,
+                               self._authenticate.user.nick))
+            self._window.local_mode.setEnabled(True)
+        else:   # connection failed
+            self.status_message.emit("L'utilisateur est déconnecté de la base "
+                                     "de donnée locale")
+            self._window.signup.setHidden(False)
+            self._window.user_informations.setText("")
+            if self._window.local_mode.isChecked():
+                self._window.reset_views()
+                self.on_openfoodfacts_mode(True)
+        self.checked_substitutes()
 
     @pyqtSlot(bool)
     def on_local_mode(self, state):
@@ -126,14 +154,20 @@ class Controller(QObject):
         self._window.record.setDisabled(True)
         if not self._flags["user_connected"]:
             self._window.record.setText("Aucun utilisateur connecté")
+            self._window.remove.setText("Aucun utilisateur connecté")
         elif not self._flags["checked_product"]:
             self._window.record.setText("Aucune sélection de substitut")
+            self._window.remove.setText("Aucune sélection de substitut")
         elif not self._flags["checked_details"]:
             self._window.record.setText("Attendez, recherche des détails "
                                         "pour la sélection")
+            self._window.remove.setText("Attendez, recherche des détails "
+                                        "pour la sélection")
         else:
-            self._window.record.setText("Enregistrer dans la base de donnée")
+            self._window.record.setText("Enregistrer dans ma base de donnée")
+            self._window.remove.setText("Supprimer de ma base de donnée")
             self._window.record.setEnabled(True)
+            self._window.remove.setEnabled(True)
 
     @pyqtSlot()
     def on_load_details_finished(self):
@@ -154,22 +188,6 @@ class Controller(QObject):
         self._flags["checked_details"] = False
         self.checked_substitutes()
 
-    @pyqtSlot(bool)
-    def on_user_connection(self, connected):
-        """When user is connected to his local database"""
-
-        self._flags["user_connected"] = connected
-        if connected:
-            self.user_connected.emit(self._authenticate.user)
-            self.status_message.emit("L'utilisateur est connecté à "
-                                 "la base de donnée locale")
-            self._window.signin.setText("Sign-out")
-        else:
-            self.status_message.emit("L'utilisateur est déconnecté de la base "
-                                     "de donnée locale")
-            self._window.signin.setText("Sign-in")
-        self.checked_substitutes()
-
     @pyqtSlot()
     def on_record_substitutes(self):
         """Record substitutes selected for product food selected inside
@@ -188,4 +206,21 @@ class Controller(QObject):
             if ok:
                 self._off_mode.model.substitutes.reset_checkboxes()
 
+    @pyqtSlot()
+    def on_remove_substitutes(self):
+        """Record substitutes selected for product food selected inside
+        local database"""
+
+        database = self._authenticate.get_user_database()
+        if database:
+            user_id = self._authenticate.user.id
+            if DEBUG_MODE:
+                print("user id:", user_id)
+            ok = database.del_record(
+                self._off_mode.model.foods.category_id,
+                self._off_mode.model.foods.selected_details,
+                self._off_mode.model.product_details.checked,
+                user_id)
+            if ok:
+                self._off_mode.model.substitutes.reset_checkboxes()
 

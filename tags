@@ -5,11 +5,14 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	0.0.0	/45968eff/
+ALL	controller/enumerator.py	/^    ALL = 1$/;"	v	class:Widget
 APPLICATION	__main__.py	/^    APPLICATION = Controller()$/;"	v
 AUTHENTICATION	__main__.py	/^    AUTHENTICATION = Authentication(APPLICATION)$/;"	v
 Authentication	controller/authentication.py	/^class Authentication(QObject):$/;"	c
-CHECKED	controller/loader_threads.py	/^    CHECKED = 1$/;"	v	class:Mode
+CATEGORIES	controller/enumerator.py	/^    CATEGORIES = 2$/;"	v	class:Widget
+CHECKED	controller/enumerator.py	/^    CHECKED = 1$/;"	v	class:Mode
 CWD	settings.py	/^CWD = os.path.dirname(os.path.abspath(__file__))$/;"	v
+CategoriesHelper	model/helpers/categories.py	/^class CategoriesHelper:$/;"	c
 CategoriesModel	model/views/categories.py	/^class CategoriesModel(QStandardItemModel):$/;"	c
 Controller	controller/control.py	/^class Controller(QObject):$/;"	c
 DB_CONNECT_MODE	settings.py	/^DB_CONNECT_MODE = "TCP"$/;"	v
@@ -18,9 +21,13 @@ DB_INIT_FILE	settings.py	/^DB_INIT_FILE = os.path.join(CWD, "assets\/sql\/reques
 DB_PORT	settings.py	/^DB_PORT = 3306$/;"	v
 DB_SOCKET	settings.py	/^DB_SOCKET = os.path.join(MARIA_RUN_DIR, "mysqld.sock")$/;"	v
 DEBUG_MODE	settings.py	/^DEBUG_MODE = True$/;"	v
+DETAILS	controller/enumerator.py	/^    DETAILS = 5$/;"	v	class:Widget
 Database	model/database.py	/^class Database(QObject):$/;"	c
-DatabaseMode	controller/db_mode.py	/^class DatabaseMode():$/;"	c
+DatabaseMode	controller/db_mode.py	/^class DatabaseMode(QObject):$/;"	c
+FOODS	controller/enumerator.py	/^    FOODS = 3$/;"	v	class:Widget
+FoodsHelper	model/helpers/foods.py	/^class FoodsHelper:$/;"	c
 FoodsModel	model/views/foods.py	/^class FoodsModel(QStandardItemModel):$/;"	c
+GET	controller/enumerator.py	/^    GET = 3$/;"	v	class:Mode
 GRANT_USER	settings.py	/^GRANT_USER = os.getenv("MARIA_GRANT_OFF_USER")$/;"	v
 GRANT_USER_PASSWD	settings.py	/^GRANT_USER_PASSWD = os.getenv("MARIA_GRANT_OFF_PASSWD")$/;"	v
 Langage used	README.md	/^## Langage used$/;"	s
@@ -28,9 +35,11 @@ Libraries dependancies	README.md	/^## Libraries dependancies$/;"	s
 LoadCategories	controller/loader_threads.py	/^class LoadCategories(QThread):$/;"	c
 LoadFoods	controller/loader_threads.py	/^class LoadFoods(QThread):$/;"	c
 LoadProductDetails	controller/loader_threads.py	/^class LoadProductDetails(QThread):$/;"	c
+LocalDatabaseModel	model/local_database.py	/^class LocalDatabaseModel(QObject):$/;"	c
 MARIA_RUN_DIR	settings.py	/^MARIA_RUN_DIR = os.path.dirname("\/run\/mysqld\/")$/;"	v
 MainWindow	view/mainwindow.py	/^class MainWindow(QMainWindow, Ui_MainWindow):$/;"	c
-Mode	controller/loader_threads.py	/^class Mode(Enum):$/;"	c
+Messenger	view/messenger.py	/^class Messenger(QObject):$/;"	c
+Mode	controller/enumerator.py	/^class Mode(Enum):$/;"	c
 NUTRISCORE_A	settings.py	/^NUTRISCORE_A = os.path.join(CWD, "assets\/images\/nutriscore A.png")$/;"	v
 NUTRISCORE_B	settings.py	/^NUTRISCORE_B = os.path.join(CWD, "assets\/images\/nutriscore B.png")$/;"	v
 NUTRISCORE_C	settings.py	/^NUTRISCORE_C = os.path.join(CWD, "assets\/images\/nutriscore C.png")$/;"	v
@@ -43,10 +52,12 @@ OpenFoodFactsMode	controller/openfoodfacts_mode.py	/^class OpenFoodFactsMode(QOb
 ProductDetailsModels	model/views/product_details.py	/^class ProductDetailsModels():$/;"	c
 QLabelClickable	assets/objects/qlabel_clickable.py	/^class QLabelClickable(QLabel):$/;"	c
 REQUEST_PAGE_SIZE	settings.py	/^REQUEST_PAGE_SIZE = 20$/;"	v
-SELECTED	controller/loader_threads.py	/^    SELECTED = 2$/;"	v	class:Mode
+SELECTED	controller/enumerator.py	/^    SELECTED = 2$/;"	v	class:Mode
+SUBSTITUTES	controller/enumerator.py	/^    SUBSTITUTES = 4$/;"	v	class:Widget
 Share	view/share_methods.py	/^class Share(QObject):$/;"	c
 SignIn	view/sign_in.py	/^class SignIn(QDialog, Ui_SignIn, Share):$/;"	c
 SignUp	view/sign_up.py	/^class SignUp(QDialog, Ui_SignUp, Share):$/;"	c
+SubstitutesHelper	model/helpers/substitutes.py	/^class SubstitutesHelper:$/;"	c
 SubstitutesModel	model/views/substitutes.py	/^class SubstitutesModel(QStandardItemModel):$/;"	c
 ThreadsControler	controller/loader_threads.py	/^class ThreadsControler(QObject):$/;"	c
 Trello board	README.md	/^## Trello board$/;"	s
@@ -55,6 +66,7 @@ Ui_SignIn	ui/ui_sign_in.py	/^class Ui_SignIn(object):$/;"	c
 Ui_SignUp	ui/ui_sign_up.py	/^class Ui_SignUp(object):$/;"	c
 UpdateCategories	controller/loader_threads.py	/^class UpdateCategories(QThread):$/;"	c
 User	model/user.py	/^class User(QObject):$/;"	c
+Widget	controller/enumerator.py	/^class Widget(Enum):$/;"	c
 __del__	controller/loader_threads.py	/^    def __del__(self):$/;"	m	class:LoadCategories
 __del__	controller/loader_threads.py	/^    def __del__(self):$/;"	m	class:LoadFoods
 __del__	controller/loader_threads.py	/^    def __del__(self):$/;"	m	class:LoadProductDetails
@@ -71,22 +83,32 @@ __init__	controller/loader_threads.py	/^    def __init__(self, model, database):
 __init__	controller/loader_threads.py	/^    def __init__(self, model, mode=Mode.SELECTED):$/;"	m	class:LoadProductDetails
 __init__	controller/openfoodfacts_mode.py	/^    def __init__(self, window, database):$/;"	m	class:OpenFoodFactsMode
 __init__	model/database.py	/^    def __init__(self, username=None, password=None, database=None):$/;"	m	class:Database
-__init__	model/openfoodfacts.py	/^    def __init__(self, views=None):$/;"	m	class:OpenFoodFacts
+__init__	model/helpers/categories.py	/^    def __init__(self, database, user):$/;"	m	class:CategoriesHelper
+__init__	model/helpers/foods.py	/^    def __init__(self, database, user):$/;"	m	class:FoodsHelper
+__init__	model/helpers/substitutes.py	/^    def __init__(self, database, user):$/;"	m	class:SubstitutesHelper
+__init__	model/local_database.py	/^    def __init__(self, views, database):$/;"	m	class:LocalDatabaseModel
+__init__	model/openfoodfacts.py	/^    def __init__(self, views=None, database=None):$/;"	m	class:OpenFoodFacts
 __init__	model/user.py	/^    def __init__(self):$/;"	m	class:User
-__init__	model/views/categories.py	/^    def __init__(self, views):$/;"	m	class:CategoriesModel
-__init__	model/views/foods.py	/^    def __init__(self, views):$/;"	m	class:FoodsModel
+__init__	model/views/categories.py	/^    def __init__(self, views, helper):$/;"	m	class:CategoriesModel
+__init__	model/views/foods.py	/^    def __init__(self, views, helper):$/;"	m	class:FoodsModel
 __init__	model/views/product_details.py	/^    def __init__(self, views):$/;"	m	class:ProductDetailsModels
-__init__	model/views/substitutes.py	/^    def __init__(self, views):$/;"	m	class:SubstitutesModel
+__init__	model/views/substitutes.py	/^    def __init__(self, views, helper):$/;"	m	class:SubstitutesModel
 __init__	view/mainwindow.py	/^    def __init__(self, controller):$/;"	m	class:MainWindow
+__init__	view/messenger.py	/^    def __init__(self, general_model, flags):$/;"	m	class:Messenger
 __init__	view/sign_in.py	/^    def __init__(self, controller):$/;"	m	class:SignIn
 __init__	view/sign_up.py	/^    def __init__(self, controller):$/;"	m	class:SignUp
 _connect_database	model/database.py	/^    def _connect_database(self, user=None, passwd=None,$/;"	m	class:Database
+_connect_signals	controller/db_mode.py	/^    def _connect_signals(self):$/;"	m	class:DatabaseMode
 _connection	model/database.py	/^    _connection = None$/;"	v	class:Database
-_load_product_for	controller/loader_threads.py	/^    def _load_product_for(self, code, name, mode=Mode.SELECTED):$/;"	m	class:ThreadsControler
+_initialize	controller/db_mode.py	/^    def _initialize(self):$/;"	m	class:DatabaseMode
+_record_product	model/database.py	/^    def _record_product(self, user_id, category_id, food_code, details):$/;"	m	class:Database
 ask_request	model/database.py	/^    def ask_request(request, values=None):$/;"	m	class:Database
+categories	model/local_database.py	/^    def categories(self):$/;"	m	class:LocalDatabaseModel
 categories	model/openfoodfacts.py	/^    def categories(self):$/;"	m	class:OpenFoodFacts
 category	controller/loader_threads.py	/^    def category(self):$/;"	m	class:LoadFoods
 category	controller/loader_threads.py	/^    def category(self, value):$/;"	m	class:LoadFoods
+category_id	model/views/foods.py	/^    def category_id(self):$/;"	m	class:FoodsModel
+category_id	model/views/foods.py	/^    def category_id(self, value):$/;"	m	class:FoodsModel
 checked	model/views/product_details.py	/^    def checked(self):$/;"	m	class:ProductDetailsModels
 checked	model/views/substitutes.py	/^    def checked(self):$/;"	m	class:SubstitutesModel
 checked_start	controller/openfoodfacts_mode.py	/^    checked_start = pyqtSignal()$/;"	v	class:OpenFoodFactsMode
@@ -104,18 +126,25 @@ connected	model/user.py	/^    def connected(self):$/;"	m	class:User
 count	model/views/foods.py	/^    def count(self):$/;"	m	class:FoodsModel
 count	model/views/foods.py	/^    def count(self, value):$/;"	m	class:FoodsModel
 create_user	model/database.py	/^    def create_user(self, username, password):$/;"	m	class:Database
+database	controller/db_mode.py	/^    def database(self):$/;"	m	class:DatabaseMode
 database	controller/openfoodfacts_mode.py	/^    def database(self):$/;"	m	class:OpenFoodFactsMode
 database	model/user.py	/^    def database(self):$/;"	m	class:User
 db_categories_status	model/database.py	/^        def db_categories_status(off_cat, cat):$/;"	f	member:Database.update_categories	file:
-define_with	model/views/product_details.py	/^    def define_with(self, var, food):$/;"	m	class:ProductDetailsModels
+define_with	model/views/product_details.py	/^    def define_with(var, food):$/;"	m	class:ProductDetailsModels
 disconnect	model/user.py	/^    def disconnect(self):$/;"	m	class:User
 disconnect_database	model/database.py	/^    def disconnect_database(self):$/;"	m	class:Database
+disconnect_signals	controller/db_mode.py	/^    def disconnect_signals(self):$/;"	m	class:DatabaseMode
+disconnect_signals	controller/openfoodfacts_mode.py	/^    def disconnect_signals(self):$/;"	m	class:OpenFoodFactsMode
 download_categories	model/openfoodfacts.py	/^    def download_categories(self):$/;"	m	class:OpenFoodFacts
 download_foods	model/openfoodfacts.py	/^    def download_foods(self, category, page=1):$/;"	m	class:OpenFoodFacts
 download_product	model/openfoodfacts.py	/^    def download_product(self, code, name):$/;"	m	class:OpenFoodFacts
+end_process	controller/loader_threads.py	/^    def end_process(self):$/;"	m	class:LoadFoods
+end_process	controller/loader_threads.py	/^    def end_process(self):$/;"	m	class:LoadProductDetails
 error_signal	controller/loader_threads.py	/^    error_signal = pyqtSignal(str)$/;"	v	class:LoadProductDetails
 exist_username	model/database.py	/^    def exist_username(self, username):$/;"	m	class:Database
 family	model/user.py	/^    def family(self):$/;"	m	class:User
+find_foods_in_database	model/views/foods.py	/^    def find_foods_in_database(self):$/;"	m	class:FoodsModel
+foods	model/local_database.py	/^    def foods(self):$/;"	m	class:LocalDatabaseModel
 foods	model/openfoodfacts.py	/^    def foods(self):$/;"	m	class:OpenFoodFacts
 generate_checked	model/views/product_details.py	/^    def generate_checked(self, product, substitutes_checked):$/;"	m	class:ProductDetailsModels
 generate_checked	model/views/substitutes.py	/^    def generate_checked(self):$/;"	m	class:SubstitutesModel
@@ -123,41 +152,64 @@ generate_database	model/database.py	/^    def generate_database(self):$/;"	m	cla
 generate_users_role	model/database.py	/^    def generate_users_role(self):$/;"	m	class:Database
 get_a_page	controller/loader_threads.py	/^    get_a_page = pyqtSignal(int, int)$/;"	v	class:LoadFoods
 get_bg_color	view/mainwindow.py	/^    def get_bg_color(self):$/;"	m	class:MainWindow
+get_categories	model/local_database.py	/^    def get_categories(self):$/;"	m	class:LocalDatabaseModel
 get_database	controller/authentication.py	/^    def get_database(self):$/;"	m	class:Authentication
+get_foods	model/local_database.py	/^    def get_foods(self, category):$/;"	m	class:LocalDatabaseModel
+get_substitute_details	model/local_database.py	/^    def get_substitute_details(self, code, name):$/;"	m	class:LocalDatabaseModel
+get_substitutes	model/local_database.py	/^    def get_substitutes(self, code, name):$/;"	m	class:LocalDatabaseModel
 get_user_database	controller/authentication.py	/^    def get_user_database(self):$/;"	m	class:Authentication
+helper	model/views/categories.py	/^    def helper(self):$/;"	m	class:CategoriesModel
+helper	model/views/foods.py	/^    def helper(self):$/;"	m	class:FoodsModel
+helper	model/views/substitutes.py	/^    def helper(self):$/;"	m	class:SubstitutesModel
 id	model/user.py	/^    def id(self):$/;"	m	class:User
-init_foods_thread	controller/loader_threads.py	/^    def init_foods_thread(self):$/;"	m	class:ThreadsControler
-init_product_details_thread	controller/loader_threads.py	/^    def init_product_details_thread(self, mode):$/;"	m	class:ThreadsControler
+init_foods_thread	controller/loader_threads.py	/^    def init_foods_thread(self, category):$/;"	m	class:ThreadsControler
+init_product_details_thread	controller/loader_threads.py	/^    def init_product_details_thread(self, code, name, mode):$/;"	m	class:ThreadsControler
 initialize_database	controller/authentication.py	/^    def initialize_database(self):$/;"	m	class:Authentication
 internet_access	model/openfoodfacts.py	/^    internet_access = pyqtSignal(bool)$/;"	v	class:OpenFoodFacts
+kill_details_checked_thread	controller/loader_threads.py	/^    kill_details_checked_thread = pyqtSignal()$/;"	v	class:ThreadsControler
+kill_details_get_thread	controller/loader_threads.py	/^    kill_details_get_thread = pyqtSignal()$/;"	v	class:ThreadsControler
+kill_details_show_thread	controller/loader_threads.py	/^    kill_details_show_thread = pyqtSignal()$/;"	v	class:ThreadsControler
+kill_foods_thread	controller/openfoodfacts_mode.py	/^    kill_foods_thread = pyqtSignal()$/;"	v	class:OpenFoodFactsMode
 load_categories	controller/loader_threads.py	/^    def load_categories(self):$/;"	m	class:ThreadsControler
 load_details_finished	controller/openfoodfacts_mode.py	/^    load_details_finished = pyqtSignal()$/;"	v	class:OpenFoodFactsMode
+model	controller/db_mode.py	/^    def model(self):$/;"	m	class:DatabaseMode
 model	controller/openfoodfacts_mode.py	/^    def model(self):$/;"	m	class:OpenFoodFactsMode
 models	model/views/product_details.py	/^    def models(self):$/;"	m	class:ProductDetailsModels
 mousePressEvent	assets/objects/qlabel_clickable.py	/^    def mousePressEvent(self, ev):$/;"	m	class:QLabelClickable
 name	controller/loader_threads.py	/^    def name(self):$/;"	m	class:LoadProductDetails
 name	controller/loader_threads.py	/^    def name(self, value):$/;"	m	class:LoadProductDetails
-new_record	model/database.py	/^    def new_record(self, category, food, substitutes, substitutes_details,$/;"	m	class:Database
+new_record	model/database.py	/^    def new_record(self, category_id, food, substitutes_details,$/;"	m	class:Database
 new_user	controller/authentication.py	/^    def new_user(self):$/;"	m	class:Authentication
 nick	model/user.py	/^    def nick(self):$/;"	m	class:User
 no_product_found	controller/loader_threads.py	/^    no_product_found = pyqtSignal()$/;"	v	class:LoadFoods
 normalize	model/openfoodfacts.py	/^        def normalize(product):$/;"	f	member:OpenFoodFacts.download_product	file:
 normalize_foods_products	model/openfoodfacts.py	/^        def normalize_foods_products(foods_products):$/;"	f	member:OpenFoodFacts.download_foods	file:
+on_category_selected	controller/db_mode.py	/^    def on_category_selected(self, index):$/;"	m	class:DatabaseMode
 on_category_selected	controller/openfoodfacts_mode.py	/^    def on_category_selected(self, index):$/;"	m	class:OpenFoodFactsMode
+on_category_selected	view/messenger.py	/^    def on_category_selected(self, index):$/;"	m	class:Messenger
 on_checked_started	controller/control.py	/^    def on_checked_started(self):$/;"	m	class:Controller
 on_close	controller/authentication.py	/^    def on_close(self):$/;"	m	class:Authentication
 on_connection_return	controller/authentication.py	/^    def on_connection_return(self, connected, status):$/;"	m	class:Authentication
 on_error_message	view/mainwindow.py	/^    def on_error_message(self, message):$/;"	m	class:MainWindow
+on_food_selected	controller/db_mode.py	/^    def on_food_selected(self, index):$/;"	m	class:DatabaseMode
 on_food_selected	controller/openfoodfacts_mode.py	/^    def on_food_selected(self, index):$/;"	m	class:OpenFoodFactsMode
+on_food_selected	view/messenger.py	/^    def on_food_selected(self, index):$/;"	m	class:Messenger
 on_internet_access	controller/openfoodfacts_mode.py	/^    def on_internet_access(self, status):$/;"	m	class:OpenFoodFactsMode
+on_internet_access	view/messenger.py	/^    def on_internet_access(self, status):$/;"	m	class:Messenger
 on_load_categories_finished	controller/openfoodfacts_mode.py	/^    def on_load_categories_finished(self):$/;"	m	class:OpenFoodFactsMode
+on_load_categories_finished	view/messenger.py	/^    def on_load_categories_finished(self):$/;"	m	class:Messenger
 on_load_details_finished	controller/control.py	/^    def on_load_details_finished(self):$/;"	m	class:Controller
 on_load_foods_finished	controller/openfoodfacts_mode.py	/^    def on_load_foods_finished(self):$/;"	m	class:OpenFoodFactsMode
+on_load_foods_finished	view/messenger.py	/^    def on_load_foods_finished(self):$/;"	m	class:Messenger
 on_load_product_details_finished	controller/openfoodfacts_mode.py	/^    def on_load_product_details_finished(self):$/;"	m	class:OpenFoodFactsMode
+on_load_product_details_finished	view/messenger.py	/^    def on_load_product_details_finished(self):$/;"	m	class:Messenger
 on_local_mode	controller/control.py	/^    def on_local_mode(self, state):$/;"	m	class:Controller
 on_new_food_page	controller/openfoodfacts_mode.py	/^    def on_new_food_page(self, page, total):$/;"	m	class:OpenFoodFactsMode
+on_new_food_page	view/messenger.py	/^    def on_new_food_page(self, page, total):$/;"	m	class:Messenger
 on_no_product_found	controller/openfoodfacts_mode.py	/^    def on_no_product_found(self):$/;"	m	class:OpenFoodFactsMode
+on_no_product_found	view/messenger.py	/^    def on_no_product_found(self):$/;"	m	class:Messenger
 on_openfoodfacts_mode	controller/control.py	/^    def on_openfoodfacts_mode(self, state):$/;"	m	class:Controller
+on_product_url_clicked	controller/db_mode.py	/^    def on_product_url_clicked(self):$/;"	m	class:DatabaseMode
 on_product_url_clicked	controller/openfoodfacts_mode.py	/^    def on_product_url_clicked(self):$/;"	m	class:OpenFoodFactsMode
 on_quit	controller/control.py	/^    def on_quit(self):$/;"	m	class:Controller
 on_record_substitutes	controller/control.py	/^    def on_record_substitutes(self):$/;"	m	class:Controller
@@ -172,13 +224,19 @@ on_status	view/sign_in.py	/^    def on_status(self, message):$/;"	m	class:SignIn
 on_status	view/sign_up.py	/^    def on_status(self, message):$/;"	m	class:SignUp
 on_status_message	view/mainwindow.py	/^    def on_status_message(self, message):$/;"	m	class:MainWindow
 on_substitute_checked	controller/openfoodfacts_mode.py	/^    def on_substitute_checked(self, item):$/;"	m	class:OpenFoodFactsMode
+on_substitute_checked	view/messenger.py	/^    def on_substitute_checked(self, item):$/;"	m	class:Messenger
+on_substitute_selected	controller/db_mode.py	/^    def on_substitute_selected(self, index):$/;"	m	class:DatabaseMode
 on_substitute_selection_changed	controller/openfoodfacts_mode.py	/^    def on_substitute_selection_changed(self, selected, deselected):$/;"	m	class:OpenFoodFactsMode
+on_substitute_selection_changed	view/messenger.py	/^    def on_substitute_selection_changed(self, selected, deselected):$/;"	m	class:Messenger
+on_user_connected	model/local_database.py	/^    def on_user_connected(self, user):$/;"	m	class:LocalDatabaseModel
+on_user_connected	model/openfoodfacts.py	/^    def on_user_connected(self, user):$/;"	m	class:OpenFoodFacts
 on_user_connection	controller/control.py	/^    def on_user_connection(self, connected):$/;"	m	class:Controller
 on_username_changed	controller/authentication.py	/^    def on_username_changed(self, username):$/;"	m	class:Authentication
 populate	model/views/categories.py	/^    def populate(self, categories):$/;"	m	class:CategoriesModel
 populate	model/views/foods.py	/^    def populate(self, foods, new=True):$/;"	m	class:FoodsModel
 populate	model/views/product_details.py	/^    def populate(self, food):$/;"	m	class:ProductDetailsModels
 populate	model/views/substitutes.py	/^    def populate(self, selected, foods, page=0, new=True):$/;"	m	class:SubstitutesModel
+product_details	model/local_database.py	/^    def product_details(self):$/;"	m	class:LocalDatabaseModel
 product_details	model/openfoodfacts.py	/^    def product_details(self):$/;"	m	class:OpenFoodFacts
 qCleanupResources	ui/images_rc.py	/^def qCleanupResources():$/;"	f
 qInitResources	ui/images_rc.py	/^def qInitResources():$/;"	f
@@ -192,10 +250,17 @@ qt_version	ui/images_rc.py	/^qt_version = [int(v) for v in QtCore.qVersion().spl
 rcc_version	ui/images_rc.py	/^    rcc_version = 1$/;"	v
 record_user	model/database.py	/^    def record_user(self, username, nick_name, family_name):$/;"	m	class:Database
 recorded	model/views/foods.py	/^    def recorded(self):$/;"	m	class:FoodsModel
+recorded	model/views/foods.py	/^    def recorded(self, value):$/;"	m	class:FoodsModel
+records_concerned	model/helpers/categories.py	/^    def records_concerned(self):$/;"	m	class:CategoriesHelper
+records_concerned	model/helpers/foods.py	/^    def records_concerned(self, category_id):$/;"	m	class:FoodsHelper
+records_concerned	model/helpers/substitutes.py	/^    def records_concerned(self, food_code):$/;"	m	class:SubstitutesHelper
+reset	model/views/categories.py	/^    def reset(self):$/;"	m	class:CategoriesModel
 reset	model/views/foods.py	/^    def reset(self):$/;"	m	class:FoodsModel
 reset	model/views/product_details.py	/^    def reset(self):$/;"	m	class:ProductDetailsModels
 reset	model/views/substitutes.py	/^    def reset(self):$/;"	m	class:SubstitutesModel
-reset_views	view/mainwindow.py	/^    def reset_views(self, views=["all"]):$/;"	m	class:MainWindow
+reset_checkboxes	model/views/substitutes.py	/^    def reset_checkboxes(self):$/;"	m	class:SubstitutesModel
+reset_models	model/openfoodfacts.py	/^    def reset_models(self, models=(Widget.ALL,)):$/;"	m	class:OpenFoodFacts
+reset_views	view/mainwindow.py	/^    def reset_views(self, views=(Widget.ALL,)):$/;"	m	class:MainWindow
 retranslateUi	ui/ui_mainwindow.py	/^    def retranslateUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
 retranslateUi	ui/ui_sign_in.py	/^    def retranslateUi(self, SignIn):$/;"	m	class:Ui_SignIn
 retranslateUi	ui/ui_sign_up.py	/^    def retranslateUi(self, SignUp):$/;"	m	class:Ui_SignUp
@@ -203,31 +268,38 @@ run	controller/loader_threads.py	/^    def run(self):$/;"	m	class:LoadCategories
 run	controller/loader_threads.py	/^    def run(self):$/;"	m	class:LoadFoods
 run	controller/loader_threads.py	/^    def run(self):$/;"	m	class:LoadProductDetails
 run	controller/loader_threads.py	/^    def run(self):$/;"	m	class:UpdateCategories
-selected	model/views/categories.py	/^    def selected(self):$/;"	m	class:CategoriesModel
-selected	model/views/categories.py	/^    def selected(self, value):$/;"	m	class:CategoriesModel
 selected	model/views/foods.py	/^    def selected(self):$/;"	m	class:FoodsModel
 selected	model/views/foods.py	/^    def selected(self, value):$/;"	m	class:FoodsModel
-selected	model/views/substitutes.py	/^    def selected(self):$/;"	m	class:SubstitutesModel
-selected	model/views/substitutes.py	/^    def selected(self, value):$/;"	m	class:SubstitutesModel
+selected_details	model/views/foods.py	/^    def selected_details(self):$/;"	m	class:FoodsModel
+selected_details	model/views/foods.py	/^    def selected_details(self, value):$/;"	m	class:FoodsModel
 send_request	model/database.py	/^    def send_request(request, values=None, many=False):$/;"	m	class:Database
 setupUi	ui/ui_mainwindow.py	/^    def setupUi(self, MainWindow):$/;"	m	class:Ui_MainWindow
 setupUi	ui/ui_sign_in.py	/^    def setupUi(self, SignIn):$/;"	m	class:Ui_SignIn
 setupUi	ui/ui_sign_up.py	/^    def setupUi(self, SignUp):$/;"	m	class:Ui_SignUp
 show_categories	view/mainwindow.py	/^    def show_categories(self, model):$/;"	m	class:MainWindow
+show_foods	view/mainwindow.py	/^    def show_foods(self, model):$/;"	m	class:MainWindow
 show_product_details	view/mainwindow.py	/^    def show_product_details(self, model):$/;"	m	class:MainWindow
 show_substitutes	controller/openfoodfacts_mode.py	/^    def show_substitutes(self):$/;"	m	class:OpenFoodFactsMode
 show_substitutes	view/mainwindow.py	/^    def show_substitutes(self, model):$/;"	m	class:MainWindow
 status_connected	model/user.py	/^    status_connected = pyqtSignal(bool, str)$/;"	v	class:User
 status_message	controller/authentication.py	/^    status_message = pyqtSignal(str)$/;"	v	class:Authentication
 status_message	controller/control.py	/^    status_message = pyqtSignal(str)$/;"	v	class:Controller
+status_message	controller/db_mode.py	/^    status_message = pyqtSignal(str)$/;"	v	class:DatabaseMode
 status_message	controller/loader_threads.py	/^    status_message = pyqtSignal(str)$/;"	v	class:LoadProductDetails
 status_message	controller/openfoodfacts_mode.py	/^    status_message = pyqtSignal(str)$/;"	v	class:OpenFoodFactsMode
 status_message	model/database.py	/^    status_message = pyqtSignal(str)$/;"	v	class:Database
+status_message	view/messenger.py	/^    status_message = pyqtSignal(str)$/;"	v	class:Messenger
 status_user_connection	controller/authentication.py	/^    status_user_connection = pyqtSignal(bool)$/;"	v	class:Authentication
+substitutes	model/local_database.py	/^    def substitutes(self):$/;"	m	class:LocalDatabaseModel
 substitutes	model/openfoodfacts.py	/^    def substitutes(self):$/;"	m	class:OpenFoodFacts
 update_categories	model/database.py	/^    def update_categories(self, off_categories):$/;"	m	class:Database
 user	controller/authentication.py	/^    def user(self):$/;"	m	class:Authentication
+user	controller/authentication.py	/^    def user(self, value):$/;"	m	class:Authentication
+user	model/helpers/foods.py	/^    def user(self):$/;"	m	class:FoodsHelper
+user	model/helpers/foods.py	/^    def user(self, value):$/;"	m	class:FoodsHelper
+user_connected	controller/control.py	/^    user_connected = pyqtSignal(User)$/;"	v	class:Controller
 username	model/user.py	/^    def username(self):$/;"	m	class:User
 wash_foods_thread	controller/loader_threads.py	/^    def wash_foods_thread(self):$/;"	m	class:ThreadsControler
 wash_product_details_thread	controller/loader_threads.py	/^    def wash_product_details_thread(self, mode):$/;"	m	class:ThreadsControler
+window	controller/db_mode.py	/^    def window(self):$/;"	m	class:DatabaseMode
 window	controller/openfoodfacts_mode.py	/^    def window(self):$/;"	m	class:OpenFoodFactsMode

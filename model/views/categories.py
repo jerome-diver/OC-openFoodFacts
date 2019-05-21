@@ -35,3 +35,9 @@ class CategoriesModel(QStandardItemModel):
         """Reset the foods list"""
 
         self.removeRows(0, self.rowCount())
+
+    @property
+    def helper(self):
+        """Property helper access"""
+
+        return self._helper

@@ -1,5 +1,6 @@
 """Model for foods list view of Mainwindow"""
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
 from settings import DEBUG_MODE
@@ -33,8 +34,10 @@ class FoodsModel(QStandardItemModel):
                 name = QStandardItem(food[key].strip())
                 code = QStandardItem(food["codes_tags"][1])
                 score = QStandardItem(food["nutrition_grades_tags"][0])
-                if code in ldb_foods:
-                    name.setForeground(QColor(0, 250, 0))
+                if food["codes_tags"][1] in ldb_foods:
+                    print("there is product", food["product_name_fr"],
+                          "int he local database")
+                    name.setForeground(QColor(16, 133, 22))
                 self.appendRow([name, code, score])
         self.sort(0)
 
@@ -44,6 +47,21 @@ class FoodsModel(QStandardItemModel):
         self._selected = ()
         self._count = 0
         self.removeRows(0, self.rowCount())
+
+    def find_foods_in_database(self):
+        """Find and colored in green foods for user connected inside local
+        database"""
+
+        print("search local DB food_codes for category",
+              self._category_id)
+        ldb_foods = self._helper.records_concerned(self._category_id)
+        print("find DB foods codes", ldb_foods)
+        for index in range(self.rowCount()):
+            item_name = self.item(index, 0)
+            item_code = self.item(index, 1)
+            print("search for item code:", item_code.data(Qt.DisplayRole))
+            if item_code.data(Qt.DisplayRole) in ldb_foods:
+                item_name.setForeground(QColor(16, 133, 22))
 
     @property
     def selected_details(self):
@@ -104,3 +122,9 @@ class FoodsModel(QStandardItemModel):
         """Setter count property"""
 
         self._count = value
+
+    @property
+    def helper(self):
+        """Property helper access"""
+
+        return self._helper

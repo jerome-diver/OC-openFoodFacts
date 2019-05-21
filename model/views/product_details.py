@@ -66,12 +66,13 @@ class ProductDetailsModels():
         self._models["brand"] = food["brands_tags"]
         img_url = food["image_front_url"] \
             if "image_front_url" in food.keys() else ""
-        data_front = urlopen(img_url).read()
-        self._models["img_data"] = data_front
-        img_front = QImage()
-        img_front.loadFromData(data_front)
-        self._models["img_thumb"] = QPixmap(img_front)
-        self._models["img_thumb"].scaledToWidth(150)
+        if img_url:
+            data_front = urlopen(img_url).read()
+            self._models["img_data"] = data_front
+            img_front = QImage()
+            img_front.loadFromData(data_front)
+            self._models["img_thumb"] = QPixmap(img_front)
+            self._models["img_thumb"].scaledToWidth(150)
 
     @staticmethod
     def define_with(var, food):

@@ -111,6 +111,31 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="user_informations">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(19, 45, 161);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -844,30 +869,54 @@ background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:1, y2:1, stop:0
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="record">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="font">
-          <font>
-           <family>Ubuntu</family>
-           <pointsize>10</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-           <underline>false</underline>
-           <stylestrategy>PreferAntialias</stylestrategy>
-           <kerning>false</kerning>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.496, y1:0.494318, x2:0.975, y2:0.494318, stop:0.29661 rgba(243, 107, 107, 103), stop:0.627119 rgba(201, 33, 33, 139), stop:0.860169 rgba(138, 91, 91, 235), stop:1 rgba(60, 60, 60, 255));
-color: rgb(155, 155, 155);
-selection-color: rgb(255, 255, 255);</string>
-         </property>
-         <property name="text">
-          <string>Enregistrer dans ma base</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="remove">
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+             <stylestrategy>PreferAntialias</stylestrategy>
+             <kerning>false</kerning>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:1, y1:0, x2:0, y2:0.00568182, stop:0 rgba(255, 188, 151, 255), stop:0.55 rgba(235, 148, 61, 255), stop:0.98 rgba(30, 30, 30, 255), stop:1 rgba(0, 0, 0, 0));
+color: rgb(200, 10, 26);</string>
+           </property>
+           <property name="text">
+            <string>Supprimer de ma base</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="record">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+             <underline>false</underline>
+             <stylestrategy>PreferAntialias</stylestrategy>
+             <kerning>false</kerning>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 188, 151, 255), stop:0.55 rgba(235, 148, 61, 255), stop:0.98 rgba(30, 30, 30, 255), stop:1 rgba(0, 0, 0, 0));
+color: rgb(49, 94, 255);</string>
+           </property>
+           <property name="text">
+            <string>Enregistrer dans ma base</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

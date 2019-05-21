@@ -252,7 +252,7 @@ class Database(QObject):
             for id in unknown:
                 self.send_request(request, (id))
 
-    def new_record(self, category_id, food, substitutes_details,
+    def new_record(self, category_id, selected, substitutes,
                    user_id):
         '''Record new entry for selected substitutes and linked
         correspondant category and food selected and products details'''
@@ -264,24 +264,24 @@ class Database(QObject):
         # add foods, shops, food_shops records :
         if DEBUG_MODE:
             print("get this product:", food)
-        food_selected_code = food["codes_tags"][1]
+        food_selected_code = selected["codes_tags"][1]
         shops = []
-        for shop in food["stores_tags"]:
+        for shop in selected["stores_tags"]:
             shops.append(shop)
         food_selected_details = (
-            food["product_name_fr"],
-            food["ingredients_text"],
-            food["nutrition_grades_tags"][0],
-            food["brands_tags"],
-            food["packaging"],
-            food["url"],
-            food["image_front_url"],
+            selected["product_name_fr"],
+            selected["ingredients_text"],
+            selected["nutrition_grades_tags"][0],
+            selected["brands_tags"],
+            selected["packaging"],
+            selected["url"],
+            selected["image_front_url"],
             shops
         )
         try:
             self._record_product(user_id, category_id, food_selected_code,
                                  food_selected_details)
-            for code, details in substitutes_details.items():
+            for code, details in substitutes.items():
                     self._record_product(user_id, category_id, code, details)
                     values = (food_selected_code, code)
                     self.send_request(request, values)
@@ -333,5 +333,12 @@ class Database(QObject):
             if DEBUG_MODE:
                 print("problem for record in database")
 
+    def del_record(self, category_id, selected, substitutes, user_id):
+        """Remove selected products from database"""
 
+        pass
 
+    def _delete_product(self, user_id, category_id, food_code, details):
+        """Delete product from database"""
+
+        pass
