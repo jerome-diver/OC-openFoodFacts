@@ -217,9 +217,8 @@ class Controller(QObject):
             if DEBUG_MODE:
                 print("user id:", user_id)
             ok = database.del_record(
-                self._off_mode.model.foods.category_id,
-                self._off_mode.model.foods.selected_details,
-                self._off_mode.model.product_details.checked,
+                self._off_mode.model.foods.selected[0],
+                self._off_mode.model.substitutes.checked,
                 user_id)
             if ok:
                 self._off_mode.model.substitutes.reset_checkboxes()

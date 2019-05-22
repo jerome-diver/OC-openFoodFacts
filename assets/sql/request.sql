@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS user_foods (
 CREATE TABLE IF NOT EXISTS food_substitutes (
     food_code VARCHAR(13),
     substitute_code varchar(13),
+    user_id INT(11),
     CONSTRAINT fk_food_substitutes__foods_code
         FOREIGN KEY (food_code)
         REFERENCES foods (code)
@@ -62,8 +63,13 @@ CREATE TABLE IF NOT EXISTS food_substitutes (
         REFERENCES foods (code)
             ON DELETE CASCADE
             ON UPDATE CASCADE,
+    CONSTRAINT fk_food_substitutes__user_id
+        FOREIGN KEY (user_id)
+        REFERENCES users (id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
     CONSTRAINT unique_food_substitutes
-        UNIQUE (food_code, substitute_code)) ENGINE = InnoDB;
+        UNIQUE (food_code, substitute_code, user_id)) ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS food_shops (
     food_code VARCHAR(13),
     shop_name VARCHAR(63),

@@ -3,6 +3,7 @@
 import webbrowser
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 
+from controller import Widget
 from model import LocalDatabaseModel
 from settings import DEBUG_MODE
 
@@ -64,11 +65,14 @@ class DatabaseMode(QObject):
     def on_category_selected(self, index):
         """Slot when an element of categories list is selected"""
 
+        self._model.reset_models((Widget.FOODS,
+                                  Widget.SUBSTITUTES,
+                                  Widget.DETAILS))
+        self._window.reset_views((Widget.FOODS,
+                                  Widget.SUBSTITUTES,
+                                  Widget.DETAILS))
         id = self._model.categories.index(index.row(), 1).data()
         self._model.foods.category_id = id
-        self._model.foods.reset()
-        self._model.substitutes.reset()
-        self._model.product_details.reset()
         foods = self._model.get_foods(id)
         self._model.foods.populate(foods)
 

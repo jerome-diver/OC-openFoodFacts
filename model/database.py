@@ -333,12 +333,18 @@ class Database(QObject):
             if DEBUG_MODE:
                 print("problem for record in database")
 
-    def del_record(self, category_id, selected, substitutes, user_id):
+    def del_record(self, selected, substitutes, user_id):
         """Remove selected products from database"""
 
-        pass
+        for substitute in substitutes:
+            self._delete_substitute(user_id, selected, substitute)
 
-    def _delete_product(self, user_id, category_id, food_code, details):
+    def _delete_substitute(self, user_id, food_code, food_substitute):
         """Delete product from database"""
 
-        pass
+        request = "DELETE FROM food_substitutes " \
+                  "WHERE substitute_code = %s " \
+                  "AND food_code = %s " \
+                  "AND user_id = %s ;"
+        values = (food_substitute, food_code, user_id)
+        self.send_request(request, values)
