@@ -139,7 +139,7 @@ class Database(QObject):
         finally:
             if cursor:
                 cursor.close()
-        return cursor
+            return cursor
 
     def generate_database(self):
         '''Create database, tables and roles'''
@@ -169,9 +169,12 @@ class Database(QObject):
         request = "CREATE OR REPLACE USER %s IDENTIFIED BY %s;"
         values = (username, password)
         self.send_request(request, values)
-        request = "GRANT %s TO %s;"
-        values = ('openfoodfacts_role', username)
-        self.send_request(request, values)
+        try:
+            request = "GRANT %s TO %s;"
+            values = ('openfoodfacts_role', username)
+            self.send_request(request, values)
+        except:
+            self.generate_users_role()
 
     def record_user(self, username, nick_name, family_name):
         '''Record an entry inside Table Users'''
@@ -187,13 +190,18 @@ class Database(QObject):
         '''Return if record users.username for username exist'''
 
         db_cursor = Database._connection.cursor()
-        request = "SELECT id FROM users WHERE username=%s;"
-        values = (username)
-        db_cursor.execute(request, values)
-        data = db_cursor.fetchone()
-        exist = True if data else False
-        db_cursor.close()
-        return exist
+        request = "SELECT id FROM users WHERE username=%s ;"
+        values = (username,)
+        exist = False
+        try:
+            db_cursor.execute(request, values)
+            data = db_cursor.fetchone()
+            exist = True if data else False
+        except pymysql.err.MySQLError as e:
+            print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+        finally:
+            db_cursor.close()
+            return exist
 
     def update_categories(self, off_categories):
         '''Will update categories table of openfoodfacts_substitutes

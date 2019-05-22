@@ -16,6 +16,7 @@ class Authentication(QObject):
     def __init__(self):
         super().__init__()
         self._dialog_open = None
+        self._dialog_count = 0
         self._db = Database()
         self.initialize_database()
         self._sign_in = SignIn(self)
@@ -62,23 +63,27 @@ class Authentication(QObject):
 
         self._sign_in.open()
         self._dialog_open = "SignIn"
+        self._dialog_count += 1
 
     @pyqtSlot()
     def on_sign_up(self):
         """Sing-up button slot"""
 
         self._sign_up.open()
-        self._dialog_open = "_sign_up"
+        self._dialog_open = "SignUp"
+        self._dialog_count += 1
 
     @pyqtSlot()
     def on_close(self):
         """Dialog box close slot"""
 
-        if self._dialog_open == "SignIn":
-            self._sign_in.close()
-        if self._dialog_open == "_sign_up":
+        if self._dialog_open == "SignUp":
             self._sign_up.close()
-        self._dialog_open = None
+            self._dialog_count -= 1
+        elif self._dialog_open == "SignIn":
+            self._sign_in.close()
+            self._dialog_count -= 1
+        self._dialog_open = None if self._dialog_count == 0 else "SignIn"
 
     @pyqtSlot(bool, str)
     def on_connection_return(self, connected, status):
@@ -107,7 +112,13 @@ class Authentication(QObject):
 
         username = self._sign_in.username.text()
         password = self._sign_in.password.text()
-        self._user.connect(username, password)
+        if not self._db.exist_username(username):
+            print("user does not exist inside local database users table")
+            self.on_sign_up()
+            self._sign_up.set_exist_username(username=username,
+                                             password=password)
+        else:
+            self._user.connect(username, password)
 
     def new_user(self):
         """Create a new user"""

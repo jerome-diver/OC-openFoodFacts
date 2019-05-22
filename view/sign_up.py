@@ -26,3 +26,11 @@ class SignUp(QDialog, Ui_SignUp, Share):
         '''call superclass slot from Share'''
 
         super(SignUp, self).on_status(message)
+
+    def set_exist_username(self, **kargs):
+        """Username property access"""
+
+        if "username" in kargs.keys():
+            self.username.setText(kargs["username"])
+        if "password" in kargs.keys():
+            self.password.setText(kargs["password"])
