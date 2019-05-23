@@ -61,6 +61,7 @@ class Authentication(QObject):
     def on_sign_in(self):
         """Sing-in button slot"""
 
+        self._sign_in.reset()
         self._sign_in.open()
         self._dialog_open = "SignIn"
         self._dialog_count += 1
@@ -69,6 +70,7 @@ class Authentication(QObject):
     def on_sign_up(self):
         """Sing-up button slot"""
 
+        self._sign_up.reset()
         self._sign_up.open()
         self._dialog_open = "SignUp"
         self._dialog_count += 1
@@ -112,13 +114,19 @@ class Authentication(QObject):
 
         username = self._sign_in.username.text()
         password = self._sign_in.password.text()
-        if not self._db.exist_username(username):
-            print("user does not exist inside local database users table")
-            self.on_sign_up()
-            self._sign_up.set_exist_username(username=username,
-                                             password=password)
+        if self._db.can_connect(username, password):
+            if not self._db.exist_username(username):
+                self.status_message.emit("l'utilisateur est inconnu de la base "
+                                         "locale")
+                self._sign_up.user_create = False
+                self.on_sign_up()
+                self._sign_up.set_exist_username(username=username,
+                                                 password=password)
+            else:
+                self._user.connect(username, password)
         else:
-            self._user.connect(username, password)
+            self.status_message.emit("Cet utilisateur ne peut pas accéder à "
+                                     "la base de donnée")
 
     def new_user(self):
         """Create a new user"""
@@ -127,14 +135,21 @@ class Authentication(QObject):
         password = self._sign_up.password.text()
         nick_name = self._sign_up.nickname.text()
         family_name = self._sign_up.familyname.text()
+        confirm_passwd = self._sign_up.passwd_confirm.text()
         if len(username) <= 6:
             self.status_message.emit("Nom d'utilisateur trop court "
                                      "(+ de 8 lettres)")
-        elif self._db.exist_username(username):
-            self.status_message.emit("{} exite déjà".format(username))
+        elif self._sign_up.user_create:
+            if self._db.exist_username(username):
+                self.status_message.emit("{} exite déjà".format(username))
+            elif password != confirm_passwd:
+                self.status_message.emit("Les mots de passe ne correspondent pas")
+            else:
+                self._db.create_user(username, password)
+                self.status_message.emit("Utilisateur enregistré")
         else:
-            self._db.create_user(username, password)
             self._db.record_user(username, nick_name, family_name)
+            self.on_close()
 
     def get_database(self):
         """Return the super admin database instance"""

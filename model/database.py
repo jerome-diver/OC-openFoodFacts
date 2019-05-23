@@ -1,4 +1,4 @@
-'''Database link objects to MariaDB database'''
+"""Database link objects to MariaDB database"""
 
 import re
 import pymysql
@@ -11,8 +11,8 @@ from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
 
 
 class Database(QObject):
-    '''Database model for user to be abee to record Open Food Facts data
-    localy'''
+    """Database model for user to be abee to record Open Food Facts data
+    localy"""
 
     _connection = None
     status_message = pyqtSignal(str)
@@ -34,7 +34,7 @@ class Database(QObject):
 
     def _connect_database(self, user=None, passwd=None,
                           database=None):
-        '''Connection to database with exception handle'''
+        """Connection to database with exception handle"""
 
         try:
             if DB_CONNECT_MODE == "SOCKET":
@@ -55,13 +55,33 @@ class Database(QObject):
             self.status_message.emit("Failed connection between",
                                      user, "and", database)
 
+    @staticmethod
+    def can_connect(username, password):
+        """User can connect or not ?"""
+
+        _can = True
+        this_db = None
+        try:
+            this_db = pymysql.connect(
+                    host=DB_HOSTNAME,
+                    port=DB_PORT,
+                    user=username,
+                    password=password,
+                    database="openfoodfacts_substitutes")
+        except:
+            _can = False
+        finally:
+            if this_db:
+                this_db.close()
+            return _can
+
     def disconnect_database(self):
-        '''Disconnect to the database'''
+        """Disconnect to the database"""
 
         Database._connection.close()
 
     def connect_to_off_db(self):
-        '''Connect the current user on database'''
+        """Connect the current user on database"""
 
         # request = "SET ROLE openfoodfacts_role;"
         # self.send_request(request)
@@ -75,7 +95,7 @@ class Database(QObject):
 
     @staticmethod
     def send_request(request, values=None, many=False):
-        '''Execute database request'''
+        """Execute database request"""
 
         cursor = None
         try:
@@ -113,7 +133,7 @@ class Database(QObject):
 
     @staticmethod
     def ask_request(request, values=None):
-        '''Return an iterator result for request question'''
+        """Return an iterator result for request question"""
 
         cursor = None
         try:
@@ -142,7 +162,7 @@ class Database(QObject):
             return cursor
 
     def generate_database(self):
-        '''Create database, tables and roles'''
+        """Create database, tables and roles"""
 
         with open(DB_INIT_FILE, 'r') as requests_file:
             sql_requests = requests_file.read()
@@ -153,8 +173,8 @@ class Database(QObject):
                     self.send_request(request)
 
     def generate_users_role(self):
-        '''From users list of openfoodfacts_substitutes,
-        generate users role of the mariadb database'''
+        """From users list of openfoodfacts_substitutes,
+        generate users role of the mariadb database"""
 
         request = "SELECT username FROM users;"
         for row in self.ask_request(request):
@@ -164,7 +184,7 @@ class Database(QObject):
             self.send_request(request, values)
 
     def create_user(self, username, password):
-        '''Create a database user to ba able to login with roles'''
+        """Create a database user to ba able to login with roles"""
 
         request = "CREATE OR REPLACE USER %s IDENTIFIED BY %s;"
         values = (username, password)
@@ -177,7 +197,7 @@ class Database(QObject):
             self.generate_users_role()
 
     def record_user(self, username, nick_name, family_name):
-        '''Record an entry inside Table Users'''
+        """Record an entry inside Table Users"""
 
         request = """
             INSERT INTO users 
@@ -187,7 +207,7 @@ class Database(QObject):
         self.send_request(request, values)
 
     def exist_username(self, username):
-        '''Return if record users.username for username exist'''
+        """Return if record users.username for username exist"""
 
         db_cursor = Database._connection.cursor()
         request = "SELECT id FROM users WHERE username=%s ;"
@@ -204,13 +224,13 @@ class Database(QObject):
             return exist
 
     def update_categories(self, off_categories):
-        '''Will update categories table of openfoodfacts_substitutes
-        database'''
+        """Will update categories table of openfoodfacts_substitutes
+        database"""
 
         def db_categories_status(off_cat, cat):
-            '''Return status variables list:
+            """Return status variables list:
             "Missing", "Unknown" and "ToUpdate"
-            of categories table records'''
+            of categories table records"""
 
             off_cat_id_list = []
             missing_categories = []
@@ -262,8 +282,8 @@ class Database(QObject):
 
     def new_record(self, category_id, selected, substitutes,
                    user_id):
-        '''Record new entry for selected substitutes and linked
-        correspondant category and food selected and products details'''
+        """Record new entry for selected substitutes and linked
+        correspondant category and food selected and products details"""
 
         request = """
                 INSERT IGNORE INTO food_substitutes 
