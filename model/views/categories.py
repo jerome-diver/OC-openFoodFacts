@@ -34,6 +34,7 @@ class CategoriesModel(QStandardItemModel):
                 if category["id"] in ldb_categories:
                     item_name.setForeground(QColor(0, 250, 0))
                 self.appendRow([item_name, item_id, item_off_name])
+        self.sort(0)
 
     def reset(self):
         """Reset the foods list"""

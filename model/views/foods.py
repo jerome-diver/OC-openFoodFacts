@@ -27,14 +27,17 @@ class FoodsModel(QStandardItemModel):
             self.reset()
         for food in foods:
             key = "product_name_fr"
-            if food[key].strip().isspace() or food[key] == '' and DEBUG_MODE:
-                print("no way (no product name) for:", food["codes_tags"][1])
+            if key not in food:
+                del food
+            elif food[key].isspace() or food[key] == '' and DEBUG_MODE:
+                print("no way (no product name) for:", food["code"])
+                del food
             else:
                 self._count += 1
                 name = QStandardItem(food[key].strip())
-                code = QStandardItem(food["codes_tags"][1])
+                code = QStandardItem(food["code"])
                 score = QStandardItem(food["nutrition_grades_tags"][0])
-                if food["codes_tags"][1] in ldb_foods:
+                if food["code"] in ldb_foods:
                     name.setForeground(QColor(16, 133, 22))
                 self.appendRow([name, code, score])
         self.sort(0)

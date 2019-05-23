@@ -55,11 +55,28 @@ class OpenFoodFacts(QObject):
             """Normalize data products content by adding missing keys"""
 
             for food in foods_products:
+                wrong = False
+                if "code" not in food.keys():
+                    if "id" not in food.keys():
+                        wrong = True
+                    else:
+                        food["code"] = food["id"]
                 if "product_name_fr" not in food:
                     if "product_name" in food:
-                        food["product_name_fr"] = food["product_name"]
+                        if food["product_name"].isspace():
+                            wrong = True
+                        elif food["product_name"] == '':
+                            wrong = True
+                        else:
+                            food["product_name_fr"] = food["product_name"]
                     else:
-                        foods_products.remove(food)
+                        wrong = True
+                elif food["product_name_fr"].isspace():
+                    wrong = True
+                elif food["product_name_fr"] == "":
+                    wrong = True
+                if wrong:
+                    foods_products.remove(food)
 
         foods = None
         try:
@@ -69,7 +86,8 @@ class OpenFoodFacts(QObject):
             return foods
         self.internet_access.emit(True)
         normalize_foods_products(foods)
-        return sorted(foods, key=lambda kv: kv["product_name_fr"])
+        #return sorted(foods, key=lambda kv: kv["product_name_fr"])
+        return foods
 
     def download_product(self, code, name):
         """Return product for this code"""
@@ -78,7 +96,8 @@ class OpenFoodFacts(QObject):
             """Normalize API keys"""
 
             if "product_name_fr" not in product:
-                product["product_name_fr"] = product["product_name"]
+                if "product_name" in product:
+                    product["product_name_fr"] = product["product_name"]
             if "nutrition_grade_fr" not in product:
                 if "nutrition_grade" in product:
                     product["nutrition_grade_fr"] = product["nutrition_grade"]
@@ -102,7 +121,7 @@ class OpenFoodFacts(QObject):
         try:
             product = openfoodfacts.products.advanced_search({
                 "search_terms": name,
-                "tagtype_0": "codes_tags",
+                "tagtype_0": "code",
                 "tag_contains_0": "contains",
                 "tag_0": code,
                 "country": "france"})
@@ -122,7 +141,6 @@ class OpenFoodFacts(QObject):
 
     def reset_models(self, models=(Widget.ALL,)):
         """Reset all models or elected ones"""
-
 
         if Widget.CATEGORIES in models or Widget.ALL in models:
             self._categories.reset()

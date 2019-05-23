@@ -3,10 +3,9 @@
 from urllib.request import urlopen
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, \
                         QImage, QPixmap
-from PyQt5.QtCore import QDataStream
 
 from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
-    NUTRISCORE_D, NUTRISCORE_E
+    NUTRISCORE_D, NUTRISCORE_E, DEBUG_MODE
 
 class ProductDetailsModels():
     """Mainwindow product details views models"""
@@ -45,7 +44,7 @@ class ProductDetailsModels():
         """Return the full views models of views for show product details"""
 
         url = "<a href=\"" + food["url"] + "\" />"
-        self._models["code"] = food["codes_tags"][1]
+        self._models["code"] = food["code"]
         self._models["shops"].removeRows(0, self._models["shops"].rowCount())
         self._models["name"] = url + food["product_name_fr"] + "</a>"
         self._models["description"] = food["ingredients_text"]
@@ -73,12 +72,27 @@ class ProductDetailsModels():
             img_front.loadFromData(data_front)
             self._models["img_thumb"] = QPixmap(img_front)
             self._models["img_thumb"].scaledToWidth(150)
+        if DEBUG_MODE:
+            print("=============================================")
+            if "code" in food.keys():
+                print("code:", food["code"])
+            if "codes_tags" in food.keys():
+                print("codes_tags:", food["codes_tags"])
+            if "id" in food.keys():
+                print("id:", food["id"])
+            if "_id" in food.keys():
+                print("_id:", food["_id"])
+            if "id_" in food.keys():
+                print("_id:", food["id_"])
+            print("=============================================")
+
+
 
     @staticmethod
     def define_with(var, food):
         """define variables records datas"""
 
-        var["code"] = food["codes_tags"][1]
+        var["code"] = food["code"]
         var["name"] = food["product_name_fr"]
         var["description"] = food["ingredients_text"]
         var["shops_names"] = []
@@ -117,7 +131,7 @@ class ProductDetailsModels():
 
         data = {}
         self.define_with(data, product)
-        if product["codes_tags"][1] in substitutes_checked:
+        if product["code"] in substitutes_checked:
             self._checked[data["code"]] = (
                 data["name"],
                 data["description"],

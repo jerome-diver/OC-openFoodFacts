@@ -291,8 +291,8 @@ class Database(QObject):
                     VALUES (%s, %s);"""
         # add foods, shops, food_shops records :
         if DEBUG_MODE:
-            print("get this product:", food)
-        food_selected_code = selected["codes_tags"][1]
+            print("get this product:", selected["code"])
+        food_selected_code = selected["code"]
         shops = []
         for shop in selected["stores_tags"]:
             shops.append(shop)

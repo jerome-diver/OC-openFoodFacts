@@ -26,13 +26,15 @@ class SubstitutesModel(QStandardItemModel):
                 print("foods length:", len(foods))
         ldb_substitutes = self._helper.records_concerned(selected[0])
         for food in foods[page]:
-            if food["codes_tags"][1] != selected[0] \
-                    and food["nutrition_grades_tags"][0] != "not-applicable" \
-                    and food["nutrition_grades_tags"][0] <= selected[1]:
+            target = food["nutrition_grades_tags"][0]
+            if food["code"] != selected[0] \
+                    and target != "not-applicable" \
+                    and target != "unknown" \
+                    and target <= selected[1]:
                 item_name = QStandardItem(food["product_name_fr"])
                 item_name.setCheckable(True)
                 item_grade = QStandardItem(food["nutrition_grades_tags"][0])
-                item_code = QStandardItem(food["codes_tags"][1])
+                item_code = QStandardItem(food["code"])
                 color_t = self._views["bg_color"]
                 color = QColor(color_t[0], color_t[1], color_t[2])
                 test_1 = "brands_tags" not in food.keys()
@@ -45,7 +47,7 @@ class SubstitutesModel(QStandardItemModel):
                     color = QColor(255, 50, 0)
                 item_name.setBackground(color)
                 item_code.setBackground(color)
-                if food["codes_tags"][1] in ldb_substitutes:
+                if food["code"] in ldb_substitutes:
                     item_name.setForeground(QColor(0, 250, 0))
                 self.appendRow([item_name, item_grade, item_code])
         self.sort(1)

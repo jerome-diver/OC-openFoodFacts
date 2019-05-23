@@ -13,7 +13,7 @@ class SubstitutesHelper:
         request = "SELECT DISTINCT fs.substitute_code  " \
                   "FROM food_substitutes AS fs, user_foods AS uf " \
                   "WHERE  uf.food_code = fs.food_code " \
-                  "AND uf.user_id = %s" \
+                  "AND uf.user_id = %s " \
                   "AND fs.food_code = %s ;"
         substitutes = []
         if self._user:
