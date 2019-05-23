@@ -107,33 +107,30 @@ class LocalDatabaseModel(QObject):
         return substitutes
 
 
-    def get_substitute_details(self, code, name):
+    def get_substitute_details(self, code):
         """Get product details from code and name"""
 
-        product_details = {}
         request = """
-            SELECT f.* FROM foods AS f, food_substitutes AS fs 
-                WHERE f.code = fs.food_code 
-                AND fs.substitute_code = %s 
-                AND f.name = %s ;"""
-        values = (code, name)
+            SELECT * FROM foods WHERE code = %s ;"""
+        values = (code,)
         for row in self._database.ask_request(request, values):
-            product_details["codes_tags"] = [None, row["code"]]
-            product_details["product_name_fr"] = row["name"]
-            product_details["ingredients_text"] = row["description"]
-            product_details["nutrition_grades_tags"] = [row["score"]]
-            product_details["url"] = row["url"]
-            product_details["packaging"] = row["packaging"]
-            product_details["brands_tags"] = row["brand"]
-            product_details["image_front_url"] = row["image_url"]
+            product_details = {
+                "code": row["code"],
+                "product_name_fr": row["name"],
+                "ingredients_text": row["description"],
+                "nutrition_grades_tags": [row["score"]],
+                "url": row["url"],
+                "packaging": row["packaging"],
+                "brands_tags": row["brand"],
+                "image_front_url": row["image_url"],
+                "stores_tags": []}
             req = """
-                SELECT s.name 
-                    FROM food_shop AS fs, shops AS s 
-                    WHERE fs.food_code = %s AND s.id = fs.shop_id;"""
+                SELECT DISTINCT shop_name 
+                    FROM food_shops 
+                    WHERE food_code = %s ;"""
             val = (row["code"], )
-            product_details["stores_tags"] = []
             for r in self._database.ask_request(req, val):
-                product_details["stores_tags"].append(r["name"])
+                product_details["stores_tags"].append(r["shop_name"])
             return product_details
 
     @pyqtSlot(User)

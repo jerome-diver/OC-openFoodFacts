@@ -106,8 +106,10 @@ class DatabaseMode(QObject):
         code = self._model.substitutes.index(index.row(), 2).data()
         name = self._model.substitutes.index(index.row(), 0).data()
         self._model.product_details.reset()
-        product_details = self._model.get_substitute_details(code, name)
+        product_details = self._model.get_substitute_details(code)
         self._model.product_details.populate(product_details)
+        self._window.show_product_details(
+            self._model.product_details.models)
 
     @pyqtSlot()
     def on_product_url_clicked(self):

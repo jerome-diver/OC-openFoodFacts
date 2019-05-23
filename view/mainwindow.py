@@ -49,25 +49,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.substitutes_list.resizeColumnsToContents()
         self.substitutes_list.show()
 
-    def show_product_details(self, model):
-        """Sow models for all details of product selected"""
+    def show_product_details(self, models):
+        """Sow modelss for all details of product selected"""
 
         self.statusBar.showMessage("Détails du produit sélectionné "
                                    "trouvés et affichés")
-        self.product_name.setText(model["name"])
-        self.product_brand.setText(model["brand"])
-        self.product_packaging.setText(model["packaging"])
-        self.product_code.setText(model["code"])
-        if isinstance(model["score"], QPixmap):
-            self.product_score.setPixmap(model["score"])
+        self.product_name.setText(models["name"])
+        self.product_brand.setText(models["brand"])
+        self.product_packaging.setText(models["packaging"])
+        self.product_code.setText(models["code"])
+        if isinstance(models["score"], QPixmap):
+            self.product_score.setPixmap(models["score"])
             self.product_score.setScaledContents(True)
         else:
-            self.product_score.setText(model["score"])
-        self.product_shops.setModel(model["shops"])
-        self.product_description.setText(model["description"])
-        self.product_url.setText(model["url"])
-        if isinstance(model["score"], QPixmap):
-            self.product_img_thumb.setPixmap(model["img_thumb"])
+            self.product_score.setText(models["score"])
+        self.product_shops.setModel(models["shops"])
+        self.product_description.setText(models["description"])
+        self.product_url.setText(models["url"])
+        if isinstance(models["score"], QPixmap):
+            self.product_img_thumb.setPixmap(models["img_thumb"])
             self.product_img_thumb.setScaledContents(True)
 
     def reset_views(self, views=(Widget.ALL,)):
