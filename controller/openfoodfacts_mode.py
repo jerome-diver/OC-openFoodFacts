@@ -28,6 +28,7 @@ class OpenFoodFactsMode(QObject):
                        "name" : self._window.product_name,
                        "brand" : self._window.product_brand,
                        "packaging" : self._window.product_packaging,
+                       "code": self._window.product_code,
                        "score" : self._window.product_score,
                        "shops" : self._window.product_shops,
                        "description" : self._window.product_description,

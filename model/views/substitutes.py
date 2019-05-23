@@ -26,6 +26,9 @@ class SubstitutesModel(QStandardItemModel):
                 print("foods length:", len(foods))
         ldb_substitutes = self._helper.records_concerned(selected[0])
         for food in foods[page]:
+            if DEBUG_MODE:
+                print("=============================")
+                print(food)
             target = food["nutrition_grades_tags"][0]
             if food["code"] != selected[0] \
                     and target != "not-applicable" \
@@ -35,6 +38,8 @@ class SubstitutesModel(QStandardItemModel):
                 item_name.setCheckable(True)
                 item_grade = QStandardItem(food["nutrition_grades_tags"][0])
                 item_code = QStandardItem(food["code"])
+                if DEBUG_MODE:
+                    print("populate:", food["product_name_fr"])
                 color_t = self._views["bg_color"]
                 color = QColor(color_t[0], color_t[1], color_t[2])
                 test_1 = "brands_tags" not in food.keys()
@@ -87,10 +92,10 @@ class SubstitutesModel(QStandardItemModel):
         for index in range(self.rowCount()):
             item_name = self.item(index, 0)
             item_code = self.item(index, 2)
-            if DEBUG_MODE:
-                print("search for item code:",
-                      item_code.data(Qt.DisplayRole))
             if item_code.data(Qt.DisplayRole) in ldb_substitutes:
+                if DEBUG_MODE:
+                    print("find item code:",
+                          item_code.data(Qt.DisplayRole))
                 item_name.setForeground(QColor(16, 133, 22))
 
     @property

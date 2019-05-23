@@ -29,8 +29,9 @@ class FoodsModel(QStandardItemModel):
             key = "product_name_fr"
             if key not in food:
                 del food
-            elif food[key].isspace() or food[key] == '' and DEBUG_MODE:
-                print("no way (no product name) for:", food["code"])
+            elif food[key].isspace() or food[key] == '':
+                if DEBUG_MODE:
+                    print("no way (no product name) for:", food["code"])
                 del food
             else:
                 self._count += 1
@@ -57,10 +58,10 @@ class FoodsModel(QStandardItemModel):
         for index in range(self.rowCount()):
             item_name = self.item(index, 0)
             item_code = self.item(index, 1)
-            if DEBUG_MODE:
-                print("search for item code:",
-                      item_code.data(Qt.DisplayRole))
             if item_code.data(Qt.DisplayRole) in ldb_foods:
+                if DEBUG_MODE:
+                    print("find item code:",
+                          item_code.data(Qt.DisplayRole))
                 item_name.setForeground(QColor(16, 133, 22))
 
     @property

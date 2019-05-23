@@ -12,7 +12,7 @@ class FoodsHelper:
         """Tell if category exist in local database table categories"""
 
         request = "SELECT DISTINCT fc.food_code  "\
-                  "FROM food_categories AS fc,  user_foods AS uf "\
+                  "FROM food_categories AS fc, user_foods AS uf "\
                   "WHERE fc.food_code = uf.food_code "\
                   "AND fc.category_id = %s "\
                   "AND uf.user_id = %s ;"

@@ -123,6 +123,10 @@ class Database(QObject):
             Database.status_message.emit("Erreur lors de l'exécution de "
                                          "la requête SQL dans la base de "
                                          "donnée")
+        except ProgrammingError as e:
+            if DEBUG_MODE:
+                print(e.args[0], e.args[1])
+            Database._connection.rollback()
         except IntegrityError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
@@ -149,6 +153,10 @@ class Database(QObject):
                 cursor.execute(request)
             Database._connection.commit()
         except OperationalError as e:
+            if DEBUG_MODE:
+                print(e.args[0], e.args[1])
+            Database._connection.rollback()
+        except ProgrammingError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
             Database._connection.rollback()
@@ -287,8 +295,8 @@ class Database(QObject):
 
         request = """
                 INSERT IGNORE INTO food_substitutes 
-                    (food_code, substitute_code) 
-                    VALUES (%s, %s);"""
+                    (food_code, substitute_code, user_id) 
+                    VALUES (%s, %s, %s);"""
         # add foods, shops, food_shops records :
         if DEBUG_MODE:
             print("get this product:", selected["code"])
@@ -311,7 +319,7 @@ class Database(QObject):
                                  food_selected_details)
             for code, details in substitutes.items():
                     self._record_product(user_id, category_id, code, details)
-                    values = (food_selected_code, code)
+                    values = (food_selected_code, code, user_id)
                     self.send_request(request, values)
             return True
         except Error as error:

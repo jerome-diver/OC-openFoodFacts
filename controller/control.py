@@ -133,10 +133,13 @@ class Controller(QObject):
                 self.user_connected.connect(
                     self._off_mode.model.on_user_connected)
             else:
-                self._window.show_categories()
-                self._window.show_foods()
-                self._window.show_substitutes()
-                self._window.show_product_details()
+                self._window.show_categories(
+                    self._off_mode.model.categories)
+                self._window.show_foods(self._off_mode.model.foods)
+                self._window.show_substitutes(
+                    self._off_mode.model.substitutes)
+                self._window.show_product_details(
+                    self._off_mode.model.product_details)
                 self._off_mode.load__details.finished.disconnect(
                     self.on_load_details_finished)
                 self._off_mode.checked_start.disconnect(

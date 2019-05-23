@@ -71,40 +71,39 @@ class LocalDatabaseModel(QObject):
         values = (category, )
         for row in self._database.ask_request(request, values):
             food = {"product_name_fr": row["name"],
-                    "codes_tags": [None, row["code"]],
+                    "code": row["code"],
                     "nutrition_grades_tags": [row["score"]]}
             foods.append(food)
+        if DEBUG_MODE:
+            print("search foods for category:", category)
+            print("found:", foods)
         return foods
 
-    def get_substitutes(self, code, name):
+    def get_substitutes(self, code):
         """Get product details from code and name"""
 
-        substitutes = []
+        substitutes = [[]]
         request = """
-            SELECT f.brand, f.store, f.name, f.score, f.code 
+            SELECT f.brand, f.name, f.score, f.code 
                 FROM foods AS f, food_substitutes AS fs 
-                WHERE fs.food_code = f.code 
-                AND fs.substitute_code = %s 
-                AND f.name = %s ;"""
-        values = (code, name)
+                WHERE f.code = fs.substitute_code 
+                AND fs.food_code = %s ;"""
+        values = (code, )
         for row in self._database.ask_request(request, values):
-            substitute = dict()
-            substitute["product_name_fr"] = row["name"]
-            substitute["nutrition_grades_tags"] = [row["score"]]
-            substitute["codes_tags"] = [None, row["code"]]
-            if row["brand"] != '':
-                substitute["brands_tags"] = row["brand"]
+            substitute = {
+                "product_name_fr": row["name"],
+                "nutrition_grades_tags": [row["score"]],
+                "code": row["code"],
+                "brands_tags": row["brand"],
+                "stores_tags": []}
             req = """
-                SELECT food_shops.shop_id 
-                    FROM food_shop, foods 
-                    WHERE foods.code = %s ;"""
+                SELECT DISTINCT shop_name 
+                    FROM food_shops  
+                    WHERE food_code = %s ;"""
             val = (row["code"], )
-            answer = ""
             for r in self._database.ask_request(req, val):
-                answer = r["shop_id"]
-            if answer != "":
-                substitute["stores_tags"] = [answer]
-            substitutes.append(substitute)
+                substitute["stores_tags"].append(r["shop_name"])
+            substitutes[0].append(substitute)
         return substitutes
 
 

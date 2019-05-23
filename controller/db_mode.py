@@ -3,8 +3,9 @@
 import webbrowser
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 
-from controller import Widget
+from controller import Widget, Mode
 from model import LocalDatabaseModel
+from view import Messenger
 from settings import DEBUG_MODE
 
 
@@ -18,9 +19,13 @@ class DatabaseMode(QObject):
         super().__init__()
         self._window = window
         self._database = database
+        self._flags = {"product": True,
+                       "internet": True,
+                       "call_mode": Mode.SELECTED}
         self._views = {"categories": self._window.categories_list,
                        "foods": self._window.foods_list,
                        "substitutes": self._window.substitutes_list,
+                       "code": self._window.product_code,
                        "name": self._window.product_name,
                        "brand": self._window.product_brand,
                        "packaging": self._window.product_packaging,
@@ -31,6 +36,7 @@ class DatabaseMode(QObject):
                        "img_thumb": self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
         self._model = LocalDatabaseModel(self._views, self._database)
+        self._messenger = Messenger(self, self._flags)
         self._connect_signals()
         self._initialize()
 
@@ -75,7 +81,7 @@ class DatabaseMode(QObject):
         self._model.foods.category_id = id
         foods = self._model.get_foods(id)
         self._model.foods.populate(foods)
-
+        self._window.show_foods(self._model.foods)
 
     @pyqtSlot(QModelIndex)
     def on_food_selected(self, index):
@@ -87,9 +93,10 @@ class DatabaseMode(QObject):
         code = self._model.foods.index(index.row(), 1).data()
         score = self._model.foods.index(index.row(), 2).data()
         self._model.foods.selected = (code, score, name)
-        substitutes = self._model.get_substitutes(code, name)
+        substitutes = self._model.get_substitutes(code)
         self._model.substitutes.populate(
             self._model.foods.selected, substitutes)
+        self._window.show_substitutes(self._model.substitutes)
 
 
     @pyqtSlot(QModelIndex)
