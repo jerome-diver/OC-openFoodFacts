@@ -12,6 +12,12 @@ This is an OpenClassRooms [Python Path project number 5](https://openclassrooms.
 ## Langage used
 Python-3
 
+## Database used
+I'm sorry, i had to use MySQL or MariaDB...
+So you should install this database server and why not create a 
+dedicated admin user for the application ?
+database name will be "openfoodfacts_substitutes"
+
 ## Libraries dependancies
 - PyQt5
 - pymysql

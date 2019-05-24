@@ -94,8 +94,10 @@ class DatabaseMode(QObject):
         score = self._model.foods.index(index.row(), 2).data()
         self._model.foods.selected = (code, score, name)
         substitutes = self._model.get_substitutes(code)
+        product_details = self._model.get_product_details(code)
         self._model.substitutes.populate(
             self._model.foods.selected, substitutes)
+        self._model.product_details.populate(product_details)
         self._window.show_substitutes(self._model.substitutes)
 
 
@@ -104,9 +106,8 @@ class DatabaseMode(QObject):
         """Slot when a substitute is selected"""
 
         code = self._model.substitutes.index(index.row(), 2).data()
-        name = self._model.substitutes.index(index.row(), 0).data()
         self._model.product_details.reset()
-        product_details = self._model.get_substitute_details(code)
+        product_details = self._model.get_product_details(code)
         self._model.product_details.populate(product_details)
         self._window.show_product_details(
             self._model.product_details.models)

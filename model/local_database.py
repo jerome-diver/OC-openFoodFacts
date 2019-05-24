@@ -107,7 +107,7 @@ class LocalDatabaseModel(QObject):
         return substitutes
 
 
-    def get_substitute_details(self, code):
+    def get_product_details(self, code):
         """Get product details from code and name"""
 
         request = """

@@ -102,7 +102,10 @@ class Controller(QObject):
         """OpenFoodFacts list button slot"""
 
         self._window.openfoodfacts_mode.setChecked(False)
+        self._window.local_mode.setDisabled(True)
+        self._window.openfoodfacts_mode.setDisabled(False)
         if state:
+            self._window.record.setHidden(True)
             if self._off_mode:
                 self._off_mode.disconnect_signals()
                 self._window.reset_views()
@@ -118,7 +121,12 @@ class Controller(QObject):
     def on_openfoodfacts_mode(self, state):
         """Local list slot"""
 
+        self._window.local_mode.setChecked(False)
+        self._window.openfoodfacts_mode.setDisabled(True)
+        if self._authenticate.user.connected:
+            self._window.local_mode.setDisabled(False)
         if state:
+            self._window.record.setHidden(False)
             self._window.local_mode.setChecked(False)
             if self._db_mode:
                 self._db_mode.disconnect_signals()
@@ -127,6 +135,7 @@ class Controller(QObject):
                 self._off_mode = OpenFoodFactsMode(
                     self._window,
                     self._authenticate.get_database())
+                self._window.reset_views()
                 self._off_mode.load_details_finished.connect(
                     self.on_load_details_finished)
                 self._off_mode.checked_start.connect(self.on_checked_started)
