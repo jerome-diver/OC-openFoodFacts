@@ -4,9 +4,9 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 import openfoodfacts
 
 from settings import DEBUG_MODE
-from model import User
 from . import CategoriesModel, FoodsModel, \
               SubstitutesModel, ProductDetailsModels
+from . import SlotsModels
 from . import CategoriesHelper, FoodsHelper, SubstitutesHelper
 from controller import Widget
 
@@ -19,6 +19,7 @@ class OpenFoodFacts(QObject):
     def __init__(self, views=None, authenticate=None):
         super().__init__()
         self._user = None
+        self._slots = SlotsModels(self)
         if views and authenticate:
             self._authenticate = authenticate
             self._user = authenticate.user
@@ -152,46 +153,6 @@ class OpenFoodFacts(QObject):
         if Widget.DETAILS in models or Widget.ALL in models:
             self._product_details.reset()
 
-    @pyqtSlot(User)
-    def on_user_connected(self, user):
-        """When a user is connected"""
-
-        if DEBUG_MODE:
-            print("=====  O p e n F o o d F a c t s M o d e l  =====")
-            print("config for User connected:", user.username)
-        self._user = user
-        self.categories.helper.user = user
-        self.categories.user_connected = True
-        self.foods.helper.user = user
-        self.foods.user_connected = True
-        self.substitutes.helper.user = user
-        self.substitutes.user_connected = True
-        if self.categories.rowCount():
-            self.categories.find_categories_in_database()
-        if self.foods.rowCount():
-            self.foods.find_foods_in_database()
-        if self.substitutes.rowCount():
-            self.substitutes.find_substitutes_in_database(
-                self.foods.selected[0])
-        if DEBUG_MODE:
-            print("get user", self._user.username, "connected")
-
-    @pyqtSlot()
-    def on_user_disconnected(self):
-        """When the user is disconnected"""
-
-        if DEBUG_MODE:
-            print("=====  O p e n F o o d F a c t s M o d e l  =====")
-            print("config for User disconnected:")
-        self._user = None
-        self.categories.helper.user = None
-        self.categories.user_connected = False
-        self.foods.helper.user = None
-        self.foods.user_connected = False
-        self.substitutes.helper.user = None
-        self.substitutes.user_connected = False
-
-
     @property
     def categories(self):
         """Categories property"""
@@ -216,3 +177,8 @@ class OpenFoodFacts(QObject):
 
         return self._product_details
 
+    @property
+    def slots(self):
+        """Slots Property"""
+
+        return self._slots

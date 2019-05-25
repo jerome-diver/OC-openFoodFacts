@@ -26,6 +26,12 @@ class FoodsModel(QStandardItemModel):
         ldb_foods = []
         if self._user_connected:
             ldb_foods = self._helper.records_concerned(self._category_id)
+        if DEBUG_MODE:
+            print("=====  F O O D S  - M O D E L  =====")
+            print("Populate categories view")
+            print("user is connected ?", self._user_connected)
+            if self._user_connected:
+                print("categories found in Database:", ldb_categories)
         if new:
             self.reset()
         for food in foods:

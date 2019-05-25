@@ -12,9 +12,9 @@ class Messenger(QObject):
 
     status_message = pyqtSignal(str)
 
-    def __init__(self, general_model, flags):
+    def __init__(self, controller, flags):
         super().__init__()
-        self._gm = general_model
+        self._ctrl = controller
         self._flags = flags
 
     @pyqtSlot()
@@ -45,7 +45,7 @@ class Messenger(QObject):
                                  format(page, total))
         if DEBUG_MODE:
             print("selected food already for:",
-                  self._gm.model.foods.selected)
+                  self._ctrl.model.foods.selected)
 
     @pyqtSlot()
     def on_load_product_details_finished(self):
@@ -98,7 +98,7 @@ class Messenger(QObject):
 
         if selected.indexes():
             index = selected.indexes()[0]
-            sub_model = self._gm._views["substitutes"].model()
+            sub_model = self._ctrl._views["substitutes"].model()
             code = sub_model.index(index.row(), 2).data()
             name = sub_model.index(index.row(), 0).data()
             if DEBUG_MODE:
@@ -111,9 +111,9 @@ class Messenger(QObject):
         """Load, from checkbox (substitutes table view) selected, products
         details"""
 
-        index = self._gm.model.substitutes.indexFromItem(item)
-        code = self._gm.model.substitutes.index(index.row(), 2).data()
-        name = self._gm._model.substitutes.index(index.row(), 0).data()
+        index = self._ctrl.model.substitutes.indexFromItem(item)
+        code = self._ctrl.model.substitutes.index(index.row(), 2).data()
+        name = self._ctrl._model.substitutes.index(index.row(), 0).data()
         if DEBUG_MODE:
             print("now searching product for code", code, "name", name)
         self.status_message.emit("Patientez, recherche sur le code produit "

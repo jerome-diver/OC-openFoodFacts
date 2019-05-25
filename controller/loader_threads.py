@@ -205,12 +205,13 @@ class ThreadsControler(QObject):
         super().__init__()
         self._controler = controler
         self._model = controler.model
-        self._load_categories = LoadCategories(self._model, controler.connection)
+        #self._load_categories = LoadCategories(
+        #    self._model, controler.connection)
         self._load_product_details = {Mode.CHECKED: [],
                                       Mode.SELECTED: [],
                                       Mode.GET: []}
         self._load_foods = None
-        self._load_categories.start()
+        #self._load_categories.start()
 
     def init_foods_thread(self, category):
         """Initialize foods thread call"""

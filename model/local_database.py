@@ -3,9 +3,9 @@
 from PyQt5.QtCore import QObject, pyqtSlot
 
 from settings import DEBUG_MODE
-from model import User
 from . import CategoriesModel, FoodsModel, \
               SubstitutesModel, ProductDetailsModels
+from . import SlotsModels
 from . import CategoriesHelper, FoodsHelper, SubstitutesHelper
 from controller import Widget
 
@@ -18,11 +18,12 @@ class LocalDatabaseModel(QObject):
         self._views = views
         self._authenticate = authenticate
         self._user = authenticate.user
+        self._slots = SlotsModels(self)
         self._connection = self._user.connection
-        self._categories = CategoriesModel(views, CategoriesHelper(
-            self._connection, self._user))
-        self._foods = FoodsModel(views, FoodsHelper(
-            self._connection, self._user))
+        self._categories = CategoriesModel(
+            views, CategoriesHelper(self._connection, self._user))
+        self._foods = FoodsModel(
+            views, FoodsHelper(self._connection, self._user))
         self._substitutes = SubstitutesModel(
             views, SubstitutesHelper(self._connection, self._user))
         self._product_details = ProductDetailsModels(views)
@@ -134,12 +135,6 @@ class LocalDatabaseModel(QObject):
                 product_details["stores_tags"].append(r["shop_name"])
             return product_details
 
-    @pyqtSlot(User)
-    def on_user_connected(self, user):
-        """When a user is connected"""
-
-        self._user = user
-
     def reset_models(self, models=(Widget.ALL,)):
         """Reset all models or elected ones"""
 
@@ -151,3 +146,9 @@ class LocalDatabaseModel(QObject):
             self._substitutes.reset()
         if Widget.DETAILS in models or Widget.ALL in models:
             self._product_details.reset()
+
+    @property
+    def slots(self):
+        """Slots Property"""
+
+        return self._slots

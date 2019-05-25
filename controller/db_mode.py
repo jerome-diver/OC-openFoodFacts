@@ -3,7 +3,7 @@
 import webbrowser
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 
-from controller import Widget, Mode
+from . import Widget, Mode, ControllerSlots
 from model import LocalDatabaseModel
 from view import Messenger
 from settings import DEBUG_MODE
@@ -15,8 +15,9 @@ class DatabaseMode(QObject):
 
     status_message = pyqtSignal(str)
 
-    def __init__(self, window, authenticate):
+    def __init__(self, general_ctrl, window, authenticate):
         super().__init__()
+        self._general_ctrl = general_ctrl
         self._window = window
         self._authenticate = authenticate
         self._connection = authenticate.user_connection
@@ -37,27 +38,10 @@ class DatabaseMode(QObject):
                        "img_thumb": self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
         self._model = LocalDatabaseModel(self._views, authenticate)
-        self._messenger = Messenger(self, self._flags)
-        self._connect_signals()
+        #self._messenger = Messenger(self, self._flags)
+        self._slots = ControllerSlots(general_ctrl, self)
+        #self._connect_signals()
         self._initialize()
-
-    def _connect_signals(self):
-        """Connect signals with slots"""
-
-        self._views["categories"].clicked.connect(self.on_category_selected)
-        self._views["foods"].clicked.connect(self.on_food_selected)
-        self._views["substitutes"].clicked.connect(self.on_substitute_selected)
-        self._views["url"].clicked.connect(self.on_product_url_clicked)
-        self.status_message.connect(self._window.on_status_message)
-
-    def disconnect_signals(self):
-        """Disconnect signals with slots"""
-
-        self._views["categories"].clicked.disconnect(self.on_category_selected)
-        self._views["foods"].clicked.disconnect(self.on_food_selected)
-        self._views["substitutes"].clicked.disconnect(self.on_substitute_selected)
-        self._views["url"].clicked.disconnect(self.on_product_url_clicked)
-        self.status_message.disconnect(self._window.on_status_message)
 
     def _initialize(self):
         """Show categories first"""
@@ -95,9 +79,9 @@ class DatabaseMode(QObject):
         score = self._model.foods.index(index.row(), 2).data()
         self._model.foods.selected = (code, score, name)
         substitutes = self._model.get_substitutes(code)
-        product_details = self._model.get_product_details(code)
         self._model.substitutes.populate(
             self._model.foods.selected, substitutes)
+        product_details = self._model.get_product_details(code)
         self._model.product_details.populate(product_details)
         self._window.show_substitutes(self._model.substitutes)
 
@@ -137,3 +121,22 @@ class DatabaseMode(QObject):
         """Window access property"""
 
         return self._window
+
+    @property
+    def views(self):
+        """Views property access"""
+
+        return self._views
+
+    @property
+    def flags(self):
+        """Property for flags access"""
+
+        return self._flags
+
+    @property
+    def slots(self):
+        """Property for slots access"""
+
+        return self._slots
+

@@ -91,6 +91,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.product_description.setText("")
             self.product_url.setText("")
             self.product_img_thumb.setText("")
+            self.product_img_thumb.setPixmap(QPixmap())
             self.product_score.setPixmap(QPixmap())
             self.product_img_thumb.setPixmap(QPixmap())
 

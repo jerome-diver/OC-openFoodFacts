@@ -29,6 +29,12 @@ class SubstitutesModel(QStandardItemModel):
         ldb_substitutes = []
         if self._user_connected:
             ldb_substitutes = self._helper.records_concerned(selected[0])
+        if DEBUG_MODE:
+            print("=====  S U B S T I T U T E S - M O D E L  =====")
+            print("Populate categories view")
+            print("user is connected ?", self._user_connected)
+            if self._user_connected:
+                print("categories found in Database:", ldb_categories)
         for food in foods[page]:
             if DEBUG_MODE:
                 print("=====  S U B S T I T U T E S  -  V I E W  =====")

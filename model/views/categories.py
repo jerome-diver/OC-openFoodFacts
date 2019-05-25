@@ -25,6 +25,12 @@ class CategoriesModel(QStandardItemModel):
         ldb_categories = []
         if self._user_connected:
             ldb_categories = self._helper.records_concerned()
+        if DEBUG_MODE:
+            print("=====  C A T E G O R I E S  - M O D E L  =====")
+            print("Populate categories view")
+            print("user is connected ?", self._user_connected)
+            if self._user_connected:
+                print("categories found in Database:", ldb_categories)
         for category in categories:
             is_fr = re.match(r'^fr:', category["name"])
             is_latin_chars = re.match(r'[0-9a-zA-z\s]', category["name"])

@@ -3,8 +3,9 @@
 import webbrowser
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
                          QModelIndex, QItemSelection
+from . import ControllerSlots
 from model import OpenFoodFacts
-from controller import ThreadsControler, Mode, Widget
+from controller import ThreadsControler, LoadCategories, Mode, Widget
 from view import Messenger
 from settings import DEBUG_MODE
 
@@ -18,11 +19,15 @@ class OpenFoodFactsMode(QObject):
     load_details_finished = pyqtSignal()
     kill_foods_thread = pyqtSignal()
 
-    def __init__(self, window, authenticate):
+    def __init__(self, general_ctrl, window, authenticate):
         super().__init__()
+        self._general_ctrl = general_ctrl
         self._window = window
         self._authenticate = authenticate
         self._connection = authenticate.user_connection
+        self._flags = {"product": True,
+                       "internet": True,
+                       "call_mode": Mode.SELECTED}
         self._views = {"categories": self._window.categories_list,
                        "foods": self._window.foods_list,
                        "substitutes": self._window.substitutes_list,
@@ -38,59 +43,24 @@ class OpenFoodFactsMode(QObject):
                        "bg_color": self._window.get_bg_color()}
         self._model = OpenFoodFacts(self._views, authenticate)
         self._threads = ThreadsControler(self)
-        self._flags = {"product": True,
-                       "internet": True,
-                       "call_mode": Mode.SELECTED}
-        self._messenger = Messenger(self, self._flags)
-        self.connect_signals()
+        self._load_categories = LoadCategories(
+            self._model, self._connection)
+        self._slots = ControllerSlots(general_ctrl, self)
+        self.initialize()
 
+    def initialize(self):
+        """Initialize the first categories populate view"""
 
-    def connect_signals(self):
-        """Connect signals to slots for concerned controller"""
-
-        self._views["categories"].clicked.connect(self.on_category_selected)
-        self._views["foods"].clicked.connect(self.on_food_selected)
-        self._views["substitutes"].selectionModel().selectionChanged.connect(
-            self.on_substitute_selection_changed)
-        self._model.substitutes.itemChanged.connect(self.on_substitute_checked)
-        self._views["url"].clicked.connect(self.on_product_url_clicked)
-        self._threads.load_categories.finished.connect(
-            self.on_load_categories_finished)
-        self._model.internet_access.connect(self.on_internet_access)
-        self.status_message.connect(self._window.on_status_message)
-        self._views["categories"].clicked.connect(
-            self._messenger.on_category_selected)
-        self._views["foods"].clicked.connect(
-            self._messenger.on_food_selected)
-        self._views["substitutes"].selectionModel().selectionChanged.connect(
-            self._messenger.on_substitute_selection_changed)
-        self._model.substitutes.itemChanged.connect(
-            self._messenger.on_substitute_checked)
-        self._threads.load_categories.finished.connect(
-            self._messenger.on_load_categories_finished)
-        self._model.internet_access.connect(
-            self._messenger.on_internet_access)
-        self._messenger.status_message.connect(self._window.on_status_message)
-
-    def disconnect_signals(self):
-        """Disconnect signals to slots for concerned controller"""
-
-        self._views["categories"].clicked.disconnect(self.on_category_selected)
-        self._views["foods"].clicked.disconnect(self.on_food_selected)
-        self._views["substitutes"].selectionModel().selectionChanged.disconnect(
-            self.on_substitute_selection_changed)
-        self._model.substitutes.itemChanged.disconnect(self.on_substitute_checked)
-        self._views["url"].clicked.disconnect(self.on_product_url_clicked)
-        self._threads.load_categories.finished.disconnect(
-            self.on_load_categories_finished)
-        self._model.internet_access.disconnect(self.on_internet_access)
-        self.status_message.disconnect(self._window.on_status_message)
+        self._load_categories.start()
 
     @pyqtSlot()
     def on_load_categories_finished(self):
-        """Show categories of products food
-        from openFoodFacts model in view"""
+        """Show categories of products food from openFoodFacts
+        model in view"""
 
+        if DEBUG_MODE:
+            print("=====  O p e n F o o d F a c t s M o d e  =====")
+            print("let'show the wiew from threads answer")
         self._window.show_categories(self._model.categories)
 
     @pyqtSlot()
@@ -231,3 +201,27 @@ class OpenFoodFactsMode(QObject):
         """Window access property"""
 
         return self._window
+
+    @property
+    def views(self):
+        """Views property access"""
+
+        return self._views
+
+    @property
+    def threads(self):
+        """Thread property access"""
+
+        return self._threads
+
+    @property
+    def slots(self):
+        """Property for slots access"""
+
+        return self._slots
+
+    @property
+    def flags(self):
+        """Property for flags access"""
+
+        return self._flags

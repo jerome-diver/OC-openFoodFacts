@@ -133,6 +133,7 @@ class DatabaseConnection(QObject):
         request = "USE openfoodfacts_substitutes;"
         self.send_request(request)
 
+
 class AdminConnection(DatabaseConnection):
 
     def __init__(self):
