@@ -2,68 +2,96 @@
 it empty if not"""
 
 import pymysql
+from enum import Enum
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from settings import DEBUG_MODE
-from model import Database
+from model import AdminConnection
+
+
+class TypeConnection(Enum):
+    ADMIN_CONNECTED = 1
+    USER_CONNECTED = 2
+    USER_DISCONNECTED = 3
+
 
 class User(QObject):
     """A user is connected to openfoodfacts_substitutes database"""
 
-    status_connected = pyqtSignal(bool, str)
+    status_connection = pyqtSignal(bool, str)
 
-    def __init__(self):
+    def __init__(self, connection):
         super().__init__()
-        self._connected = False
+        self._connection = connection
+        if DEBUG_MODE:
+            nature = "Admin" if self.is_admin() else "normal"
+            print("=====  U S E R  ( new", nature, ") =====")
         self._family = ""
         self._nick = ""
         self._username = ""
         self._id = ""
-        self._database = None
 
     def connect(self, username, password, family=None, nick=None):
         """Connect User"""
 
-        self._family = family
-        self._nick = nick
-        self._username = username
-        self._database = None
-        try:
-            self._database = Database(username,
-                                      password,
-                                      'openfoodfacts_substitutes')
-            self._connected = True
-            request = "SELECT * FROM users WHERE username = %s;"
-            for row in self._database.ask_request(request,
-                                                  (self._username,)):
-                self._id = row["id"]
-                self._family = row["family_name"]
-                self._nick = row["nick_name"]
-            if DEBUG_MODE:
-                print("connected to:",
-                      self._id, "-", self._nick, "-", self._family)
-            self.status_connected.emit(True, "Vous êtes connecté")
-        except pymysql.err.OperationalError as error:
-            status = "{}\n{}".format(error.args[0], error.args[1])
-            self.status_connected.emit(False, status)
+        if not self.is_admin() and not self.is_connected():
+            try:
+                self._connection.connect(
+                    username,
+                    password,
+                    'openfoodfacts_substitutes')
+            except pymysql.err.OperationalError as error:
+                status = "{}\n{}".format(error.args[0], error.args[1])
+                self.status_connection.emit(False, status)
+            else:
+                self._family = family
+                self._nick = nick
+                self._username = username
+                try:
+                    request = "SELECT * FROM users WHERE username = %s;"
+                    for row in self._connection.ask_request(
+                            request, (self._username,)):
+                        self._id = row["id"]
+                        self._family = row["family_name"]
+                        self._nick = row["nick_name"]
+                except pymysql.err.OperationalError as error:
+                    status = "{}\n{}".format(error.args[0], error.args[1])
+                    self.status_connection.emit(False, status)
+                else:
+                    if DEBUG_MODE:
+                        print("=====  U S E R  (normal) ======")
+                        print("connected to:",
+                              self._id, "-", self._nick, "-", self._family)
+                    self.status_connection.emit(True, "Vous êtes connecté")
 
     def disconnect(self):
         """disconnect User to local database"""
 
-        self._database.disconnect_database()
-        self.status_connected.emit(False, "Vous êtes déconnecté")
+        if not self.is_admin() and self.is_connected():
+            self._connection.disconnect()
+            self.status_connection.emit(False, "Vous êtes déconnecté")
 
-    @property
-    def connected(self):
+    def is_admin(self):
+        """Tell if this user is an Admin connected database server user"""
+
+        return isinstance(self._connection, AdminConnection)
+
+    def is_connected(self):
         """Said if User is connected"""
 
-        return self._connected
+        return self._connection.is_connected()
 
     @property
-    def database(self):
+    def connection(self):
         """Database property getter"""
 
-        return self._database
+        return self._connection
+
+    @connection.setter
+    def connection(self, connection):
+        """Database property getter"""
+
+        self._connection = connection
 
     @property
     def id(self):
@@ -88,3 +116,4 @@ class User(QObject):
         """Return self._username"""
 
         return self._username
+

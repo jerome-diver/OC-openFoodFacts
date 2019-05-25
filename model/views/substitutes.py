@@ -13,6 +13,7 @@ class SubstitutesModel(QStandardItemModel):
         self.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
         self._views = views
         self._helper = helper
+        self._user_connected = False
         self._checked = []
 
     def populate(self, selected, foods, page=0, new=True):
@@ -23,11 +24,14 @@ class SubstitutesModel(QStandardItemModel):
         if new:
             self.reset()
             if DEBUG_MODE:
+                print("=====  S U B S T I T U T E S  -  V I E W  =====")
                 print("foods length:", len(foods))
-        ldb_substitutes = self._helper.records_concerned(selected[0])
+        ldb_substitutes = []
+        if self._user_connected:
+            ldb_substitutes = self._helper.records_concerned(selected[0])
         for food in foods[page]:
             if DEBUG_MODE:
-                print("=============================")
+                print("=====  S U B S T I T U T E S  -  V I E W  =====")
                 print(food)
             target = food["nutrition_grades_tags"][0]
             if food["code"] != selected[0] \

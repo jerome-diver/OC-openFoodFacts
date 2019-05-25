@@ -15,13 +15,16 @@ class CategoriesModel(QStandardItemModel):
         super().__init__(views["categories"])
         self._views = views
         self._helper = helper
+        self._user_connected = False
 
     def populate(self, categories):
         """Return all categories inside list categories view
         by openfoodfacts module helper"""
 
         self.removeRows(0, self.rowCount())
-        ldb_categories = self._helper.records_concerned()
+        ldb_categories = []
+        if self._user_connected:
+            ldb_categories = self._helper.records_concerned()
         for category in categories:
             is_fr = re.match(r'^fr:', category["name"])
             is_latin_chars = re.match(r'[0-9a-zA-z\s]', category["name"])
@@ -32,7 +35,7 @@ class CategoriesModel(QStandardItemModel):
                 item_id = QStandardItem(category["id"])
                 item_off_name = QStandardItem(category["name"])
                 if category["id"] in ldb_categories:
-                    item_name.setForeground(QColor(0, 250, 0))
+                    item_name.setForeground(QColor(16, 133, 22))
                 self.appendRow([item_name, item_id, item_off_name])
         self.sort(0)
 

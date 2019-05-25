@@ -6,7 +6,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from controller import DatabaseMode, OpenFoodFactsMode, \
                        UpdateCategories, Authentication
-from model import OpenFoodFacts, User
+from model import OpenFoodFacts, User,TypeConnection, AdminConnection
 from view import MainWindow
 from settings import DEBUG_MODE
 
@@ -16,6 +16,7 @@ class Controller(QObject):
 
     status_message = pyqtSignal(str)
     user_connected = pyqtSignal(User)
+    user_disconnected = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -32,7 +33,7 @@ class Controller(QObject):
         self._window.local_mode.setDisabled(True)
         self._window.remove.setDisabled(True)
         off_model = OpenFoodFacts()
-        loader = UpdateCategories(self._authenticate.get_database(),
+        loader = UpdateCategories(self._authenticate.user_connection,
                                   off_model)
         loader.start()
         self.checked_substitutes()
@@ -51,7 +52,7 @@ class Controller(QObject):
         self._window.remove.clicked.connect(self.on_remove_substitutes)
         self.status_message.connect(self._window.on_status_message)
         self._authenticate.status_user_connection.connect(
-            self.on_user_connection)
+            self.on_new_status_connection)
 
     @pyqtSlot()
     def on_quit(self):
@@ -70,13 +71,13 @@ class Controller(QObject):
             self._window.signin.setText("Sign-in")
             self._authenticate.user = None
 
-    @pyqtSlot(bool)
-    def on_user_connection(self, connected):
+    @pyqtSlot(TypeConnection)
+    def on_new_status_connection(self, connected):
         """When user is connected (or failed to be connected)
          to his local database"""
 
         self._flags["user_connected"] = connected
-        if connected:
+        if connected == TypeConnection.USER_CONNECTED:
             self.user_connected.emit(self._authenticate.user)
             self.status_message.emit("L'utilisateur est connecté à "
                                      "la base de donnée locale")
@@ -87,14 +88,21 @@ class Controller(QObject):
                 "{} {}".format(self._authenticate.user.family,
                                self._authenticate.user.nick))
             self._window.local_mode.setEnabled(True)
-        else:   # connection failed
+        elif connected == TypeConnection.USER_DISCONNECTED:
+            self._authenticate.define_user(AdminConnection())
+            self.user_disconnected.emit()
+            if self._window.local_mode.isChecked():
+                self.on_openfoodfacts_mode(True)
+            else:
+                self._window.local_mode.setDisabled(True)
             self.status_message.emit("L'utilisateur est déconnecté de la base "
                                      "de donnée locale")
             self._window.signup.setHidden(False)
             self._window.user_informations.setText("")
-            if self._window.local_mode.isChecked():
-                self._window.reset_views()
-                self.on_openfoodfacts_mode(True)
+        elif connected == TypeConnection.ADMIN_CONNECTED:
+            if DEBUG_MODE:
+                print("=====  C O N T R O L  =====")
+                print("get signal ADMIN is connected")
         self.checked_substitutes()
 
     @pyqtSlot(bool)
@@ -104,16 +112,15 @@ class Controller(QObject):
         self._window.openfoodfacts_mode.setChecked(False)
         self._window.local_mode.setDisabled(True)
         self._window.openfoodfacts_mode.setDisabled(False)
+        self._window.reset_views()
         if state:
             self._window.record.setHidden(True)
             if self._off_mode:
                 self._off_mode.disconnect_signals()
-                self._window.reset_views()
                 self._off_mode = None
             if not self._db_mode:
-                self._db_mode = DatabaseMode(
-                    self._window,
-                    self._authenticate.get_database())
+                self._db_mode = DatabaseMode(self._window,
+                                             self._authenticate)
         else:
             self._window.reset_views()
 
@@ -121,26 +128,28 @@ class Controller(QObject):
     def on_openfoodfacts_mode(self, state):
         """Local list slot"""
 
-        self._window.local_mode.setChecked(False)
-        self._window.openfoodfacts_mode.setDisabled(True)
-        if self._authenticate.user.connected:
-            self._window.local_mode.setDisabled(False)
+        self._window.reset_views()
+        self._window.local_mode.setChecked(not state)
+        self._window.openfoodfacts_mode.setChecked(state)
+        self._window.openfoodfacts_mode.setDisabled(state)
+        local_mode_status = self._authenticate.user.is_connected() \
+                            and not self._authenticate.user.is_admin()
+        self._window.local_mode.setEnabled(local_mode_status)
+        self._window.record.setHidden(not state)
         if state:
-            self._window.record.setHidden(False)
-            self._window.local_mode.setChecked(False)
             if self._db_mode:
                 self._db_mode.disconnect_signals()
                 self._db_mode = None
             if not self._off_mode:
-                self._off_mode = OpenFoodFactsMode(
-                    self._window,
-                    self._authenticate.get_database())
-                self._window.reset_views()
+                self._off_mode = OpenFoodFactsMode(self._window,
+                                                   self._authenticate)
                 self._off_mode.load_details_finished.connect(
                     self.on_load_details_finished)
                 self._off_mode.checked_start.connect(self.on_checked_started)
                 self.user_connected.connect(
                     self._off_mode.model.on_user_connected)
+                self.user_disconnected.connect(
+                    self._off_mode.model.on_user_disconnected)
             else:
                 self._window.show_categories(
                     self._off_mode.model.categories)
@@ -155,6 +164,8 @@ class Controller(QObject):
                     self.on_checked_started)
                 self.user_connected.disconnect(
                     self._off_mode.model.on_user_connected)
+                self.user_disconnected.disconnect(
+                    self._off_mode.model.on_user_disconnected)
         else:
             self._window.reset_views()
 
@@ -205,7 +216,7 @@ class Controller(QObject):
         """Record substitutes selected for product food selected inside
         local database"""
 
-        database = self._authenticate.get_user_database()
+        database = self._authenticate.user_connection
         if database:
             user_id = self._authenticate.user.id
             if DEBUG_MODE:
@@ -223,7 +234,7 @@ class Controller(QObject):
         """Record substitutes selected for product food selected inside
         local database"""
 
-        database = self._authenticate.get_user_database()
+        database = self._authenticate.user_connection
         if database:
             user_id = self._authenticate.user.id
             if DEBUG_MODE:

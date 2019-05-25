@@ -12,6 +12,7 @@ class FoodsModel(QStandardItemModel):
         super().__init__(views["foods"])
         self._views = views
         self._helper = helper
+        self._user_connected = False
         self._recorded = [] # [ [] ]  |as pages of foods
         self._selected = ()
         self._selected_details = dict()
@@ -22,7 +23,9 @@ class FoodsModel(QStandardItemModel):
         """Return the list wiew of foods for give category string
         with openfoodfacts library helper"""
 
-        ldb_foods = self._helper.records_concerned(self._category_id)
+        ldb_foods = []
+        if self._user_connected:
+            ldb_foods = self._helper.records_concerned(self._category_id)
         if new:
             self.reset()
         for food in foods:

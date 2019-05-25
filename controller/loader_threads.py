@@ -12,10 +12,10 @@ class LoadCategories(QThread):
     """Load Categories model in background process to not freeze
     thz application"""
 
-    def __init__(self, model, database):
+    def __init__(self, model, connection):
         super().__init__()
         self._model = model
-        self._database = database
+        self._connection = connection
 
     def __del__(self):
         self.wait()
@@ -27,7 +27,7 @@ class LoadCategories(QThread):
 
         categories = []
         request = "SELECT id, name FROM categories ORDER BY name;"
-        for row in  self._database.ask_request(request):
+        for row in  self._connection.ask_request(request):
             categories.append(row)
         if not categories:
             categories = self._model.download_categories()
@@ -174,9 +174,9 @@ class UpdateCategories(QThread):
     """Load categories from Open Food Facts in background in categories
     table of the Open Food Facts_substitutes database"""
 
-    def __init__(self, database, off_model):
+    def __init__(self, connection, off_model):
         super().__init__()
-        self._database = database
+        self._connection = connection
         self._off_model = off_model
 
     def __del__(self):
@@ -189,7 +189,7 @@ class UpdateCategories(QThread):
             print("start to update categories table from OFF categories")
         categories = self._off_model.download_categories()
         if categories:
-            self._database.update_categories(categories)
+            self._connection.update_categories(categories)
         if DEBUG_MODE:
             print("End of update categories table")
 
@@ -205,7 +205,7 @@ class ThreadsControler(QObject):
         super().__init__()
         self._controler = controler
         self._model = controler.model
-        self._load_categories = LoadCategories(self._model, controler.database)
+        self._load_categories = LoadCategories(self._model, controler.connection)
         self._load_product_details = {Mode.CHECKED: [],
                                       Mode.SELECTED: [],
                                       Mode.GET: []}

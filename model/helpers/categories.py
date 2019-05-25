@@ -3,12 +3,12 @@
 
 class CategoriesHelper:
 
-    def __init__(self, database, user):
-        self._database = database
+    def __init__(self, connection, user):
+        self._connection = connection
         self._user = user
 
     def records_concerned(self):
-        """Tell if category exist in local database table categories"""
+        """Tell if category exist in local connection table categories"""
 
         request = "SELECT DISTINCT fc.category_id " \
                   "FROM food_categories AS fc, user_foods AS uf " \
@@ -17,7 +17,7 @@ class CategoriesHelper:
         categories = []
         if self._user:
             value = (self._user.id,)
-            for row in self._database.ask_request(request, value):
+            for row in self._connection.ask_request(request, value):
                 categories.append(row["category_id"])
         return categories
 

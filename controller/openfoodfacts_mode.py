@@ -18,10 +18,11 @@ class OpenFoodFactsMode(QObject):
     load_details_finished = pyqtSignal()
     kill_foods_thread = pyqtSignal()
 
-    def __init__(self, window, database):
+    def __init__(self, window, authenticate):
         super().__init__()
         self._window = window
-        self._database = database
+        self._authenticate = authenticate
+        self._connection = authenticate.user_connection
         self._views = {"categories": self._window.categories_list,
                        "foods": self._window.foods_list,
                        "substitutes": self._window.substitutes_list,
@@ -35,7 +36,7 @@ class OpenFoodFactsMode(QObject):
                        "url" : self._window.product_url,
                        "img_thumb" : self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
-        self._model = OpenFoodFacts(self._views, database)
+        self._model = OpenFoodFacts(self._views, authenticate)
         self._threads = ThreadsControler(self)
         self._flags = {"product": True,
                        "internet": True,
@@ -220,10 +221,10 @@ class OpenFoodFactsMode(QObject):
         return self._model
 
     @property
-    def database(self):
-        """Database property access"""
+    def connection(self):
+        """connection property access"""
 
-        return self._database
+        return self._connection
 
     @property
     def window(self):

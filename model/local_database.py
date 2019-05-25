@@ -13,17 +13,18 @@ from controller import Widget
 class LocalDatabaseModel(QObject):
     """Local Database model Object"""
 
-    def __init__(self, views, database):
+    def __init__(self, views, authenticate):
         super().__init__()
         self._views = views
-        self._database = database
-        self._user = None
-        self._categories = CategoriesModel(views, CategoriesHelper(database,
-                                                                   self._user))
-        self._foods = FoodsModel(views, FoodsHelper(database, self._user))
-        self._substitutes = SubstitutesModel(views,
-                                             SubstitutesHelper(
-                                                database, self._user))
+        self._authenticate = authenticate
+        self._user = authenticate.user
+        self._connection = self._user.connection
+        self._categories = CategoriesModel(views, CategoriesHelper(
+            self._connection, self._user))
+        self._foods = FoodsModel(views, FoodsHelper(
+            self._connection, self._user))
+        self._substitutes = SubstitutesModel(
+            views, SubstitutesHelper(self._connection, self._user))
         self._product_details = ProductDetailsModels(views)
 
     @property
@@ -55,7 +56,7 @@ class LocalDatabaseModel(QObject):
 
         categories = []
         request = "SELECT * FROM categories;"
-        for row in self._database.ask_request(request):
+        for row in self._connection.ask_request(request):
             categories.append({"id": row["id"], "name": row["name"]})
         return categories
 
@@ -69,7 +70,7 @@ class LocalDatabaseModel(QObject):
                 WHERE fc.food_code = f.code 
                 AND fc.category_id = %s ;"""
         values = (category, )
-        for row in self._database.ask_request(request, values):
+        for row in self._connection.ask_request(request, values):
             food = {"product_name_fr": row["name"],
                     "code": row["code"],
                     "nutrition_grades_tags": [row["score"]]}
@@ -89,7 +90,7 @@ class LocalDatabaseModel(QObject):
                 WHERE f.code = fs.substitute_code 
                 AND fs.food_code = %s ;"""
         values = (code, )
-        for row in self._database.ask_request(request, values):
+        for row in self._connection.ask_request(request, values):
             substitute = {
                 "product_name_fr": row["name"],
                 "nutrition_grades_tags": [row["score"]],
@@ -101,7 +102,7 @@ class LocalDatabaseModel(QObject):
                     FROM food_shops  
                     WHERE food_code = %s ;"""
             val = (row["code"], )
-            for r in self._database.ask_request(req, val):
+            for r in self._connection.ask_request(req, val):
                 substitute["stores_tags"].append(r["shop_name"])
             substitutes[0].append(substitute)
         return substitutes
@@ -113,7 +114,7 @@ class LocalDatabaseModel(QObject):
         request = """
             SELECT * FROM foods WHERE code = %s ;"""
         values = (code,)
-        for row in self._database.ask_request(request, values):
+        for row in self._connection.ask_request(request, values):
             product_details = {
                 "code": row["code"],
                 "product_name_fr": row["name"],
@@ -129,7 +130,7 @@ class LocalDatabaseModel(QObject):
                     FROM food_shops 
                     WHERE food_code = %s ;"""
             val = (row["code"], )
-            for r in self._database.ask_request(req, val):
+            for r in self._connection.ask_request(req, val):
                 product_details["stores_tags"].append(r["shop_name"])
             return product_details
 

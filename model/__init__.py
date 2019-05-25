@@ -1,7 +1,7 @@
 """module import file"""
 
-from .database import Database
-from .user import User
+from .database import DatabaseConnection, AdminConnection, UserConnection
+from .user import User, TypeConnection
 from .helpers import CategoriesHelper, FoodsHelper, SubstitutesHelper
 from .views import CategoriesModel, FoodsModel, \
                    SubstitutesModel, ProductDetailsModels

@@ -10,97 +10,47 @@ from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
     DB_INIT_FILE, DEBUG_MODE
 
 
-class Database(QObject):
-    """Database model for user to be abee to record Open Food Facts data
-    localy"""
+class DatabaseConnection(QObject):
 
-    _connection = None
     status_message = pyqtSignal(str)
 
-    def __init__(self, username=None, password=None, database=None):
+    def __init__(self):
         super().__init__()
-        if Database._connection:
-            if Database._connection.open:
-                Database._connection.close()
-        if username is None:
-            self._connect_database(user=GRANT_USER,
-                                   passwd=GRANT_USER_PASSWD,
-                                   database='information_schema')
-        else:
-            self._connect_database(user=username,
-                                   passwd=password,
-                                   database=database)
-            self.connect_to_off_db()
+        self._connection = None
 
-    def _connect_database(self, user=None, passwd=None,
-                          database=None):
-        """Connection to database with exception handle"""
+    def connect(self, user, password, database):
+        """Connect database for ADMIN"""
 
         try:
             if DB_CONNECT_MODE == "SOCKET":
-                Database._connection = pymysql.connect(
+                self._connection = pymysql.connect(
                     unix_socket=DB_SOCKET,
                     user=user,
-                    password=passwd,
+                    password=password,
                     database=database)
-
             elif DB_CONNECT_MODE == "TCP":
-                Database._connection = pymysql.connect(
+                self._connection = pymysql.connect(
                     host=DB_HOSTNAME,
                     port=DB_PORT,
                     user=user,
-                    password=passwd,
+                    password=password,
                     database=database)
         except ConnectionError:
             self.status_message.emit("Failed connection between",
                                      user, "and", database)
 
-    @staticmethod
-    def can_connect(username, password):
-        """User can connect or not ?"""
+    def disconnect(self):
+        """Should disconnect database"""
+        
+        self._connection.close()
 
-        _can = True
-        this_db = None
-        try:
-            this_db = pymysql.connect(
-                    host=DB_HOSTNAME,
-                    port=DB_PORT,
-                    user=username,
-                    password=password,
-                    database="openfoodfacts_substitutes")
-        except:
-            _can = False
-        finally:
-            if this_db:
-                this_db.close()
-            return _can
-
-    def disconnect_database(self):
-        """Disconnect to the database"""
-
-        Database._connection.close()
-
-    def connect_to_off_db(self):
-        """Connect the current user on database"""
-
-        # request = "SET ROLE openfoodfacts_role;"
-        # self.send_request(request)
-        request = "USE openfoodfacts_substitutes;"
-        self.send_request(request)
-
-    def __del__(self):
-        if Database._connection:
-            if Database._connection.open:
-                Database._connection.close()
-
-    @staticmethod
-    def send_request(request, values=None, many=False):
-        """Execute database request"""
-
+    def send_request(self, request, values=None, many=None):
+        """Send a request with this connection to this database"""
+        
         cursor = None
         try:
-            Database._connection.begin()
-            cursor = Database._connection.cursor()
+            self._connection.begin()
+            cursor = self._connection.cursor()
             if DEBUG_MODE:
                 print("request :", request)
             if values:
@@ -115,34 +65,33 @@ class Database(QObject):
                     cursor.executemany(request)
                 else:
                     cursor.execute(request)
-            Database._connection.commit()
+            self._connection.commit()
         except OperationalError as error:
             if DEBUG_MODE:
                 print(error.args[0], error.args[1])
-            Database._connection.rollback()
-            Database.status_message.emit("Erreur lors de l'exécution de "
-                                         "la requête SQL dans la base de "
-                                         "donnée")
+            self._connection.rollback()
+            self.status_message.emit("Erreur lors de l'exécution de "
+                                     "la requête SQL dans la base de "
+                                      "donnée")
         except ProgrammingError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
-            Database._connection.rollback()
+            self._connection.rollback()
         except IntegrityError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
-            Database._connection.rollback()
+            self._connection.rollback()
         finally:
             if cursor:
                 cursor.close()
 
-    @staticmethod
-    def ask_request(request, values=None):
-        """Return an iterator result for request question"""
+    def ask_request(self, request, values=None):
+        """Ask for a request to this connection for this database"""
 
         cursor = None
         try:
-            Database._connection.begin()
-            cursor = Database._connection.cursor(pymysql.cursors.DictCursor)
+            self._connection.begin()
+            cursor = self._connection.cursor(pymysql.cursors.DictCursor)
             if DEBUG_MODE:
                 print("request :", request)
             if values:
@@ -151,23 +100,46 @@ class Database(QObject):
                 cursor.execute(request, values)
             else:
                 cursor.execute(request)
-            Database._connection.commit()
+            self._connection.commit()
         except OperationalError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
-            Database._connection.rollback()
+            self._connection.rollback()
         except ProgrammingError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
-            Database._connection.rollback()
+            self._connection.rollback()
         except IntegrityError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
-            Database._connection.rollback()
+            self._connection.rollback()
         finally:
             if cursor:
                 cursor.close()
             return cursor
+
+    def is_connected(self):
+        """Said if this is connected to the database server"""
+
+        if self._connection:
+            return self._connection.open
+        return False
+
+    def connect_to_off_db(self):
+        """Connect the current user on database"""
+
+        # request = "SET ROLE openfoodfacts_role;"
+        # self.send_request(request)
+        request = "USE openfoodfacts_substitutes;"
+        self.send_request(request)
+
+class AdminConnection(DatabaseConnection):
+
+    def __init__(self):
+        super().__init__()
+        self.connect(user=GRANT_USER,
+                     password=GRANT_USER_PASSWD,
+                     database='information_schema')
 
     def generate_database(self):
         """Create database, tables and roles"""
@@ -217,7 +189,7 @@ class Database(QObject):
     def exist_username(self, username):
         """Return if record users.username for username exist"""
 
-        db_cursor = Database._connection.cursor()
+        db_cursor = self._connection.cursor()
         request = "SELECT id FROM users WHERE username=%s ;"
         values = (username,)
         exist = False
@@ -230,6 +202,26 @@ class Database(QObject):
         finally:
             db_cursor.close()
             return exist
+
+    @staticmethod
+    def can_connect(username, password):
+        """User can connect or not ?"""
+
+        _can = True
+        this_db = None
+        try:
+            this_db = pymysql.connect(
+                host=DB_HOSTNAME,
+                port=DB_PORT,
+                user=username,
+                password=password,
+                database="openfoodfacts_substitutes")
+        except:
+            _can = False
+        finally:
+            if this_db:
+                this_db.close()
+            return _can
 
     def update_categories(self, off_categories):
         """Will update categories table of openfoodfacts_substitutes
@@ -288,8 +280,16 @@ class Database(QObject):
             for id in unknown:
                 self.send_request(request, (id))
 
-    def new_record(self, category_id, selected, substitutes,
-                   user_id):
+
+class UserConnection(DatabaseConnection):
+
+    def connect(self, user, password, database):
+        """Connect database for ADMIN"""
+
+        super(UserConnection, self).connect(user, password, database)
+        self.connect_to_off_db()
+
+    def new_record(self, category_id, selected, substitutes, user_id):
         """Record new entry for selected substitutes and linked
         correspondant category and food selected and products details"""
 
@@ -318,9 +318,9 @@ class Database(QObject):
             self._record_product(user_id, category_id, food_selected_code,
                                  food_selected_details)
             for code, details in substitutes.items():
-                    self._record_product(user_id, category_id, code, details)
-                    values = (food_selected_code, code, user_id)
-                    self.send_request(request, values)
+                self._record_product(user_id, category_id, code, details)
+                values = (food_selected_code, code, user_id)
+                self.send_request(request, values)
             return True
         except Error as error:
             self.status_message.emit("Il y a eu un problème d'enregistrement "
@@ -384,3 +384,4 @@ class Database(QObject):
                   "AND user_id = %s ;"
         values = (food_substitute, food_code, user_id)
         self.send_request(request, values)
+
