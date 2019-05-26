@@ -5,39 +5,41 @@ from PyQt5.QtCore import Qt
 
 from settings import DEBUG_MODE
 
+
 class SubstitutesModel(QStandardItemModel):
     """MainWindow substitutes view model"""
 
-    def __init__(self, views, helper):
+    def __init__(self, views, user, helper):
         super().__init__(views["substitutes"])
         self.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
         self._views = views
+        self._user = user
         self._helper = helper
-        self._user_connected = False
         self._checked = []
 
-    def populate(self, selected, foods, page=0, new=True):
+    def populate(self, foods, substitutes, page=0, new=True):
         """Return the list of possible substitution products inside
         substitutes list view without the selected one and for score better
-        then selected one and without empty product_name foods"""
+        then selected one and without empty product_name substitutes"""
 
+        selected = foods.selected
+        user_state = self._user.is_connected() \
+                     and not self._user.is_admin()
+        if DEBUG_MODE:
+            print("=====  S u b s t i t u t e s M o d e l  =====")
+            print("Populate categories view")
+            print("user is connected ?", user_state)
         if new:
             self.reset()
             if DEBUG_MODE:
-                print("=====  S U B S T I T U T E S  -  V I E W  =====")
-                print("foods length:", len(foods))
+                print("substitutes length:", len(substitutes))
         ldb_substitutes = []
-        if self._user_connected:
-            ldb_substitutes = self._helper.records_concerned(selected[0])
-        if DEBUG_MODE:
-            print("=====  S U B S T I T U T E S - M O D E L  =====")
-            print("Populate categories view")
-            print("user is connected ?", self._user_connected)
-            if self._user_connected:
-                print("categories found in Database:", ldb_categories)
-        for food in foods[page]:
+        if user_state:
+            ldb_substitutes = self._helper.records_concerned(foods.category_id)
             if DEBUG_MODE:
-                print("=====  S U B S T I T U T E S  -  V I E W  =====")
+                print("categories found in Database:", ldb_substitutes)
+        for food in substitutes[page]:
+            if DEBUG_MODE:
                 print(food)
             target = food["nutrition_grades_tags"][0]
             if food["code"] != selected[0] \
@@ -63,7 +65,11 @@ class SubstitutesModel(QStandardItemModel):
                 item_name.setBackground(color)
                 item_code.setBackground(color)
                 if food["code"] in ldb_substitutes:
-                    item_name.setForeground(QColor(0, 250, 0))
+                    item_name.setForeground(QColor(16, 133, 22))
+                    item_code.setForeground(QColor(16, 133, 22))
+                else:
+                    item_name.setForeground(QColor(0, 0, 0))
+                    item_code.setForeground(QColor(0, 0, 0))
                 self.appendRow([item_name, item_grade, item_code])
         self.sort(1)
 
@@ -94,11 +100,11 @@ class SubstitutesModel(QStandardItemModel):
             if item.checkState() == Qt.Checked:
                 item.setCheckState(Qt.Unchecked)
 
-    def find_substitutes_in_database(self, selected):
-        """Find and colored in green foods for user connected inside local
+    def find_substitutes_in_database(self, selected_category):
+        """Find and colored in green substitutes for user connected inside local
         database"""
 
-        ldb_substitutes = self._helper.records_concerned(selected)
+        ldb_substitutes = self._helper.records_concerned(selected_category)
         for index in range(self.rowCount()):
             item_name = self.item(index, 0)
             item_code = self.item(index, 2)
@@ -107,6 +113,10 @@ class SubstitutesModel(QStandardItemModel):
                     print("find item code:",
                           item_code.data(Qt.DisplayRole))
                 item_name.setForeground(QColor(16, 133, 22))
+                item_code.setForeground(QColor(16, 133, 22))
+            else:
+                item_name.setForeground(QColor(0, 0, 0))
+                item_code.setForeground(QColor(0, 0, 0))
 
     @property
     def helper(self):

@@ -16,11 +16,6 @@ class ControllerSlots(QObject):
         self._messenger = Messenger(self._ctrl, self._ctrl.flags)
         self.connect()
 
-    def __del__(self):
-
-        pass
-        #self.disconnect()
-
     def connect(self):
         """Connect Signals with Slots"""
 
@@ -57,9 +52,9 @@ class ControllerSlots(QObject):
                 self._ctrl.on_internet_access)
             self._ctrl.model.internet_access.connect(
                 self._messenger.on_internet_access)
-            self._ctrl._load_categories.finished.connect(
+            self._ctrl.load_categories.finished.connect(
                 self._ctrl.on_load_categories_finished)
-            self._ctrl._load_categories.finished.connect(
+            self._ctrl.load_categories.finished.connect(
                 self._messenger.on_load_categories_finished)
             self._ctrl.load_details_finished.connect(
                 self._ctrl_general.on_load_details_finished)

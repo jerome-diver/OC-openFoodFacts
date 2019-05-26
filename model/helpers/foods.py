@@ -12,19 +12,26 @@ class FoodsHelper:
         """Tell if category exist in local connection table categories"""
 
         request = "SELECT DISTINCT fc.food_code  "\
-                  "FROM food_categories AS fc, user_foods AS uf "\
+                  "FROM food_categories AS fc, " \
+                  "     user_foods AS uf "\
                   "WHERE fc.food_code = uf.food_code "\
                   "AND fc.category_id = %s "\
-                  "AND uf.user_id = %s ;"
+                  "AND uf.user_id = %s " \
+                  "ANd fc.food_code IN (" \
+                  "     SELECT DISTINCT food_code " \
+                  "     FROM food_substitutes " \
+                  "     WHERE user_id = %s) ;"
+
         foods = []
         if self._user:
             if DEBUG_MODE:
-                print("=====  H E L P E R  =====")
+                print("=====  F o o d s H e l p e r  =====")
                 print("is searching for foods of category id:",
                       category_id)
-                print(" in local connection for user:",
+                print("in local connection for user:",
                       self._user.id)
-            values = (category_id, self._user.id)
+                print("where have any substitute")
+            values = (category_id, self._user.id, self._user.id)
             for row in self._connection.ask_request(request, values):
                 foods.append(row["food_code"])
         return foods

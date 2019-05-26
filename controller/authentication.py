@@ -64,7 +64,7 @@ class Authentication(QObject):
 
     #@pyqtSlot()
     def on_sign_in(self):
-        """Sing-in button slot"""
+        """Sing-in button call from controller"""
 
         self._sign_in.reset()
         self._sign_in.open()

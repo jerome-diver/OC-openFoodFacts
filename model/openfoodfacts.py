@@ -24,12 +24,12 @@ class OpenFoodFacts(QObject):
             self._authenticate = authenticate
             self._user = authenticate.user
             self._connection = self._user.connection
-            self._categories = CategoriesModel(
-                views, CategoriesHelper(self._connection, self._user))
-            self._foods = FoodsModel(
-                views, FoodsHelper(self._connection, self._user))
-            self._substitutes = SubstitutesModel(
-                views, SubstitutesHelper(self._connection, self._user))
+            self._categories = CategoriesModel(views, self._user,
+                CategoriesHelper(self._connection, self._user))
+            self._foods = FoodsModel(views, self._user,
+                FoodsHelper(self._connection, self._user))
+            self._substitutes = SubstitutesModel(views, self._user,
+                SubstitutesHelper(self._connection, self._user))
             self._product_details = ProductDetailsModels(views)
         else:
             self._substitutes = None
@@ -88,7 +88,6 @@ class OpenFoodFacts(QObject):
             return foods
         self.internet_access.emit(True)
         normalize_foods_products(foods)
-        #return sorted(foods, key=lambda kv: kv["product_name_fr"])
         return foods
 
     def download_product(self, code, name):
@@ -135,10 +134,12 @@ class OpenFoodFacts(QObject):
             normalize(product["products"][0])
             return product["products"][0]
         if product["count"] == 0 and DEBUG_MODE:
+            print("======  O p e n F o o d F a c t s  (model)  =====")
             print("====== NO PRODUCT FOUND ======")
         elif DEBUG_MODE:
-            print("====== FIND MANY PRODUCT FOR CODE:", code,
-                  "AND [product_name]:", name, "======")
+            print("======  O p e n F o o d F a c t s  (model)  =====")
+            print("Find products for code:", code,
+                  "and [product_name]:", name)
         return None
 
     def reset_models(self, models=(Widget.ALL,)):
@@ -182,3 +183,15 @@ class OpenFoodFacts(QObject):
         """Slots Property"""
 
         return self._slots
+
+    @property
+    def connection(self):
+        """Property _connection access"""
+
+        return self._connection
+
+    @connection.setter
+    def connection(self, new_connection):
+        """Setter for self._connection"""
+
+        self._connection = new_connection

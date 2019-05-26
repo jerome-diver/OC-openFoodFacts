@@ -34,6 +34,7 @@ class Messenger(QObject):
             self.status_message.emit("Tous les produits de la catégorie sont "
                                      "affichés")
         if DEBUG_MODE:
+            print("=====  M e s s e n g e r  =====")
             print("End process to load foods")
 
     @pyqtSlot(int, int)
@@ -44,6 +45,7 @@ class Messenger(QObject):
                                  "pages: {} affichées | {} restantes".
                                  format(page, total))
         if DEBUG_MODE:
+            print("=====  M e s s e n g e r  =====")
             print("selected food already for:",
                   self._ctrl.model.foods.selected)
 
@@ -71,6 +73,7 @@ class Messenger(QObject):
         if not status:
             self.status_message.emit("Il n'y a pas d'accès à internet")
             if DEBUG_MODE:
+                print("=====  M e s s e n g e r  =====")
                 print("there is no internet access")
 
     @pyqtSlot(QModelIndex)
@@ -102,9 +105,11 @@ class Messenger(QObject):
             code = sub_model.index(index.row(), 2).data()
             name = sub_model.index(index.row(), 0).data()
             if DEBUG_MODE:
-                print("now searching product for code", code, "name", name)
-            self.status_message.emit("Patientez, recherche sur le code produit "
-                                     "{} sélectionné".format(code))
+                print("=====  M e s s e n g e r  =====")
+                print("now searching product for code", code,
+                      "name", name)
+            self.status_message.emit("Patientez, recherche sur le code "
+                                     "produit {} sélectionné".format(code))
 
     @pyqtSlot('QStandardItem*')
     def on_substitute_checked(self, item):
@@ -115,6 +120,7 @@ class Messenger(QObject):
         code = self._ctrl.model.substitutes.index(index.row(), 2).data()
         name = self._ctrl._model.substitutes.index(index.row(), 0).data()
         if DEBUG_MODE:
+            print("=====  M e s s e n g e r  =====")
             print("now searching product for code", code, "name", name)
         self.status_message.emit("Patientez, recherche sur le code produit "
                                  "{} à ajouter dans la base".format(code))

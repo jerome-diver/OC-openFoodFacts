@@ -7,17 +7,18 @@ class SubstitutesHelper:
         self._connection = connection
         self._user = user
 
-    def records_concerned(self, food_code):
+    def records_concerned(self, category_id):
         """Tell if category exist in local connection table categories"""
 
         request = "SELECT DISTINCT fs.substitute_code  " \
-                  "FROM food_substitutes AS fs, user_foods AS uf " \
-                  "WHERE  uf.food_code = fs.food_code " \
-                  "AND uf.user_id = %s " \
-                  "AND fs.food_code = %s ;"
+                  "FROM food_substitutes AS fs, " \
+                  "     food_categories AS fc " \
+                  "WHERE  fc.food_code = fs.food_code " \
+                  "AND fc.category_id = %s " \
+                  "AND fs.user_id = %s ;"
         substitutes = []
         if self._user:
-            values = (self._user.id, food_code)
+            values = (category_id, self._user.id)
             for row in self._connection.ask_request(request, values):
                 substitutes.append(row["substitute_code"])
         return substitutes

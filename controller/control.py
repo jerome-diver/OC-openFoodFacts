@@ -1,4 +1,4 @@
-"""Genral controller for the application"""
+"""General controller for the application"""
 
 import sys
 from PyQt5.QtWidgets import QApplication
@@ -211,7 +211,8 @@ class Controller(QObject):
         if database:
             user_id = self._authenticate.user.id
             if DEBUG_MODE:
-                print("user id:", user_id)
+                print("=====  C O N T R O L  =====")
+                print("record substitute(s) for user id:", user_id)
             ok = database.new_record(
                 self._off_mode.model.foods.category_id,
                 self._off_mode.model.foods.selected_details,
@@ -229,7 +230,8 @@ class Controller(QObject):
         if database:
             user_id = self._authenticate.user.id
             if DEBUG_MODE:
-                print("user id:", user_id)
+                print("=====  C O N T R O L  =====")
+                print("remove substitute(s) for user id:", user_id)
             ok = database.del_record(
                 self._off_mode.model.foods.selected[0],
                 self._off_mode.model.substitutes.checked,

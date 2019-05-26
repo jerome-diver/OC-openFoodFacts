@@ -20,37 +20,13 @@ class LocalDatabaseModel(QObject):
         self._user = authenticate.user
         self._slots = SlotsModels(self)
         self._connection = self._user.connection
-        self._categories = CategoriesModel(
-            views, CategoriesHelper(self._connection, self._user))
-        self._foods = FoodsModel(
-            views, FoodsHelper(self._connection, self._user))
-        self._substitutes = SubstitutesModel(
-            views, SubstitutesHelper(self._connection, self._user))
+        self._categories = CategoriesModel(views, self._user,
+            CategoriesHelper(self._connection, self._user))
+        self._foods = FoodsModel(views, self._user,
+            FoodsHelper(self._connection, self._user))
+        self._substitutes = SubstitutesModel(views, self._user,
+            SubstitutesHelper(self._connection, self._user))
         self._product_details = ProductDetailsModels(views)
-
-    @property
-    def categories(self):
-        """Categories property"""
-
-        return self._categories
-
-    @property
-    def foods(self):
-        """Foods property"""
-
-        return self._foods
-
-    @property
-    def substitutes(self):
-        """Substitutes property"""
-
-        return self._substitutes
-
-    @property
-    def product_details(self):
-        """Product details property"""
-
-        return self._product_details
 
     def get_categories(self):
         """Get categories from local  database"""
@@ -67,10 +43,14 @@ class LocalDatabaseModel(QObject):
         foods = []
         request = """
             SELECT f.name, f.code, f.score 
-                FROM foods AS f, food_categories AS fc 
-                WHERE fc.food_code = f.code 
-                AND fc.category_id = %s ;"""
-        values = (category, )
+                FROM foods AS f, 
+                     food_categories AS fc,
+                     user_foods AS uf 
+                WHERE fc.food_code = f.code
+                AND uf.food_code = f.code 
+                AND fc.category_id = %s
+                AND uf.user_id = %s ;"""
+        values = (category, self._user.id)
         for row in self._connection.ask_request(request, values):
             food = {"product_name_fr": row["name"],
                     "code": row["code"],
@@ -107,7 +87,6 @@ class LocalDatabaseModel(QObject):
                 substitute["stores_tags"].append(r["shop_name"])
             substitutes[0].append(substitute)
         return substitutes
-
 
     def get_product_details(self, code):
         """Get product details from code and name"""
@@ -152,3 +131,39 @@ class LocalDatabaseModel(QObject):
         """Slots Property"""
 
         return self._slots
+
+    @property
+    def categories(self):
+        """Categories property"""
+
+        return self._categories
+
+    @property
+    def foods(self):
+        """Foods property"""
+
+        return self._foods
+
+    @property
+    def substitutes(self):
+        """Substitutes property"""
+
+        return self._substitutes
+
+    @property
+    def product_details(self):
+        """Product details property"""
+
+        return self._product_details
+
+    @property
+    def connection(self):
+        """Property _connection access"""
+
+        return self._connection
+
+    @connection.setter
+    def connection(self, new_connection):
+        """Setter for self._connection"""
+
+        self._connection = new_connection

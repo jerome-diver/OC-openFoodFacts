@@ -7,11 +7,11 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, \
 from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
     NUTRISCORE_D, NUTRISCORE_E, DEBUG_MODE
 
+
 class ProductDetailsModels():
     """Mainwindow product details views models"""
 
     def __init__(self, views):
-        #super().__init__()
         self._views = views
         self._models = {"name": "",
                         "description": "",
@@ -27,18 +27,6 @@ class ProductDetailsModels():
                         "code": "",
                         }
         self._checked = {}
-
-    @property
-    def models(self):
-        """Details of selected product models"""
-
-        return self._models
-
-    @property
-    def checked(self):
-        """Checked list of substitutes products property"""
-
-        return self._checked
 
     def populate(self, food):
         """Return the full views models of views for show product details"""
@@ -86,8 +74,6 @@ class ProductDetailsModels():
                 print("_id:", food["id_"])
             print("=============================================")
 
-
-
     @staticmethod
     def define_with(var, food):
         """define variables records datas"""
@@ -109,7 +95,6 @@ class ProductDetailsModels():
         #var["image"] = data_front
         var["img_url"] = img_url
         
-
     def reset(self):
         """Reset models for product details views"""
 
@@ -144,3 +129,16 @@ class ProductDetailsModels():
         else:
             if product["codes_tags"][1] in self._checked.keys():
                 del self._checked[product["codes_tags"][1]]
+
+    @property
+    def models(self):
+        """Details of selected product models"""
+
+        return self._models
+
+    @property
+    def checked(self):
+        """Checked list of substitutes products property"""
+
+        return self._checked
+

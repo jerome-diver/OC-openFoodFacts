@@ -5,7 +5,6 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
 
 from . import Widget, Mode, ControllerSlots
 from model import LocalDatabaseModel
-from view import Messenger
 from settings import DEBUG_MODE
 
 
@@ -38,9 +37,7 @@ class DatabaseMode(QObject):
                        "img_thumb": self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
         self._model = LocalDatabaseModel(self._views, authenticate)
-        #self._messenger = Messenger(self, self._flags)
         self._slots = ControllerSlots(general_ctrl, self)
-        #self._connect_signals()
         self._initialize()
 
     def _initialize(self):
@@ -79,8 +76,7 @@ class DatabaseMode(QObject):
         score = self._model.foods.index(index.row(), 2).data()
         self._model.foods.selected = (code, score, name)
         substitutes = self._model.get_substitutes(code)
-        self._model.substitutes.populate(
-            self._model.foods.selected, substitutes)
+        self._model.substitutes.populate(self._model.foods, substitutes)
         product_details = self._model.get_product_details(code)
         self._model.product_details.populate(product_details)
         self._window.show_substitutes(self._model.substitutes)

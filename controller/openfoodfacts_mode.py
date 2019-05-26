@@ -140,9 +140,10 @@ class OpenFoodFactsMode(QObject):
         score = self._model.foods.index(index.row(), 2).data()
         self._model.foods.selected = (code, score, name)
         if DEBUG_MODE:
+            print("=====  O p e n F o o d F a c t s M o d e  =====")
             print("you are just selecting food:", self._model.foods.selected)
             print("and foods pages is", len(self._model.foods.recorded))
-        self._model.substitutes.populate(self._model.foods.selected,
+        self._model.substitutes.populate(self._model.foods,
                                          self._model.foods.recorded)
         self._threads.init_product_details_thread(code, name, Mode.GET)
         self.show_substitutes()
@@ -225,3 +226,9 @@ class OpenFoodFactsMode(QObject):
         """Property for flags access"""
 
         return self._flags
+
+    @property
+    def load_categories(self):
+        """Property for load_categories thread access"""
+
+        return self._load_categories

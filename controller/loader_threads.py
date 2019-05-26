@@ -80,6 +80,7 @@ class LoadFoods(QThread):
             if foods:
                 have_more_product = bool(len(foods) >= 21)
                 if DEBUG_MODE:
+                    print("===== L o a d F o o d s  (thread)  =====")
                     print("there is foods to add...")
                 self._model.foods.recorded.append(foods)
                 self._model.foods.populate(foods, first_page)
@@ -147,22 +148,25 @@ class LoadProductDetails(QThread):
         ms = self._model.substitutes
         mpd.reset()
         if DEBUG_MODE:
-            print("LoadProductDetails start searching for product with "
-                  "code:", self._code, "and name:", self._name)
+            print("===== L o a d P r o d u c t D e t a i l s  (thread) =====")
+            print("LoadProductDetails start searching for product")
+            print("with code:", self._code, "and name:", self._name)
         self.status_message.emit("Patientez, recherche du produit "
                                  "(code {} ) en cours sur "
                                  "Open Food Facts...".format(self._code))
         food = self._model.download_product(self._code, self._name)
         if food and self._on_air:
-            if self._mode == Mode.GET:
+            if self._mode == Mode.GET and self._on_air:
                 mpd.populate(food)
                 mf.selected_details = food
-            if self._mode == Mode.SELECTED and self._on_air:
+            elif self._mode == Mode.SELECTED and self._on_air:
                 mpd.populate(food)
             elif self._mode == Mode.CHECKED and self._on_air:
                 ms.generate_checked()
                 mpd.generate_checked(food, ms.checked)
                 if DEBUG_MODE:
+                    print("===== L o a d P r o d u c t D e t a i l s  "
+                          "(thread) =====")
                     print("list checked:", mpd.checked)
         else:
             self.error_signal.emit("Hélas, il n'y a aucun détail enregistré "
@@ -186,12 +190,13 @@ class UpdateCategories(QThread):
         """Start thread job"""
 
         if DEBUG_MODE:
+            print("=====  U p d a t e C a t e g o r i e s  (thread)  =====")
             print("start to update categories table from OFF categories")
         categories = self._off_model.download_categories()
         if categories:
             self._connection.update_categories(categories)
         if DEBUG_MODE:
-            print("End of update categories table")
+            print("End of update categories table from thread")
 
 
 class ThreadsControler(QObject):
@@ -233,6 +238,7 @@ class ThreadsControler(QObject):
 
         if self._load_foods:
             if DEBUG_MODE:
+                print("=====  T h r e a d s C o n t r o l l e r  =====")
                 print("thread foods cleaning process is running")
             if self._load_foods.isRunning():
                 self._load_foods.terminate()

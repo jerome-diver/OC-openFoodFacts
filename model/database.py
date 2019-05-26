@@ -52,6 +52,7 @@ class DatabaseConnection(QObject):
             self._connection.begin()
             cursor = self._connection.cursor()
             if DEBUG_MODE:
+                print("=====  D a t a b a s e  =====")
                 print("request :", request)
             if values:
                 if DEBUG_MODE:
@@ -68,6 +69,7 @@ class DatabaseConnection(QObject):
             self._connection.commit()
         except OperationalError as error:
             if DEBUG_MODE:
+                print("=====  D a t a b a s e  =====")
                 print(error.args[0], error.args[1])
             self._connection.rollback()
             self.status_message.emit("Erreur lors de l'exécution de "
@@ -75,10 +77,12 @@ class DatabaseConnection(QObject):
                                       "donnée")
         except ProgrammingError as e:
             if DEBUG_MODE:
+                print("=====  D a t a b a s e  =====")
                 print(e.args[0], e.args[1])
             self._connection.rollback()
         except IntegrityError as e:
             if DEBUG_MODE:
+                print("=====  D a t a b a s e  =====")
                 print(e.args[0], e.args[1])
             self._connection.rollback()
         finally:
@@ -93,6 +97,7 @@ class DatabaseConnection(QObject):
             self._connection.begin()
             cursor = self._connection.cursor(pymysql.cursors.DictCursor)
             if DEBUG_MODE:
+                print("=====  D a t a b a s e  =====")
                 print("request :", request)
             if values:
                 if DEBUG_MODE:
@@ -150,6 +155,7 @@ class AdminConnection(DatabaseConnection):
             for request in sql_requests.split(';'):
                 if request != "":
                     if DEBUG_MODE:
+                        print("=====  D a t a b a s e  =====")
                         print(request)
                     self.send_request(request)
 
@@ -300,6 +306,7 @@ class UserConnection(DatabaseConnection):
                     VALUES (%s, %s, %s);"""
         # add foods, shops, food_shops records :
         if DEBUG_MODE:
+            print("=====  D a t a b a s e  =====")
             print("get this product:", selected["code"])
         food_selected_code = selected["code"]
         shops = []
@@ -368,6 +375,7 @@ class UserConnection(DatabaseConnection):
                     self.send_request(request["food_shops"], values)
         except Error as error:
             if DEBUG_MODE:
+                print("=====  D a t a b a s e  =====")
                 print("problem for record in database")
 
     def del_record(self, selected, substitutes, user_id):

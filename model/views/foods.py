@@ -8,11 +8,11 @@ from settings import DEBUG_MODE
 class FoodsModel(QStandardItemModel):
     """Mainwindow foods view model"""
 
-    def __init__(self, views, helper):
+    def __init__(self, views, user, helper):
         super().__init__(views["foods"])
         self._views = views
+        self._user = user
         self._helper = helper
-        self._user_connected = False
         self._recorded = [] # [ [] ]  |as pages of foods
         self._selected = ()
         self._selected_details = dict()
@@ -23,15 +23,17 @@ class FoodsModel(QStandardItemModel):
         """Return the list wiew of foods for give category string
         with openfoodfacts library helper"""
 
-        ldb_foods = []
-        if self._user_connected:
-            ldb_foods = self._helper.records_concerned(self._category_id)
+        user_state = self._user.is_connected() \
+                     and not self._user.is_admin()
         if DEBUG_MODE:
-            print("=====  F O O D S  - M O D E L  =====")
+            print("=====  F o o d s M o d e l  =====")
             print("Populate categories view")
-            print("user is connected ?", self._user_connected)
-            if self._user_connected:
-                print("categories found in Database:", ldb_categories)
+            print("user is connected ?", user_state)
+        ldb_foods = []
+        if user_state:
+            ldb_foods = self._helper.records_concerned(self._category_id)
+            if DEBUG_MODE:
+                print("categories found in Database:", ldb_foods)
         if new:
             self.reset()
         for food in foods:
@@ -49,6 +51,8 @@ class FoodsModel(QStandardItemModel):
                 score = QStandardItem(food["nutrition_grades_tags"][0])
                 if food["code"] in ldb_foods:
                     name.setForeground(QColor(16, 133, 22))
+                else:
+                    name.setForeground(QColor(0, 0, 0))
                 self.appendRow([name, code, score])
         self.sort(0)
 
@@ -72,6 +76,8 @@ class FoodsModel(QStandardItemModel):
                     print("find item code:",
                           item_code.data(Qt.DisplayRole))
                 item_name.setForeground(QColor(16, 133, 22))
+            else:
+                item_name.setForeground(QColor(0, 0, 0))
 
     @property
     def selected_details(self):
