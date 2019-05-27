@@ -5,24 +5,22 @@ import re
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
+from . import MixinViews
 from settings import DEBUG_MODE
 
 
-class CategoriesModel(QStandardItemModel):
+class CategoriesModel(MixinViews, QStandardItemModel):
     """categories view model"""
 
-    def __init__(self, views, user, helper):
-        super().__init__(views["categories"])
-        self._views = views
-        self._user = user
-        self._helper = helper
+    def __init__(self, **kargs):
+        kargs["parent"] = kargs["views"]["categories"]
+        super().__init__(**kargs)
 
     def populate(self, categories):
         """Return all categories inside list categories view
         by openfoodfacts module helper"""
 
-        user_state = self._user.is_connected() \
-                     and not self._user.is_admin()
+        user_state = self._user.is_connected()
         if DEBUG_MODE:
             print("=====  C a t e g o r i e s M o d e l  =====")
             print("Populate categories view")
@@ -58,20 +56,16 @@ class CategoriesModel(QStandardItemModel):
         """Find and colored in green foods for user connected inside local
         database"""
 
-        ldb_categories = self._helper.records_concerned()
-        for index in range(self.rowCount()):
-            item_name = self.item(index, 0)
-            item_code = self.item(index, 1)
-            if item_code.data(Qt.DisplayRole) in ldb_categories:
-                if DEBUG_MODE:
-                    print("find item code:",
-                          item_code.data(Qt.DisplayRole))
-                item_name.setForeground(QColor(16, 133, 22))
-            else:
-                item_name.setForeground(QColor(0, 0, 0))
+        if self._user.is_connected():
+            ldb_categories = self._helper.records_concerned()
+            for index in range(self.rowCount()):
+                item_name = self.item(index, 0)
+                item_code = self.item(index, 1)
+                if item_code.data(Qt.DisplayRole) in ldb_categories:
+                    if DEBUG_MODE:
+                        print("find item code:",
+                              item_code.data(Qt.DisplayRole))
+                    item_name.setForeground(QColor(16, 133, 22))
+                else:
+                    item_name.setForeground(QColor(0, 0, 0))
 
-    @property
-    def helper(self):
-        """Property helper access"""
-
-        return self._helper

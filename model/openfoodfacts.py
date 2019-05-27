@@ -16,22 +16,26 @@ class OpenFoodFacts(QObject):
 
     internet_access = pyqtSignal(bool)
 
-    def __init__(self, views=None, authenticate=None):
+    def __init__(self, general_ctrl=None, views=None):
         super().__init__()
-        self._user = None
-        self._slots = SlotsModels(self)
-        if views and authenticate:
-            self._authenticate = authenticate
-            self._user = authenticate.user
+        if general_ctrl:
+            self._slots = SlotsModels(self)
+            self._authenticate = general_ctrl.authenticate
+            self._user = self._authenticate.user
             self._connection = self._user.connection
-            self._categories = CategoriesModel(views, self._user,
-                CategoriesHelper(self._connection, self._user))
-            self._foods = FoodsModel(views, self._user,
-                FoodsHelper(self._connection, self._user))
-            self._substitutes = SubstitutesModel(views, self._user,
-                SubstitutesHelper(self._connection, self._user))
-            self._product_details = ProductDetailsModels(views)
+            self._views = views
+            self._categories = CategoriesModel(
+                general_ctrl=general_ctrl, views=views,
+                helper=CategoriesHelper(self._user))
+            self._foods = FoodsModel(
+                general_ctrl=general_ctrl, views=views,
+                helper=FoodsHelper(self._user))
+            self._substitutes = SubstitutesModel(
+                general_ctrl=general_ctrl, views=views,
+                helper=SubstitutesHelper(self._user))
+            self._product_details = ProductDetailsModels(self._views)
         else:
+            self._user = None
             self._substitutes = None
             self._foods = None
             self._categories = None

@@ -126,9 +126,7 @@ class DatabaseConnection(QObject):
     def is_connected(self):
         """Said if this is connected to the database server"""
 
-        if self._connection:
-            return self._connection.open
-        return False
+        return bool(self._connection and self._connection.open)
 
     def connect_to_off_db(self):
         """Connect the current user on database"""

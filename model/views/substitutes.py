@@ -3,18 +3,18 @@
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt5.QtCore import Qt
 
+from . import MixinViews
 from settings import DEBUG_MODE
 
 
-class SubstitutesModel(QStandardItemModel):
+
+class SubstitutesModel(MixinViews, QStandardItemModel):
     """MainWindow substitutes view model"""
 
-    def __init__(self, views, user, helper):
-        super().__init__(views["substitutes"])
-        self.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
-        self._views = views
-        self._user = user
-        self._helper = helper
+    def __init__(self, **kargs):
+        kargs["parent"] = kargs["views"]["substitutes"]
+        super().__init__(**kargs)
+        #self.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
         self._checked = []
 
     def populate(self, foods, substitutes, page=0, new=True):
@@ -23,8 +23,7 @@ class SubstitutesModel(QStandardItemModel):
         then selected one and without empty product_name substitutes"""
 
         selected = foods.selected
-        user_state = self._user.is_connected() \
-                     and not self._user.is_admin()
+        user_state = self._user.is_connected()
         if DEBUG_MODE:
             print("=====  S u b s t i t u t e s M o d e l  =====")
             print("Populate categories view")
@@ -101,28 +100,23 @@ class SubstitutesModel(QStandardItemModel):
                 item.setCheckState(Qt.Unchecked)
 
     def find_substitutes_in_database(self, selected_category):
-        """Find and colored in green substitutes for user connected inside local
-        database"""
+        """Find and colored in green substitutes for user connected
+        inside local database"""
 
-        ldb_substitutes = self._helper.records_concerned(selected_category)
-        for index in range(self.rowCount()):
-            item_name = self.item(index, 0)
-            item_code = self.item(index, 2)
-            if item_code.data(Qt.DisplayRole) in ldb_substitutes:
-                if DEBUG_MODE:
-                    print("find item code:",
-                          item_code.data(Qt.DisplayRole))
-                item_name.setForeground(QColor(16, 133, 22))
-                item_code.setForeground(QColor(16, 133, 22))
-            else:
-                item_name.setForeground(QColor(0, 0, 0))
-                item_code.setForeground(QColor(0, 0, 0))
-
-    @property
-    def helper(self):
-        """Property helper access"""
-
-        return self._helper
+        if self._user.is_connected():
+            ldb_substitutes = self._helper.records_concerned(selected_category)
+            for index in range(self.rowCount()):
+                item_name = self.item(index, 0)
+                item_code = self.item(index, 2)
+                if item_code.data(Qt.DisplayRole) in ldb_substitutes:
+                    if DEBUG_MODE:
+                        print("find item code:",
+                              item_code.data(Qt.DisplayRole))
+                    item_name.setForeground(QColor(16, 133, 22))
+                    item_code.setForeground(QColor(16, 133, 22))
+                else:
+                    item_name.setForeground(QColor(0, 0, 0))
+                    item_code.setForeground(QColor(0, 0, 0))
 
     @property
     def checked(self):

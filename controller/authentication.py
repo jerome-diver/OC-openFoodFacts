@@ -36,11 +36,9 @@ class Authentication(QObject):
             self._user = User(type)
             if isinstance(type, AdminConnection):
                 self._user.connection.connect_to_off_db()
-                self.status_user_connection.emit(TypeConnection.ADMIN_CONNECTED)
         elif isinstance(type, User):
             self._user = type
         self._user.status_connection.connect(self.on_new_status_connection)
-
 
     def initialize_database(self):
         """Initialization of Open Food Facts database"""
@@ -105,7 +103,6 @@ class Authentication(QObject):
             QMessageBox.information(None, "Problème de connexion", status)
             self.status_user_connection.emit(TypeConnection.USER_DISCONNECTED)
 
-
     @pyqtSlot(str)
     def on_username_changed(self, username):
         """Slot action when username text is changed"""
@@ -132,10 +129,18 @@ class Authentication(QObject):
             else:
                 self.define_user(UserConnection())
                 self._user.connect(username, password)
-
         else:
             self.status_message.emit("Cet utilisateur ne peut pas accéder à "
                                      "la base de donnée")
+
+    def disconnect_user(self):
+        """Disconnect current user and change to AdminConnection
+        GRANT user"""
+
+        self._user.disconnect()
+        self.define_user(AdminConnection())
+        if self._user.connection.is_connected():
+            self.status_user_connection.emit(TypeConnection.ADMIN_CONNECTED)
 
     def new_user(self):
         """Create a new user"""

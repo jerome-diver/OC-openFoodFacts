@@ -15,8 +15,7 @@ class Controller(QObject):
     """Control everything"""
 
     status_message = pyqtSignal(str)
-    user_connected = pyqtSignal(User)
-    user_disconnected = pyqtSignal()
+    user_event = pyqtSignal(User)
 
     def __init__(self):
         super().__init__()
@@ -67,18 +66,17 @@ class Controller(QObject):
         if self._window.signin.text() == "Sign-in":
             self._authenticate.on_sign_in()
         else:   # Sign-Out
-            self._authenticate.user.disconnect()
+            self._authenticate.disconnect_user()
             self._window.signin.setText("Sign-in")
-            self._authenticate.user = None
 
     @pyqtSlot(TypeConnection)
     def on_new_status_connection(self, connected):
         """When user is connected (or failed to be connected)
          to his local database"""
 
+        self.user_event.emit(self._authenticate.user)
         self._flags["user_connected"] = connected
         if connected == TypeConnection.USER_CONNECTED:
-            self.user_connected.emit(self._authenticate.user)
             self.status_message.emit("L'utilisateur est connecté à "
                                      "la base de donnée locale")
             self._window.signup.setHidden(True)
@@ -89,17 +87,14 @@ class Controller(QObject):
                                self._authenticate.user.nick))
             self._window.local_mode.setEnabled(True)
         elif connected == TypeConnection.USER_DISCONNECTED:
-            self._authenticate.define_user(AdminConnection())
-            self.user_disconnected.emit()
-            if self._window.local_mode.isChecked():
-                self.on_openfoodfacts_mode(True)
-            else:
-                self._window.local_mode.setDisabled(True)
             self.status_message.emit("L'utilisateur est déconnecté de la base "
                                      "de donnée locale")
             self._window.signup.setHidden(False)
             self._window.user_informations.setText("")
         elif connected == TypeConnection.ADMIN_CONNECTED:
+            if self._window.local_mode.isChecked():
+                self.on_openfoodfacts_mode(True)
+            self._window.local_mode.setDisabled(True)
             if DEBUG_MODE:
                 print("=====  C O N T R O L  =====")
                 print("get signal ADMIN is connected")
@@ -121,10 +116,9 @@ class Controller(QObject):
                 self._off_mode.slots.disconnect()
                 self._off_mode = None
             if not self._db_mode:
-                self._db_mode = DatabaseMode(self, self._window,
-                                             self._authenticate)
+                self._db_mode = DatabaseMode(self)
                 if user_status:
-                    self.user_connected.emit(self._authenticate.user)
+                    self.user_event.emit(self._authenticate.user)
         else:
             self._window.reset_views()
 
@@ -145,10 +139,9 @@ class Controller(QObject):
                 self._db_mode.slots.disconnect()
                 self._db_mode = None
             if not self._off_mode:
-                self._off_mode = OpenFoodFactsMode(self, self._window,
-                                                   self._authenticate)
+                self._off_mode = OpenFoodFactsMode(self)
                 if user_status:
-                    self.user_connected.emit(self._authenticate.user)
+                    self.user_event.emit(self._authenticate.user)
             else:
                 self._window.show_categories(
                     self._off_mode.model.categories)
@@ -238,3 +231,33 @@ class Controller(QObject):
                 user_id)
             if ok:
                 self._off_mode.model.substitutes.reset_checkboxes()
+
+    @property
+    def window(self):
+        """Property for _window Ui View"""
+
+        return self._window
+
+    @property
+    def authenticate(self):
+        """Property for authenticate controller"""
+
+        return self._authenticate
+
+    @property
+    def views(self):
+        """Property for views dict of QWidgets views"""
+
+        return self._views
+
+    @property
+    def db_mode(self):
+        """Property for db_mode controller"""
+
+        return self._db_mode
+
+    @property
+    def off_mode(self):
+        """Property for off_mode controller"""
+
+        return self._off_mode

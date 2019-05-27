@@ -116,4 +116,3 @@ class User(QObject):
         """Return self._username"""
 
         return self._username
-

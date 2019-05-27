@@ -13,20 +13,23 @@ from controller import Widget
 class LocalDatabaseModel(QObject):
     """Local Database model Object"""
 
-    def __init__(self, views, authenticate):
+    def __init__(self, general_ctrl, views):
         super().__init__()
         self._views = views
-        self._authenticate = authenticate
-        self._user = authenticate.user
+        self._authenticate = general_ctrl.authenticate
+        self._user = self._authenticate.user
         self._slots = SlotsModels(self)
         self._connection = self._user.connection
-        self._categories = CategoriesModel(views, self._user,
-            CategoriesHelper(self._connection, self._user))
-        self._foods = FoodsModel(views, self._user,
-            FoodsHelper(self._connection, self._user))
-        self._substitutes = SubstitutesModel(views, self._user,
-            SubstitutesHelper(self._connection, self._user))
-        self._product_details = ProductDetailsModels(views)
+        self._categories = CategoriesModel(
+            general_ctrl=general_ctrl,
+            helper=CategoriesHelper(self._user))
+        self._foods = FoodsModel(
+            general_ctrl=general_ctrl,
+            helper=FoodsHelper(self._user))
+        self._substitutes = SubstitutesModel(
+            general_ctrl=general_ctrl,
+            helper=SubstitutesHelper(self._user))
+        self._product_details = ProductDetailsModels(self._views)
 
     def get_categories(self):
         """Get categories from local  database"""

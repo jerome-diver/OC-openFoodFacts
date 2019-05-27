@@ -3,16 +3,16 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
+from . import MixinViews
 from settings import DEBUG_MODE
 
-class FoodsModel(QStandardItemModel):
+
+class FoodsModel(MixinViews, QStandardItemModel):
     """Mainwindow foods view model"""
 
-    def __init__(self, views, user, helper):
-        super().__init__(views["foods"])
-        self._views = views
-        self._user = user
-        self._helper = helper
+    def __init__(self, **kargs):
+        kargs["parent"] = kargs["views"]["foods"]
+        super().__init__(**kargs)
         self._recorded = [] # [ [] ]  |as pages of foods
         self._selected = ()
         self._selected_details = dict()
@@ -23,8 +23,7 @@ class FoodsModel(QStandardItemModel):
         """Return the list wiew of foods for give category string
         with openfoodfacts library helper"""
 
-        user_state = self._user.is_connected() \
-                     and not self._user.is_admin()
+        user_state = self._user.is_connected()
         if DEBUG_MODE:
             print("=====  F o o d s M o d e l  =====")
             print("Populate categories view")
@@ -67,17 +66,19 @@ class FoodsModel(QStandardItemModel):
         """Find and colored in green foods for user connected inside local
         database"""
 
-        ldb_foods = self._helper.records_concerned(self._category_id)
-        for index in range(self.rowCount()):
-            item_name = self.item(index, 0)
-            item_code = self.item(index, 1)
-            if item_code.data(Qt.DisplayRole) in ldb_foods:
-                if DEBUG_MODE:
-                    print("find item code:",
-                          item_code.data(Qt.DisplayRole))
-                item_name.setForeground(QColor(16, 133, 22))
-            else:
-                item_name.setForeground(QColor(0, 0, 0))
+        user_state = self._user.is_connected()
+        if user_state:
+            ldb_foods = self._helper.records_concerned(self._category_id)
+            for index in range(self.rowCount()):
+                item_name = self.item(index, 0)
+                item_code = self.item(index, 1)
+                if item_code.data(Qt.DisplayRole) in ldb_foods:
+                    if DEBUG_MODE:
+                        print("find item code:",
+                              item_code.data(Qt.DisplayRole))
+                    item_name.setForeground(QColor(16, 133, 22))
+                else:
+                    item_name.setForeground(QColor(0, 0, 0))
 
     @property
     def selected_details(self):
@@ -138,9 +139,3 @@ class FoodsModel(QStandardItemModel):
         """Setter count property"""
 
         self._count = value
-
-    @property
-    def helper(self):
-        """Property helper access"""
-
-        return self._helper

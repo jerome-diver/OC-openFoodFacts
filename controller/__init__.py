@@ -4,7 +4,7 @@ from .enumerator import Mode, Widget
 from .authentication import Authentication
 from .loader_threads import LoadCategories, LoadFoods, \
                             LoadProductDetails, UpdateCategories, \
-                            ThreadsControler
+                            ThreadsController
 from.controllers_slots import ControllerSlots
 from .openfoodfacts_mode import OpenFoodFactsMode
 from .db_mode import DatabaseMode

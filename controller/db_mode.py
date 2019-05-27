@@ -14,12 +14,12 @@ class DatabaseMode(QObject):
 
     status_message = pyqtSignal(str)
 
-    def __init__(self, general_ctrl, window, authenticate):
+    def __init__(self, general_ctrl):
         super().__init__()
         self._general_ctrl = general_ctrl
-        self._window = window
-        self._authenticate = authenticate
-        self._connection = authenticate.user_connection
+        self._window = general_ctrl.window
+        self._authenticate = general_ctrl.authenticate
+        self._connection = self._authenticate.user_connection
         self._flags = {"product": True,
                        "internet": True,
                        "call_mode": Mode.SELECTED}
@@ -36,7 +36,7 @@ class DatabaseMode(QObject):
                        "url": self._window.product_url,
                        "img_thumb": self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
-        self._model = LocalDatabaseModel(self._views, authenticate)
+        self._model = LocalDatabaseModel(general_ctrl, self._views)
         self._slots = ControllerSlots(general_ctrl, self)
         self._initialize()
 

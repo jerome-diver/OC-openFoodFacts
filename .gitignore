@@ -131,6 +131,7 @@ target/
 
 # IPython Notebook
 .ipynb_checkpoints
+*.ipynb
 
 # pyenv
 .python-version
@@ -150,3 +151,5 @@ ENV/
 
 # Rope project settings
 .ropeproject
+Supprimerait openfoodfacts_tests.ipynb
+/tags

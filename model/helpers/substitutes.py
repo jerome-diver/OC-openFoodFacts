@@ -3,9 +3,9 @@
 
 class SubstitutesHelper:
 
-    def __init__(self, connection, user):
-        self._connection = connection
+    def __init__(self, user):
         self._user = user
+        self._connection = user.connection
 
     def records_concerned(self, category_id):
         """Tell if category exist in local connection table categories"""
@@ -30,7 +30,8 @@ class SubstitutesHelper:
         return self._user
 
     @user.setter
-    def user(self, value):
+    def user(self, usr):
         """Setter property for user"""
 
-        self._user = value
+        self._user = usr
+        self._connection = usr.connection

@@ -49,18 +49,6 @@ class LoadFoods(QThread):
     def __del__(self):
         self.wait()
 
-    @property
-    def category(self):
-        """Return property of category name"""
-
-        return self._category
-
-    @category.setter
-    def category(self, value):
-        """Setter for property of category name"""
-
-        self._category = value
-
     @pyqtSlot()
     def end_process(self):
         """End of the loop, then thread will die"""
@@ -90,6 +78,18 @@ class LoadFoods(QThread):
                 self.no_product_found.emit()
             page += 1
 
+    @property
+    def category(self):
+        """Return property of category name"""
+
+        return self._category
+
+    @category.setter
+    def category(self, value):
+        """Setter for property of category name"""
+
+        self._category = value
+
 
 class LoadProductDetails(QThread):
     """Load product selected from substitutes list to create model
@@ -105,30 +105,6 @@ class LoadProductDetails(QThread):
         self._name = ""
         self._mode = mode
         self._on_air = True
-
-    @property
-    def name(self):
-        """Return property for product name substitute"""
-
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        """Setter property for name of substitute product"""
-
-        self._name = value
-
-    @property
-    def code(self):
-        """Return property for code product substitute"""
-
-        return self._code
-
-    @code.setter
-    def code(self, value):
-        """ Setter property for code"""
-
-        self._code = value
 
     def __del__(self):
         self.wait()
@@ -173,6 +149,30 @@ class LoadProductDetails(QThread):
                                    "pour ce code produit")
             self.status_message.emit("Aucun détail cohérent n'est fourni")
 
+    @property
+    def name(self):
+        """Return property for product name substitute"""
+
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        """Setter property for name of substitute product"""
+
+        self._name = value
+
+    @property
+    def code(self):
+        """Return property for code product substitute"""
+
+        return self._code
+
+    @code.setter
+    def code(self, value):
+        """ Setter property for code"""
+
+        self._code = value
+
 
 class UpdateCategories(QThread):
     """Load categories from Open Food Facts in background in categories
@@ -199,19 +199,17 @@ class UpdateCategories(QThread):
             print("End of update categories table from thread")
 
 
-class ThreadsControler(QObject):
+class ThreadsController(QObject):
     """Proxy class to control threads"""
 
     kill_details_show_thread = pyqtSignal()
     kill_details_checked_thread = pyqtSignal()
     kill_details_get_thread = pyqtSignal()
 
-    def __init__(self, controler):
+    def __init__(self, controller):
         super().__init__()
-        self._controler = controler
-        self._model = controler.model
-        #self._load_categories = LoadCategories(
-        #    self._model, controler.connection)
+        self._controller = controller
+        self._model = controller.model
         self._load_product_details = {Mode.CHECKED: [],
                                       Mode.SELECTED: [],
                                       Mode.GET: []}
@@ -222,16 +220,15 @@ class ThreadsControler(QObject):
         """Initialize foods thread call"""
 
         self._load_foods = LoadFoods(self._model)
-        self._controler.kill_foods_thread.connect(
+        self._controller.kill_foods_thread.connect(
             self._load_foods.end_process)
         self._load_foods.finished.connect(
-            self._controler.on_load_foods_finished)
+            self._controller.on_load_foods_finished)
         self._load_foods.no_product_found.connect(
-            self._controler.on_no_product_found)
-        self._load_foods.get_a_page.connect(self._controler.on_new_food_page)
+            self._controller.on_no_product_found)
+        self._load_foods.get_a_page.connect(self._controller.on_new_food_page)
         self._load_foods.category = category
         self._load_foods.start()
-
 
     def wash_foods_thread(self):
         """Cleaner thread for load foods"""
@@ -257,11 +254,11 @@ class ThreadsControler(QObject):
             self.kill_details_get_thread.connect(
                 self._load_product_details[mode].end_process)
         self._load_product_details[mode].finished.connect(
-            self._controler.on_load_product_details_finished)
+            self._controller.on_load_product_details_finished)
         self._load_product_details[mode].status_message.connect(
-            self._controler.window.on_status_message)
+            self._controller.window.on_status_message)
         self._load_product_details[mode].error_signal.connect(
-            self._controler.window.on_error_message)
+            self._controller.window.on_error_message)
         self._load_product_details[mode].code = code
         self._load_product_details[mode].name = name
         self._load_product_details[mode].start()
@@ -276,8 +273,3 @@ class ThreadsControler(QObject):
             if self._load_product_details[mode].isRunning():
                 self._load_product_details[mode].terminate()
 
-    @property
-    def load_categories(self):
-        """Property for self._load_categories access"""
-
-        return self._load_categories

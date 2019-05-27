@@ -5,8 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
                          QModelIndex, QItemSelection
 from . import ControllerSlots
 from model import OpenFoodFacts
-from controller import ThreadsControler, LoadCategories, Mode, Widget
-from view import Messenger
+from controller import ThreadsController, LoadCategories, Mode, Widget
 from settings import DEBUG_MODE
 
 
@@ -19,12 +18,12 @@ class OpenFoodFactsMode(QObject):
     load_details_finished = pyqtSignal()
     kill_foods_thread = pyqtSignal()
 
-    def __init__(self, general_ctrl, window, authenticate):
+    def __init__(self, general_ctrl):
         super().__init__()
         self._general_ctrl = general_ctrl
-        self._window = window
-        self._authenticate = authenticate
-        self._connection = authenticate.user_connection
+        self._window = general_ctrl.window
+        self._authenticate = general_ctrl.authenticate
+        self._connection = self._authenticate.user_connection
         self._flags = {"product": True,
                        "internet": True,
                        "call_mode": Mode.SELECTED}
@@ -41,8 +40,8 @@ class OpenFoodFactsMode(QObject):
                        "url" : self._window.product_url,
                        "img_thumb" : self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
-        self._model = OpenFoodFacts(self._views, authenticate)
-        self._threads = ThreadsControler(self)
+        self._model = OpenFoodFacts(general_ctrl, self._views)
+        self._threads = ThreadsController(self)
         self._load_categories = LoadCategories(
             self._model, self._connection)
         self._slots = ControllerSlots(general_ctrl, self)

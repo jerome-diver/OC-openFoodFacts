@@ -60,20 +60,16 @@ class ControllerSlots(QObject):
                 self._ctrl_general.on_load_details_finished)
             self._ctrl.checked_start.connect(
                 self._ctrl_general.on_checked_started)
-            self._ctrl_general.user_connected.connect(
-                self._ctrl.model.slots.on_user_connected)
-            self._ctrl_general.user_disconnected.connect(
-                self._ctrl.model.slots.on_user_disconnected)
+            self._ctrl_general.user_event.connect(
+                self._ctrl.model.slots.on_user_event)
 
         elif self._name == "DatabaseMode":
             if DEBUG_MODE:
                 print("Connect for DatabaseMode")
             self._ctrl.views["substitutes"].clicked.connect(
                 self._ctrl.on_substitute_selected)
-            self._ctrl_general.user_connected.connect(
-                self._ctrl.model.slots.on_user_connected)
-            self._ctrl_general.user_disconnected.connect(
-                self._ctrl.model.slots.on_user_disconnected)
+            self._ctrl_general.user_event.connect(
+                self._ctrl.model.slots.on_user_event)
 
     def disconnect(self):
         """Disconnect SLots and Signals for Models linked"""
@@ -112,26 +108,26 @@ class ControllerSlots(QObject):
                 self._ctrl.on_internet_access)
             self._ctrl.model.internet_access.disconnect(
                 self._messenger.on_internet_access)
-            self._ctrl._load_categories.finished.disconnect(
+            self._ctrl.load_categories.finished.disconnect(
                 self._ctrl.on_load_categories_finished)
-            self._ctrl._load_categories.finished.disconnect(
+            self._ctrl.load_categories.finished.disconnect(
                 self._messenger.on_load_categories_finished)
             self._ctrl.load_details_finished.disconnect(
                 self._ctrl_general.on_load_details_finished)
             self._ctrl.checked_start.disconnect(
                 self._ctrl_general.on_checked_started)
-            self._ctrl_general.user_connected.disconnect(
-                self._ctrl.model.slots.on_user_connected)
-            self._ctrl_general.user_disconnected.disconnect(
-                self._ctrl.model.slots.on_user_disconnected)
+            self._ctrl_general.user_event.disconnect(
+                self._ctrl.model.slots.on_user_event)
+            #self._ctrl_general.user_disconnected.disconnect(
+            #    self._ctrl.model.slots.on_user_disconnected)
 
         elif self._name == "DatabaseMode":
             if DEBUG_MODE:
                 print("disconnect for DatabaseMode")
             self._ctrl.views["substitutes"].clicked.disconnect(
                 self._ctrl.on_substitute_selected)
-            self._ctrl_general.user_connected.disconnect(
-                self._ctrl.model.slots.on_user_connected)
-            self._ctrl_general.user_disconnected.disconnect(
-                self._ctrl.model.slots.on_user_disconnected)
+            self._ctrl_general.user_event.disconnect(
+                self._ctrl.model.slots.on_user_event)
+            #self._ctrl_general.user_disconnected.disconnect(
+            #    self._ctrl.model.slots.on_user_disconnected)
 
