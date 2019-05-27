@@ -228,10 +228,16 @@ class Controller(QObject):
             if DEBUG_MODE:
                 print("=====  C O N T R O L  =====")
                 print("remove substitute(s) for user id:", user_id)
-            ok = database.del_record(
-                self._off_mode.model.foods.selected[0],
-                self._off_mode.model.substitutes.checked,
-                user_id)
+            if self._off_mode:
+                ok = database.del_record(
+                    self._off_mode.model.foods.selected[0],
+                    self._off_mode.model.substitutes.checked,
+                    user_id)
+            elif self._db_mode:
+                ok = database.del_record(
+                    self._db_mode.model.foods.selected[0],
+                    self._db_mode.model.substitutes.checked,
+                    user_id)
             if ok:
                 self._off_mode.model.substitutes.reset_checkboxes()
 
@@ -252,15 +258,3 @@ class Controller(QObject):
         """Property for views dict of QWidgets views"""
 
         return self._views
-
-    @property
-    def db_mode(self):
-        """Property for db_mode controller"""
-
-        return self._db_mode
-
-    @property
-    def off_mode(self):
-        """Property for off_mode controller"""
-
-        return self._off_mode

@@ -294,6 +294,16 @@ class UserConnection(DatabaseConnection):
         super(UserConnection, self).connect(user, password, database)
         self.connect_to_off_db()
 
+    def _normalize_product_details(self, product):
+        """Normalize the product missing keys to be able to pass record
+        details contruction (food_selected_details)"""
+
+        k_t = ("product_name_fr", "ingredients_text", "nutrition_grades_tags",
+               "brands_tags", "packaging", "url", "image_front_url")
+        missing_list = [f for f in k_t if f not in product.keys()]
+        for missing in missing_list:
+            product[missing] = "" if isinstance(missing, str) else list()
+
     def new_record(self, category_id, selected, substitutes, user_id):
         """Record new entry for selected substitutes and linked
         correspondant category and food selected and products details"""
@@ -310,6 +320,7 @@ class UserConnection(DatabaseConnection):
         shops = []
         for shop in selected["stores_tags"]:
             shops.append(shop)
+        self._normalize_product_details(selected)
         food_selected_details = (
             selected["product_name_fr"],
             selected["ingredients_text"],
