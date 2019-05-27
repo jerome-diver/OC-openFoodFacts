@@ -13,7 +13,7 @@ from controller import Widget
 class LocalDatabaseModel(QObject):
     """Local Database model Object"""
 
-    def __init__(self, general_ctrl, views):
+    def __init__(self, general_ctrl=None, views=None):
         super().__init__()
         self._views = views
         self._authenticate = general_ctrl.authenticate
@@ -21,13 +21,13 @@ class LocalDatabaseModel(QObject):
         self._slots = SlotsModels(self)
         self._connection = self._user.connection
         self._categories = CategoriesModel(
-            general_ctrl=general_ctrl,
+            general_ctrl=general_ctrl, views=views,
             helper=CategoriesHelper(self._user))
         self._foods = FoodsModel(
-            general_ctrl=general_ctrl,
+            general_ctrl=general_ctrl, views=views,
             helper=FoodsHelper(self._user))
         self._substitutes = SubstitutesModel(
-            general_ctrl=general_ctrl,
+            general_ctrl=general_ctrl, views=views,
             helper=SubstitutesHelper(self._user))
         self._product_details = ProductDetailsModels(self._views)
 

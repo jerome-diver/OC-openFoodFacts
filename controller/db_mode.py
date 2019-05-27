@@ -1,7 +1,8 @@
 """Controller for Database mode"""
 
 import webbrowser
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QModelIndex
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
+                         QModelIndex, QItemSelection
 
 from . import Widget, Mode, ControllerSlots
 from model import LocalDatabaseModel
@@ -13,6 +14,7 @@ class DatabaseMode(QObject):
     """ Print/record data inside local database"""
 
     status_message = pyqtSignal(str)
+    checked_start = pyqtSignal()
 
     def __init__(self, general_ctrl):
         super().__init__()
@@ -92,6 +94,35 @@ class DatabaseMode(QObject):
         self._model.product_details.populate(product_details)
         self._window.show_product_details(
             self._model.product_details.models)
+
+    @pyqtSlot(QItemSelection, QItemSelection)
+    def on_substitute_selection_changed(self, selected, deselected):
+        """Load details from new selection of substitutes table view"""
+
+        if selected.indexes():
+            index_select = selected.indexes()[0]
+            self._flags["call_mode"] = Mode.SELECTED
+            sub_model = self._views["substitutes"].model()
+            code = sub_model.index(index_select.row(), 2).data()
+            product_details = self._model.get_product_details(code)
+            self._model.product_details.populate(product_details)
+            self._window.show_product_details(
+                self._model.product_details.models)
+
+    @pyqtSlot('QStandardItem*')
+    def on_substitute_checked(self, item):
+        """Load, from checkbox (substitutes table view) selected,
+        products details"""
+
+        self._flags["call_mode"] = Mode.CHECKED
+        index = self._model.substitutes.indexFromItem(item)
+        code = self._model.substitutes.index(index.row(), 2).data()
+        mpd = self._model.product_details
+        ms = self._model.substitutes
+        ms.generate_checked()
+        product_details = self._model.get_product_details(code)
+        mpd.generate_checked(product_details, ms.checked)
+        self.checked_start.emit()
 
     @pyqtSlot()
     def on_product_url_clicked(self):
