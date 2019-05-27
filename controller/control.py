@@ -159,7 +159,7 @@ class Controller(QObject):
 
         self._window.record.setEnabled(False)
         self._window.record.setDisabled(True)
-        if not self._flags["user_connected"]:
+        if self._flags["user_connected"] != TypeConnection.USER_CONNECTED:
             self._window.record.setText("Aucun utilisateur connecté")
             self._window.remove.setText("Aucun utilisateur connecté")
         elif not self._flags["checked_product"]:
@@ -187,12 +187,15 @@ class Controller(QObject):
                 self._off_mode.model.product_details.checked)
         self.checked_substitutes()
 
-    @pyqtSlot()
-    def on_checked_started(self):
+    @pyqtSlot(str)
+    def on_checked_started(self, mode):
         """Slot for receipt signal to said if substitutes list any selection"""
 
         self._flags["checked_product"] = True
-        self._flags["checked_details"] = False
+        if mode == "OFF_MODE":
+            self._flags["checked_details"] = False
+        elif mode == "LOCAL_DB_MODE":
+            self._flags["checked_details"] = True
         self.checked_substitutes()
 
     @pyqtSlot()

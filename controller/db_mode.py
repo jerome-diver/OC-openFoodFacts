@@ -14,7 +14,7 @@ class DatabaseMode(QObject):
     """ Print/record data inside local database"""
 
     status_message = pyqtSignal(str)
-    checked_start = pyqtSignal()
+    checked_start = pyqtSignal(str)
 
     def __init__(self, general_ctrl):
         super().__init__()
@@ -83,18 +83,6 @@ class DatabaseMode(QObject):
         self._model.product_details.populate(product_details)
         self._window.show_substitutes(self._model.substitutes)
 
-
-    @pyqtSlot(QModelIndex)
-    def on_substitute_selected(self, index):
-        """Slot when a substitute is selected"""
-
-        code = self._model.substitutes.index(index.row(), 2).data()
-        self._model.product_details.reset()
-        product_details = self._model.get_product_details(code)
-        self._model.product_details.populate(product_details)
-        self._window.show_product_details(
-            self._model.product_details.models)
-
     @pyqtSlot(QItemSelection, QItemSelection)
     def on_substitute_selection_changed(self, selected, deselected):
         """Load details from new selection of substitutes table view"""
@@ -122,7 +110,7 @@ class DatabaseMode(QObject):
         ms.generate_checked()
         product_details = self._model.get_product_details(code)
         mpd.generate_checked(product_details, ms.checked)
-        self.checked_start.emit()
+        self.checked_start.emit("LOCAL_DB_MODE")
 
     @pyqtSlot()
     def on_product_url_clicked(self):

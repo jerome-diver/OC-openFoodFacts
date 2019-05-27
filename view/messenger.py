@@ -53,7 +53,7 @@ class Messenger(QObject):
     def on_load_product_details_finished(self):
         """Show details of product from Open Food Facts"""
 
-        if self._flag["call_mode"] is Mode.CHECKED:
+        if self._flags["call_mode"] is Mode.CHECKED:
             self.status_message.emit("Détails des substituts sélectionnés "
                                      "trouvés")
         else:

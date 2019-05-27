@@ -14,7 +14,7 @@ class OpenFoodFactsMode(QObject):
     selected for category list and food list"""
 
     status_message = pyqtSignal(str)
-    checked_start = pyqtSignal()
+    checked_start = pyqtSignal(str)
     load_details_finished = pyqtSignal()
     kill_foods_thread = pyqtSignal()
 
@@ -175,7 +175,7 @@ class OpenFoodFactsMode(QObject):
         code = self._model.substitutes.index(index.row(), 2).data()
         name = self._model.substitutes.index(index.row(), 0).data()
         self._threads.init_product_details_thread(code, name, Mode.CHECKED)
-        self.checked_start.emit()
+        self.checked_start.emit("OFF_MODE")
 
     @pyqtSlot()
     def on_product_url_clicked(self):

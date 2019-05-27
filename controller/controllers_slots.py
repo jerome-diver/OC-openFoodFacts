@@ -5,6 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from view import Messenger
 from settings import DEBUG_MODE
 
+
 class ControllerSlots(QObject):
     """Slots for controllers OpenFoodFactsMode and DatabaseMode"""
 
@@ -30,6 +31,8 @@ class ControllerSlots(QObject):
         self._ctrl.views["substitutes"].selectionModel(). \
             selectionChanged.connect(
             self._ctrl.on_substitute_selection_changed)
+        self._ctrl.model.substitutes.itemChanged.connect(
+            self._ctrl.on_substitute_checked)
         self._ctrl.views["url"].clicked.connect(
             self._ctrl.on_product_url_clicked)
         self._ctrl.status_message.connect(
@@ -86,6 +89,8 @@ class ControllerSlots(QObject):
         self._ctrl.views["substitutes"].selectionModel(). \
             selectionChanged.disconnect(
             self._ctrl.on_substitute_selection_changed)
+        self._ctrl.model.substitutes.itemChanged.disconnect(
+            self._ctrl.on_substitute_checked)
         self._ctrl.views["url"].clicked.disconnect(
             self._ctrl.on_product_url_clicked)
         self._ctrl.status_message.disconnect(
