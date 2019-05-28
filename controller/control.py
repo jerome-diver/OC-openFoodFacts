@@ -86,11 +86,15 @@ class Controller(QObject):
                 "{} {}".format(self._authenticate.user.family,
                                self._authenticate.user.nick))
             self._window.local_mode.setEnabled(True)
+            self._authenticate.user.connection.status_message.connect(
+                self._window.on_status_message)
         elif connected == TypeConnection.USER_DISCONNECTED:
             self.status_message.emit("L'utilisateur est déconnecté de la base "
                                      "de donnée locale")
             self._window.signup.setHidden(False)
             self._window.user_informations.setText("")
+            self._authenticate.user.connection.status_message.disconnect(
+                self._window.on_status_message)
         elif connected == TypeConnection.ADMIN_CONNECTED:
             if self._window.local_mode.isChecked():
                 self.on_openfoodfacts_mode(True)
@@ -111,6 +115,8 @@ class Controller(QObject):
         user_status = self._authenticate.user.is_connected() \
             and not self._authenticate.user.is_admin()
         if state:
+            self._authenticate.user.connection.connect_to_off_db(
+                self._authenticate.user.is_admin())
             self._window.record.setHidden(True)
             if self._off_mode:
                 self._off_mode.slots.disconnect()
@@ -135,6 +141,8 @@ class Controller(QObject):
         self._window.local_mode.setEnabled(user_status)
         self._window.record.setHidden(not state)
         if state:
+            self._authenticate.user.connection.connect_to_off_db(
+                self._authenticate.user.is_admin())
             if self._db_mode:
                 self._db_mode.slots.disconnect()
                 self._db_mode = None
@@ -215,6 +223,8 @@ class Controller(QObject):
                 self._off_mode.model.product_details.checked,
                 user_id)
             if ok:
+                self.status_message.emit("Substituts enregistrés dans la base "
+                                         "de donnée")
                 self._off_mode.model.substitutes.reset_checkboxes()
 
     @pyqtSlot()
@@ -239,6 +249,8 @@ class Controller(QObject):
                     self._db_mode.model.substitutes.checked,
                     user_id)
             if ok:
+                self.status_message.emit("Substituts sélectionnés supprimés de "
+                                         "la base de données")
                 self._off_mode.model.substitutes.reset_checkboxes()
 
     @property

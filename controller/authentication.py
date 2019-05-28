@@ -34,8 +34,7 @@ class Authentication(QObject):
                     self.on_new_status_connection)
         if isinstance(type, DatabaseConnection):
             self._user = User(type)
-            if isinstance(type, AdminConnection):
-                self._user.connection.connect_to_off_db()
+           # if isinstance(type, AdminConnection):
         elif isinstance(type, User):
             self._user = type
         self._user.status_connection.connect(self.on_new_status_connection)

@@ -128,11 +128,12 @@ class DatabaseConnection(QObject):
 
         return bool(self._connection and self._connection.open)
 
-    def connect_to_off_db(self):
+    def connect_to_off_db(self, admin=None):
         """Connect the current user on database"""
 
-        # request = "SET ROLE openfoodfacts_role;"
-        # self.send_request(request)
+        if not admin:
+            request = "SET ROLE openfoodfacts_role;"
+            self.send_request(request)
         request = "USE openfoodfacts_substitutes;"
         self.send_request(request)
 
@@ -292,7 +293,7 @@ class UserConnection(DatabaseConnection):
         """Connect database for ADMIN"""
 
         super(UserConnection, self).connect(user, password, database)
-        self.connect_to_off_db()
+        #self.connect_to_off_db()
 
     def _normalize_product_details(self, product):
         """Normalize the product missing keys to be able to pass record
@@ -338,11 +339,13 @@ class UserConnection(DatabaseConnection):
                 self._record_product(user_id, category_id, code, details)
                 values = (food_selected_code, code, user_id)
                 self.send_request(request, values)
-            return True
         except Error as error:
             self.status_message.emit("Il y a eu un problème d'enregistrement "
                                      "des données dans la base")
             return False
+        else:
+            self.status_message.emit("Enregistrement des substituts effectué")
+            return True
 
     def _record_product(self, user_id, category_id, food_code, details):
         """Record a full detailed content for tables:
