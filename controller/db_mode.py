@@ -1,11 +1,9 @@
 """Controller for Database mode"""
 
-import webbrowser
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
+from PyQt5.QtCore import QObject, pyqtSlot, \
                          QModelIndex, QItemSelection
 
 from . import Widget, Mode, MixinControllers
-from model import LocalDatabase
 from settings import DEBUG_MODE
 
 
@@ -15,8 +13,6 @@ class DatabaseMode(MixinControllers, QObject):
 
     def __init__(self, **kargs):
         super().__init__(**kargs)
-        self._model = LocalDatabase(general_ctrl=self._general_ctrl,
-                                    views=self._views)
         self.initialize()
 
     def initialize(self):

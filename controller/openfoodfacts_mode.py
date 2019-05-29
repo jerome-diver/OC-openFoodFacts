@@ -3,9 +3,7 @@
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
                          QModelIndex, QItemSelection
 
-from model import OpenFoodFacts
-from . import ThreadsController, LoadCategories, Mode, Widget, \
-              MixinControllers
+from . import  Mode, Widget, MixinControllers
 from settings import DEBUG_MODE
 
 
@@ -18,11 +16,6 @@ class OpenFoodFactsMode(MixinControllers, QObject):
 
     def __init__(self, **kargs):
         super().__init__(**kargs)
-        self._model = OpenFoodFacts(general_ctrl=self._general_ctrl,
-                                    views=self._views)
-        self._threads = ThreadsController(self)
-        self._load_categories = LoadCategories(
-            self._model, self._connection)
         self.initialize()
 
     def initialize(self):

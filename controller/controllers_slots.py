@@ -4,7 +4,8 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 import webbrowser
 
 from view import Messenger
-from . import Mode, Widget
+from . import ThreadsController, LoadCategories, Mode
+from model import LocalDatabase, OpenFoodFacts
 from settings import DEBUG_MODE
 
 
@@ -16,7 +17,7 @@ class MixinControllers(QObject):
     
     def __init__(self, **kargs):
         super().__init__()
-        self._ctrl_general = kargs["general_ctrl"]
+        self._general_ctrl = kargs["general_ctrl"]
         self._name = "%s" % type(self).__name__
         self._window = self._general_ctrl.window
         self._authenticate = self._general_ctrl.authenticate
@@ -37,6 +38,15 @@ class MixinControllers(QObject):
                        "url" : self._window.product_url,
                        "img_thumb" : self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
+        if self._name == "OpenFoodFactsMode":
+            self._model = OpenFoodFacts(general_ctrl=self._general_ctrl,
+                                        views=self._views)
+            self._threads = ThreadsController(self)
+            self._load_categories = LoadCategories(
+                self._model, self._connection)
+        elif self._name == "DatabaseMode":
+            self._model = LocalDatabase(general_ctrl=self._general_ctrl,
+                                        views=self._views)
         self._messenger = Messenger(self, self._flags)
         self.connect()
 
@@ -49,44 +59,44 @@ class MixinControllers(QObject):
         """Connect Signals with Slots"""
 
         if DEBUG_MODE:
-            print("=====  C o n t r o l l e r S l o t  =====")
+            print("=====  M i x i n C o n t r o l l e r s  =====")
             print("connect similar connections")
         ######   Connect for controller   ##############################
-        self.views["categories"].clicked.connect(self.on_category_selected)
-        self.views["foods"].clicked.connect(self.on_food_selected)
-        self.views["substitutes"].selectionModel().selectionChanged.connect(
+        self._views["categories"].clicked.connect(self.on_category_selected)
+        self._views["foods"].clicked.connect(self.on_food_selected)
+        self._views["substitutes"].selectionModel().selectionChanged.connect(
             self.on_substitute_selection_changed)
-        self.model.substitutes.itemChanged.connect(self.on_substitute_checked)
-        self.views["url"].clicked.connect(self.on_product_url_clicked)
-        self.status_message.connect(self.window.on_status_message)
+        self._model.substitutes.itemChanged.connect(self.on_substitute_checked)
+        self._views["url"].clicked.connect(self.on_product_url_clicked)
+        self.status_message.connect(self._window.on_status_message)
         ######   Connect for messenger   ###############################
-        self.views["categories"].clicked.connect(
+        self._views["categories"].clicked.connect(
             self._messenger.on_category_selected)
-        self.views["foods"].clicked.connect(
+        self._views["foods"].clicked.connect(
             self._messenger.on_food_selected)
-        self.views["substitutes"].selectionModel().selectionChanged.connect(
+        self._views["substitutes"].selectionModel().selectionChanged.connect(
             self._messenger.on_substitute_selection_changed)
-        self.model.substitutes.itemChanged.connect(
+        self._model.substitutes.itemChanged.connect(
             self._messenger.on_substitute_checked)
         ######   Connect for general controller   ######################
-        self._ctrl_general.user_event.connect(self.model.on_user_event)
-        self.checked_start.connect(self._ctrl_general.on_checked_started)
+        self._general_ctrl.user_event.connect(self._model.on_user_event)
+        self.checked_start.connect(self._general_ctrl.on_checked_started)
 
         if self._name == "OpenFoodFactsMode":
             if DEBUG_MODE:
                 print("Connect for OpenFoodFactsMode")
         ######   Connect for controller   ##############################
-            self.model.internet_access.connect(self.on_internet_access)
-            self.load_categories.finished.connect(
+            self._model.internet_access.connect(self.on_internet_access)
+            self._load_categories.finished.connect(
                 self.on_load_categories_finished)
             self.load_details_finished.connect(
-                self._ctrl_general.on_load_details_finished)
+                self._general_ctrl.on_load_details_finished)
         ######   Connect for messenger   ###############################
-            self.load_categories.finished.connect(
+            self._load_categories.finished.connect(
                 self._messenger.on_load_categories_finished)
             self.load_details_finished.connect(
                 self._messenger.on_load_product_details_finished)
-            self.model.internet_access.connect(
+            self._model.internet_access.connect(
                 self._messenger.on_internet_access)
 
         elif self._name == "DatabaseMode":
@@ -97,48 +107,48 @@ class MixinControllers(QObject):
         """Disconnect SLots and Signals for Models linked"""
         
         if DEBUG_MODE:
-            print("=====  C o n t r o l l e r S l o t  =====")
+            print("=====  M i x i n C o n t r o l l e r s  =====")
             print("disconnect similar connections")
         ######   Disconnect for controller   ###########################
-        self.views["categories"].clicked.disconnect(self.on_category_selected)
-        self.views["foods"].clicked.disconnect(self.on_food_selected)
-        self.views["substitutes"].selectionModel(). \
+        self._views["categories"].clicked.disconnect(self.on_category_selected)
+        self._views["foods"].clicked.disconnect(self.on_food_selected)
+        self._views["substitutes"].selectionModel(). \
             selectionChanged.disconnect(
             self.on_substitute_selection_changed)
-        self.model.substitutes.itemChanged.disconnect(
+        self._model.substitutes.itemChanged.disconnect(
             self.on_substitute_checked)
-        self.views["url"].clicked.disconnect(self.on_product_url_clicked)
-        self.status_message.disconnect(self.window.on_status_message)
+        self._views["url"].clicked.disconnect(self.on_product_url_clicked)
+        self.status_message.disconnect(self._window.on_status_message)
         ######   Disconnect for messenger   ############################
-        self.views["categories"].clicked.disconnect(
+        self._views["categories"].clicked.disconnect(
             self._messenger.on_category_selected)
-        self.views["foods"].clicked.disconnect(
+        self._views["foods"].clicked.disconnect(
             self._messenger.on_food_selected)
-        self.views["substitutes"].selectionModel(). \
+        self._views["substitutes"].selectionModel(). \
             selectionChanged.disconnect(
             self._messenger.on_substitute_selection_changed)
-        self.model.substitutes.itemChanged.disconnect(
+        self._model.substitutes.itemChanged.disconnect(
             self._messenger.on_substitute_checked)
         ###### Disconnect for general controller
-        self._ctrl_general.user_event.disconnect(self.model.on_user_event)
+        self._general_ctrl.user_event.disconnect(self._model.on_user_event)
         self.checked_start.disconnect(
-            self._ctrl_general.on_checked_started)
+            self._general_ctrl.on_checked_started)
 
         if self._name == "OpenFoodFactsMode":
             if DEBUG_MODE:
                 print("disconnect for OpenFoodFactsMode")
         ######   Connect for controller   ##############################
-            self.model.internet_access.disconnect(self.on_internet_access)
-            self.load_categories.finished.disconnect(
-                self.on_load_categories_finished)
+            self._model.internet_access.disconnect(self.on_internet_access)
+            self._load_categories.finished.disconnect(
+                self.on__load_categories_finished)
             self.load_details_finished.disconnect(
-                self._ctrl_general.on_load_details_finished)
+                self._general_ctrl.on_load_details_finished)
         ######   Connect for messenger   ###############################
-            self.load_categories.finished.disconnect(
-                self._messenger.on_load_categories_finished)
+            self._load_categories.finished.disconnect(
+                self._messenger.on__load_categories_finished)
             self.load_details_finished.disconnect(
                 self._messenger.on_load_product_details_finished)
-            self.model.internet_access.disconnect(
+            self._model.internet_access.disconnect(
                 self._messenger.on_internet_access)
 
         elif self._name == "DatabaseMode":

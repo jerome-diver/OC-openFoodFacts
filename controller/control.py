@@ -120,7 +120,7 @@ class Controller(QObject):
             if isinstance(self._current_mode, OpenFoodFactsMode):
                 self._current_mode = None
             if not self._current_mode:
-                self._current_mode = DatabaseMode(self)
+                self._current_mode = DatabaseMode(general_ctrl=self)
                 if user_status:
                     self.user_event.emit(self._authenticate.user)
         else:
@@ -144,7 +144,7 @@ class Controller(QObject):
             if isinstance(self._current_mode, DatabaseMode):
                 self._current_mode = None
             if not self._current_mode:
-                self._current_mode = OpenFoodFactsMode(self)
+                self._current_mode = OpenFoodFactsMode(general_ctrl=self)
                 if user_status:
                     self.user_event.emit(self._authenticate.user)
             else :
