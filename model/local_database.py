@@ -1,42 +1,29 @@
 """Local Database mode model"""
 
-from PyQt5.QtCore import QObject, pyqtSlot
-
 from settings import DEBUG_MODE
-from . import CategoriesModel, FoodsModel, \
-              SubstitutesModel, ProductDetailsModels
-from . import SlotsModels
-from . import CategoriesHelper, FoodsHelper, SubstitutesHelper
+from . import MixinModels
 from controller import Widget
 
 
-class LocalDatabaseModel(QObject):
+class LocalDatabase(MixinModels):
     """Local Database model Object"""
 
-    def __init__(self, general_ctrl=None, views=None):
-        super().__init__()
-        self._views = views
-        self._authenticate = general_ctrl.authenticate
-        self._user = self._authenticate.user
-        self._slots = SlotsModels(self)
-        self._connection = self._user.connection
-        self._categories = CategoriesModel(
-            general_ctrl=general_ctrl, views=views,
-            helper=CategoriesHelper(self._user))
-        self._foods = FoodsModel(
-            general_ctrl=general_ctrl, views=views,
-            helper=FoodsHelper(self._user))
-        self._substitutes = SubstitutesModel(
-            general_ctrl=general_ctrl, views=views,
-            helper=SubstitutesHelper(self._user))
-        self._product_details = ProductDetailsModels(self._views)
+    def __init__(self, **kargs):
+        super().__init__(**kargs)
 
     def get_categories(self):
         """Get categories from local  database"""
 
         categories = []
-        request = "SELECT * FROM categories;"
-        for row in self._connection.ask_request(request):
+        request = "SELECT DISTINCT c.* " \
+                  "FROM categories AS c, " \
+                  "     food_categories AS fc," \
+                  "     user_foods AS uf " \
+                  "WHERE uf.user_id = %s " \
+                  "AND uf.food_code = fc.food_code " \
+                  "AND fc.category_id = c.id;"
+        values = (self._user.id,)
+        for row in self._connection.ask_request(request, values):
             categories.append({"id": row["id"], "name": row["name"]})
         return categories
 
@@ -129,44 +116,3 @@ class LocalDatabaseModel(QObject):
         if Widget.DETAILS in models or Widget.ALL in models:
             self._product_details.reset()
 
-    @property
-    def slots(self):
-        """Slots Property"""
-
-        return self._slots
-
-    @property
-    def categories(self):
-        """Categories property"""
-
-        return self._categories
-
-    @property
-    def foods(self):
-        """Foods property"""
-
-        return self._foods
-
-    @property
-    def substitutes(self):
-        """Substitutes property"""
-
-        return self._substitutes
-
-    @property
-    def product_details(self):
-        """Product details property"""
-
-        return self._product_details
-
-    @property
-    def connection(self):
-        """Property _connection access"""
-
-        return self._connection
-
-    @connection.setter
-    def connection(self, new_connection):
-        """Setter for self._connection"""
-
-        self._connection = new_connection

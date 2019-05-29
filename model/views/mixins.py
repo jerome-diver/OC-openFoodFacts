@@ -2,14 +2,15 @@
 
 
 class MixinViews():
+    """Mix-ins class for share DRY properties of models-views:
+    [categories, substitutes, foods]"""
 
-    def __init__(self, general_ctrl, views=None, helper=None,
-                 **kargs):
-        super().__init__(**kargs)
-        self._helper = helper
-        self._general_ctrl = general_ctrl
-        self._views = views
-        self._user = general_ctrl.authenticate.user
+    def __init__(self, **kargs):
+        super().__init__(kargs["parent"])
+        self._helper = kargs["helper"]
+        self._general_ctrl = kargs["general_ctrl"]
+        self._views = kargs["views"]
+        self._user = self._general_ctrl.authenticate.user
 
     @property
     def helper(self):

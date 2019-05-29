@@ -1,45 +1,17 @@
 """OpenFoodFacts link API of openFoodFacts online with application"""
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 import openfoodfacts
 
 from settings import DEBUG_MODE
-from . import CategoriesModel, FoodsModel, \
-              SubstitutesModel, ProductDetailsModels
-from . import SlotsModels
-from . import CategoriesHelper, FoodsHelper, SubstitutesHelper
+from . import MixinModels
 from controller import Widget
 
 
-class OpenFoodFacts(QObject):
+class OpenFoodFacts(MixinModels):
     """Model for Open Food Facts data requests"""
 
-    internet_access = pyqtSignal(bool)
-
-    def __init__(self, general_ctrl=None, views=None):
-        super().__init__()
-        if general_ctrl:
-            self._slots = SlotsModels(self)
-            self._authenticate = general_ctrl.authenticate
-            self._user = self._authenticate.user
-            self._connection = self._user.connection
-            self._views = views
-            self._categories = CategoriesModel(
-                general_ctrl=general_ctrl, views=views,
-                helper=CategoriesHelper(self._user))
-            self._foods = FoodsModel(
-                general_ctrl=general_ctrl, views=views,
-                helper=FoodsHelper(self._user))
-            self._substitutes = SubstitutesModel(
-                general_ctrl=general_ctrl, views=views,
-                helper=SubstitutesHelper(self._user))
-            self._product_details = ProductDetailsModels(self._views)
-        else:
-            self._user = None
-            self._substitutes = None
-            self._foods = None
-            self._categories = None
-            self._product_details = None
+    def __init__(self, **kargs):
+        super().__init__(**kargs)
 
     def download_categories(self):
         """Download categories and return them sorted by name"""
@@ -157,45 +129,3 @@ class OpenFoodFacts(QObject):
             self._substitutes.reset()
         if Widget.DETAILS in models or Widget.ALL in models:
             self._product_details.reset()
-
-    @property
-    def categories(self):
-        """Categories property"""
-
-        return self._categories
-
-    @property
-    def foods(self):
-        """Foods property"""
-
-        return self._foods
-
-    @property
-    def substitutes(self):
-        """Substitutes property"""
-
-        return self._substitutes
-
-    @property
-    def product_details(self):
-        """Product details property"""
-
-        return self._product_details
-
-    @property
-    def slots(self):
-        """Slots Property"""
-
-        return self._slots
-
-    @property
-    def connection(self):
-        """Property _connection access"""
-
-        return self._connection
-
-    @connection.setter
-    def connection(self, new_connection):
-        """Setter for self._connection"""
-
-        self._connection = new_connection

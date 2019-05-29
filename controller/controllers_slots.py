@@ -17,6 +17,11 @@ class ControllerSlots(QObject):
         self._messenger = Messenger(self._ctrl, self._ctrl.flags)
         self.connect()
 
+    def __del__(self):
+        """Auto disconnect at end life time"""
+
+        self.disconnect()
+
     def connect(self):
         """Connect Signals with Slots"""
 
@@ -49,7 +54,7 @@ class ControllerSlots(QObject):
             self._messenger.on_substitute_checked)
         ######   Connect for general controller   ######################
         self._ctrl_general.user_event.connect(
-            self._ctrl.model.slots.on_user_event)
+            self._ctrl.model.on_user_event)
         self._ctrl.checked_start.connect(
             self._ctrl_general.on_checked_started)
 
@@ -107,7 +112,7 @@ class ControllerSlots(QObject):
             self._messenger.on_substitute_checked)
         ###### Disconnect for general controller
         self._ctrl_general.user_event.disconnect(
-            self._ctrl.model.slots.on_user_event)
+            self._ctrl.model.on_user_event)
         self._ctrl.checked_start.disconnect(
             self._ctrl_general.on_checked_started)
 

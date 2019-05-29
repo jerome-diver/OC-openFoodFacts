@@ -119,7 +119,6 @@ class Controller(QObject):
                 self._authenticate.user.is_admin())
             self._window.record.setHidden(True)
             if self._off_mode:
-                self._off_mode.slots.disconnect()
                 self._off_mode = None
             if not self._db_mode:
                 self._db_mode = DatabaseMode(self)
@@ -144,7 +143,6 @@ class Controller(QObject):
             self._authenticate.user.connection.connect_to_off_db(
                 self._authenticate.user.is_admin())
             if self._db_mode:
-                self._db_mode.slots.disconnect()
                 self._db_mode = None
             if not self._off_mode:
                 self._off_mode = OpenFoodFactsMode(self)

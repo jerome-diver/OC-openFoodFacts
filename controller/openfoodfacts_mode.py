@@ -40,7 +40,8 @@ class OpenFoodFactsMode(QObject):
                        "url" : self._window.product_url,
                        "img_thumb" : self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
-        self._model = OpenFoodFacts(general_ctrl, self._views)
+        self._model = OpenFoodFacts(general_ctrl=general_ctrl,
+                                    views=self._views)
         self._threads = ThreadsController(self)
         self._load_categories = LoadCategories(
             self._model, self._connection)

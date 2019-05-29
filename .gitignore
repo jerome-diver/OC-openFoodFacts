@@ -153,3 +153,4 @@ ENV/
 .ropeproject
 Supprimerait openfoodfacts_tests.ipynb
 /tags
+/openfoodfacts_tests.ipynb

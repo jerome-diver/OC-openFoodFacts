@@ -5,7 +5,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
                          QModelIndex, QItemSelection
 
 from . import Widget, Mode, ControllerSlots
-from model import LocalDatabaseModel
+from model import LocalDatabase
 from settings import DEBUG_MODE
 
 
@@ -38,7 +38,8 @@ class DatabaseMode(QObject):
                        "url": self._window.product_url,
                        "img_thumb": self._window.product_img_thumb,
                        "bg_color": self._window.get_bg_color()}
-        self._model = LocalDatabaseModel(general_ctrl, self._views)
+        self._model = LocalDatabase(general_ctrl=general_ctrl,
+                                    views=self._views)
         self._slots = ControllerSlots(general_ctrl, self)
         self._initialize()
 
