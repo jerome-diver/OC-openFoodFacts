@@ -4,7 +4,6 @@ import openfoodfacts
 
 from settings import DEBUG_MODE
 from . import MixinModels
-from controller import Widget
 
 
 class OpenFoodFacts(MixinModels):
@@ -117,15 +116,3 @@ class OpenFoodFacts(MixinModels):
             print("Find products for code:", code,
                   "and [product_name]:", name)
         return None
-
-    def reset_models(self, models=(Widget.ALL,)):
-        """Reset all models or elected ones"""
-
-        if Widget.CATEGORIES in models or Widget.ALL in models:
-            self._categories.reset()
-        if Widget.FOODS in models or Widget.ALL in models:
-            self._foods.reset()
-        if Widget.SUBSTITUTES in models or Widget.ALL in models:
-            self._substitutes.reset()
-        if Widget.DETAILS in models or Widget.ALL in models:
-            self._product_details.reset()

@@ -6,6 +6,7 @@ from . import User
 from . import CategoriesModel, FoodsModel, \
     SubstitutesModel, ProductDetailsModels
 from . import CategoriesHelper, FoodsHelper, SubstitutesHelper
+from controller import Widget
 from settings import DEBUG_MODE
 
 
@@ -63,6 +64,18 @@ class MixinModels(QObject):
         if self._substitutes.rowCount():
             self._substitutes.find_substitutes_in_database(
                 self._foods.category_id)
+
+    def reset_models(self, models=(Widget.ALL,)):
+        """Reset all models or elected ones"""
+
+        if Widget.CATEGORIES in models or Widget.ALL in models:
+            self._categories.reset()
+        if Widget.FOODS in models or Widget.ALL in models:
+            self._foods.reset()
+        if Widget.SUBSTITUTES in models or Widget.ALL in models:
+            self._substitutes.reset()
+        if Widget.DETAILS in models or Widget.ALL in models:
+            self._product_details.reset()
 
     @property
     def categories(self):

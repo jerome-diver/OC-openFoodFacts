@@ -23,8 +23,7 @@ class Controller(QObject):
         self._authenticate = Authentication()
         self._window = MainWindow(self)
         self._window.show()
-        self._db_mode = None
-        self._off_mode = None
+        self._current_mode = None
         self._flags = dict(user_connected=False,
                            checked_product=False,
                            checked_details=False)
@@ -118,10 +117,10 @@ class Controller(QObject):
             self._authenticate.user.connection.connect_to_off_db(
                 self._authenticate.user.is_admin())
             self._window.record.setHidden(True)
-            if self._off_mode:
-                self._off_mode = None
-            if not self._db_mode:
-                self._db_mode = DatabaseMode(self)
+            if isinstance(self._current_mode, OpenFoodFactsMode):
+                self._current_mode = None
+            if not self._current_mode:
+                self._current_mode = DatabaseMode(self)
                 if user_status:
                     self.user_event.emit(self._authenticate.user)
         else:
@@ -142,20 +141,20 @@ class Controller(QObject):
         if state:
             self._authenticate.user.connection.connect_to_off_db(
                 self._authenticate.user.is_admin())
-            if self._db_mode:
-                self._db_mode = None
-            if not self._off_mode:
-                self._off_mode = OpenFoodFactsMode(self)
+            if isinstance(self._current_mode, DatabaseMode):
+                self._current_mode = None
+            if not self._current_mode:
+                self._current_mode = OpenFoodFactsMode(self)
                 if user_status:
                     self.user_event.emit(self._authenticate.user)
-            else:
+            else :
                 self._window.show_categories(
-                    self._off_mode.model.categories)
-                self._window.show_foods(self._off_mode.model.foods)
+                    self._current_mode.model.categories)
+                self._window.show_foods(self._current_mode.model.foods)
                 self._window.show_substitutes(
-                    self._off_mode.model.substitutes)
+                    self._current_mode.model.substitutes)
                 self._window.show_product_details(
-                    self._off_mode.model.product_details)
+                    self._current_mode.model.product_details)
         else:
             self._window.reset_views()
 
@@ -186,11 +185,11 @@ class Controller(QObject):
     def on_load_details_finished(self):
         """When product substitutes checked details are loaded..."""
 
-        if self._off_mode:
+        if isinstance(self._curent_mode, OpenFoodFactsMode):
             self._flags["checked_product"] = bool(
-                self._off_mode.model.substitutes.checked)
+                self._current_mode.model.substitutes.checked)
             self._flags["checked_details"] = bool(
-                self._off_mode.model.product_details.checked)
+                self._current_mode.model.product_details.checked)
         self.checked_substitutes()
 
     @pyqtSlot(str)
@@ -216,14 +215,14 @@ class Controller(QObject):
                 print("=====  C O N T R O L  =====")
                 print("record substitute(s) for user id:", user_id)
             ok = database.new_record(
-                self._off_mode.model.foods.category_id,
-                self._off_mode.model.foods.selected_details,
-                self._off_mode.model.product_details.checked,
+                self._current_mode.model.foods.category_id,
+                self._current_mode.model.foods.selected_details,
+                self._current_mode.model.product_details.checked,
                 user_id)
             if ok:
                 self.status_message.emit("Substituts enregistrés dans la base "
                                          "de donnée")
-                self._off_mode.model.substitutes.reset_checkboxes()
+                self._refresh_views()
 
     @pyqtSlot()
     def on_remove_substitutes(self):
@@ -236,20 +235,23 @@ class Controller(QObject):
             if DEBUG_MODE:
                 print("=====  C O N T R O L  =====")
                 print("remove substitute(s) for user id:", user_id)
-            if self._off_mode:
-                ok = database.del_record(
-                    self._off_mode.model.foods.selected[0],
-                    self._off_mode.model.substitutes.checked,
-                    user_id)
-            elif self._db_mode:
-                ok = database.del_record(
-                    self._db_mode.model.foods.selected[0],
-                    self._db_mode.model.substitutes.checked,
-                    user_id)
-            if ok:
+            removed = database.del_record(
+                self._current_mode.model.foods.selected[0],
+                self._current_mode.model.substitutes.checked,
+                user_id)
+            if removed:
                 self.status_message.emit("Substituts sélectionnés supprimés de "
                                          "la base de données")
-                self._off_mode.model.substitutes.reset_checkboxes()
+                self._refresh_views()
+
+    def _refresh_views(self):
+        """Refresh all views for concerned mode's running"""
+
+        self._current_mode.model.substitutes.reset_checkboxes()
+        self._current_mode.model.reset_models()
+        self._current_mode.initialize()
+
+
 
     @property
     def window(self):

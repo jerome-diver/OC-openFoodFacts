@@ -1,51 +1,28 @@
 """Controller for OpenFoodFacts API access mode"""
 
-import webbrowser
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, \
                          QModelIndex, QItemSelection
-from . import ControllerSlots
+
 from model import OpenFoodFacts
-from controller import ThreadsController, LoadCategories, Mode, Widget
+from . import ThreadsController, LoadCategories, Mode, Widget, \
+              MixinControllers
 from settings import DEBUG_MODE
 
 
-class OpenFoodFactsMode(QObject):
+class OpenFoodFactsMode(MixinControllers, QObject):
     """Print OpenFoodFacts substitutions food
     selected for category list and food list"""
 
-    status_message = pyqtSignal(str)
-    checked_start = pyqtSignal(str)
     load_details_finished = pyqtSignal()
     kill_foods_thread = pyqtSignal()
 
-    def __init__(self, general_ctrl):
-        super().__init__()
-        self._general_ctrl = general_ctrl
-        self._window = general_ctrl.window
-        self._authenticate = general_ctrl.authenticate
-        self._connection = self._authenticate.user_connection
-        self._flags = {"product": True,
-                       "internet": True,
-                       "call_mode": Mode.SELECTED}
-        self._views = {"categories": self._window.categories_list,
-                       "foods": self._window.foods_list,
-                       "substitutes": self._window.substitutes_list,
-                       "name" : self._window.product_name,
-                       "brand" : self._window.product_brand,
-                       "packaging" : self._window.product_packaging,
-                       "code": self._window.product_code,
-                       "score" : self._window.product_score,
-                       "shops" : self._window.product_shops,
-                       "description" : self._window.product_description,
-                       "url" : self._window.product_url,
-                       "img_thumb" : self._window.product_img_thumb,
-                       "bg_color": self._window.get_bg_color()}
-        self._model = OpenFoodFacts(general_ctrl=general_ctrl,
+    def __init__(self, **kargs):
+        super().__init__(**kargs)
+        self._model = OpenFoodFacts(general_ctrl=self._general_ctrl,
                                     views=self._views)
         self._threads = ThreadsController(self)
         self._load_categories = LoadCategories(
             self._model, self._connection)
-        self._slots = ControllerSlots(general_ctrl, self)
         self.initialize()
 
     def initialize(self):
@@ -178,54 +155,11 @@ class OpenFoodFactsMode(QObject):
         self._threads.init_product_details_thread(code, name, Mode.CHECKED)
         self.checked_start.emit("OFF_MODE")
 
-    @pyqtSlot()
-    def on_product_url_clicked(self):
-        """Go to url"""
-
-        url = self._model.product_details.models["url"]
-        webbrowser.open(url)
-
-    @property
-    def model(self):
-        """Return model property for OpenFoodFacts instance model"""
-
-        return self._model
-
-    @property
-    def connection(self):
-        """connection property access"""
-
-        return self._connection
-
-    @property
-    def window(self):
-        """Window access property"""
-
-        return self._window
-
-    @property
-    def views(self):
-        """Views property access"""
-
-        return self._views
-
     @property
     def threads(self):
         """Thread property access"""
 
         return self._threads
-
-    @property
-    def slots(self):
-        """Property for slots access"""
-
-        return self._slots
-
-    @property
-    def flags(self):
-        """Property for flags access"""
-
-        return self._flags
 
     @property
     def load_categories(self):

@@ -2,7 +2,6 @@
 
 from settings import DEBUG_MODE
 from . import MixinModels
-from controller import Widget
 
 
 class LocalDatabase(MixinModels):
@@ -104,15 +103,4 @@ class LocalDatabase(MixinModels):
                 product_details["stores_tags"].append(r["shop_name"])
             return product_details
 
-    def reset_models(self, models=(Widget.ALL,)):
-        """Reset all models or elected ones"""
-
-        if Widget.CATEGORIES in models or Widget.ALL in models:
-            self._categories.reset()
-        if Widget.FOODS in models or Widget.ALL in models:
-            self._foods.reset()
-        if Widget.SUBSTITUTES in models or Widget.ALL in models:
-            self._substitutes.reset()
-        if Widget.DETAILS in models or Widget.ALL in models:
-            self._product_details.reset()
 
