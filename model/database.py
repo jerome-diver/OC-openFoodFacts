@@ -166,7 +166,7 @@ class AdminConnection(DatabaseConnection):
         for row in self.ask_request(request):
             request = "GRANT SELECT, INSERT, DELETE, UPDATE, SHOW VIEW ON " \
                       "openfoodfacts_substitutes.* TO %s ;"
-            values = (row['username'])
+            values = (row['username'],)
             self.send_request(request, values)
 
     def create_user(self, username, password):
@@ -181,6 +181,9 @@ class AdminConnection(DatabaseConnection):
             self.send_request(request, values)
         except:
             self.generate_users_role()
+        request = "SET DEFAULT ROLE openfoodfacts_role FOR %s;"
+        values = (username,)
+        self.send_request(request, values)
 
     def record_user(self, username, nick_name, family_name):
         """Record an entry inside Table Users"""
