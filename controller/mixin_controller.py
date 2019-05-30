@@ -53,7 +53,7 @@ class MixinControllers(QObject):
     def __del__(self):
         """Auto disconnect at end life time"""
 
-        self.disconnect()
+        #self.disconnect()
 
     def connect(self):
         """Connect Signals with Slots"""
@@ -140,12 +140,12 @@ class MixinControllers(QObject):
         ######   Connect for controller   ##############################
             self._model.internet_access.disconnect(self.on_internet_access)
             self._load_categories.finished.disconnect(
-                self.on__load_categories_finished)
+                self.on_load_categories_finished)
             self.load_details_finished.disconnect(
                 self._general_ctrl.on_load_details_finished)
         ######   Connect for messenger   ###############################
             self._load_categories.finished.disconnect(
-                self._messenger.on__load_categories_finished)
+                self._messenger.on_load_categories_finished)
             self.load_details_finished.disconnect(
                 self._messenger.on_load_product_details_finished)
             self._model.internet_access.disconnect(

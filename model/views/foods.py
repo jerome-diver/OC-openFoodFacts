@@ -3,11 +3,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
-from . import MixinViews
+from . import MixinModelsView
 from settings import DEBUG_MODE
 
 
-class FoodsModel(MixinViews, QStandardItemModel):
+class FoodsModel(MixinModelsView, QStandardItemModel):
     """Mainwindow foods view model"""
 
     def __init__(self, **kargs):

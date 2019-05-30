@@ -5,11 +5,11 @@ import re
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
-from . import MixinViews
+from . import MixinModelsView
 from settings import DEBUG_MODE
 
 
-class CategoriesModel(MixinViews, QStandardItemModel):
+class CategoriesModel(MixinModelsView, QStandardItemModel):
     """categories view model"""
 
     def __init__(self, **kargs):

@@ -118,6 +118,7 @@ class Controller(QObject):
                 self._authenticate.user.is_admin())
             self._window.record.setHidden(True)
             if isinstance(self._current_mode, OpenFoodFactsMode):
+                self._current_mode.disconnect()
                 self._current_mode = None
             if not self._current_mode:
                 self._current_mode = DatabaseMode(general_ctrl=self)
@@ -142,6 +143,7 @@ class Controller(QObject):
             self._authenticate.user.connection.connect_to_off_db(
                 self._authenticate.user.is_admin())
             if isinstance(self._current_mode, DatabaseMode):
+                self._current_mode.disconnect()
                 self._current_mode = None
             if not self._current_mode:
                 self._current_mode = OpenFoodFactsMode(general_ctrl=self)
@@ -185,7 +187,7 @@ class Controller(QObject):
     def on_load_details_finished(self):
         """When product substitutes checked details are loaded..."""
 
-        if isinstance(self._curent_mode, OpenFoodFactsMode):
+        if isinstance(self._current_mode, OpenFoodFactsMode):
             self._flags["checked_product"] = bool(
                 self._current_mode.model.substitutes.checked)
             self._flags["checked_details"] = bool(
@@ -250,8 +252,6 @@ class Controller(QObject):
         self._current_mode.model.substitutes.reset_checkboxes()
         self._current_mode.model.reset_models()
         self._current_mode.initialize()
-
-
 
     @property
     def window(self):

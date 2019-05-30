@@ -1,7 +1,7 @@
-"""Mixin class to share attributes and own Propêrties to use"""
+"""Mixin class to share attributes and own Properties to use"""
 
 
-class MixinViews():
+class MixinModelsView():
     """Mix-ins class for share DRY properties of models-views:
     [categories, substitutes, foods]"""
 

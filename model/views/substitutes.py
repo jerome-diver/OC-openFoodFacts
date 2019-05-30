@@ -3,12 +3,12 @@
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 from PyQt5.QtCore import Qt
 
-from . import MixinViews
+from . import MixinModelsView
 from settings import DEBUG_MODE
 
 
 
-class SubstitutesModel(MixinViews, QStandardItemModel):
+class SubstitutesModel(MixinModelsView, QStandardItemModel):
     """MainWindow substitutes view model"""
 
     def __init__(self, **kargs):

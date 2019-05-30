@@ -60,10 +60,11 @@ class OpenFoodFacts(MixinModels):
             foods = openfoodfacts.products.get_by_category(category, page=page)
         except:
             self.internet_access.emit(False)
+        else:
+            self.internet_access.emit(True)
+            normalize_foods_products(foods)
+        finally:
             return foods
-        self.internet_access.emit(True)
-        normalize_foods_products(foods)
-        return foods
 
     def download_product(self, code, name):
         """Return product for this code"""

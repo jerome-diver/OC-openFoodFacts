@@ -1,6 +1,6 @@
 """Module import files"""
 
-from .mixins import MixinViews
+from .mixin_models_view import MixinModelsView
 from .categories import CategoriesModel
 from .foods import FoodsModel
 from .substitutes import SubstitutesModel

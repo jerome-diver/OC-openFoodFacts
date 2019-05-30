@@ -408,4 +408,3 @@ class UserConnection(DatabaseConnection):
                   "AND user_id = %s ;"
         values = (food_substitute, food_code, user_id)
         self.send_request(request, values)
-
