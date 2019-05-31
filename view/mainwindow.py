@@ -6,15 +6,14 @@ from PyQt5.QtGui import QStandardItemModel, QPixmap
 from PyQt5.QtCore import pyqtSlot, QSortFilterProxyModel
 
 from ui import Ui_MainWindow
-from controller import Widget
+from enumerator import Widget
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """Main Window application"""
 
-    def __init__(self, controller):
+    def __init__(self):
         super().__init__()
-        self.controller = controller
         self.setupUi(self)
         self.record.setDisabled(True)
         self.openfoodfacts_mode.setChecked(False)
