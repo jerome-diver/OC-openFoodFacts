@@ -87,10 +87,10 @@ class FoodsModel(MixinModelsView, QStandardItemModel):
         return self._selected_details
 
     @selected_details.setter
-    def selected_details(self, value):
+    def selected_details(self, details):
         """Setter for property of dict selected food details"""
 
-        self._selected_details = value
+        self._selected_details = details
 
     @property
     def selected(self):

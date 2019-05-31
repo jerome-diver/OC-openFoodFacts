@@ -19,3 +19,12 @@ class Widget(Enum):
     FOODS = 3
     SUBSTITUTES = 4
     DETAILS = 5
+
+
+class TypeConnection(Enum):
+    """Type of connection"""
+
+    ADMIN_CONNECTED = 1
+    USER_CONNECTED = 2
+    USER_DISCONNECTED = 3
+

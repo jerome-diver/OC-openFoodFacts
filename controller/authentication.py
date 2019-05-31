@@ -3,8 +3,9 @@
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
 
+from enumerator import TypeConnection
 from model import DatabaseConnection, AdminConnection, \
-                  UserConnection, TypeConnection, User
+                  UserConnection, User
 from view import SignUp, SignIn
 
 
@@ -21,8 +22,8 @@ class Authentication(QObject):
         self._user = None
         self.define_user(AdminConnection())
         self.initialize_database()
-        self._sign_in = SignIn(self)
-        self._sign_up = SignUp(self)
+        self._sign_in = SignIn(controller=self)
+        self._sign_up = SignUp(controller=self)
         self.connect_signals()
 
     def define_user(self, type):

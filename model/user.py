@@ -2,17 +2,10 @@
 it empty if not"""
 
 import pymysql
-from enum import Enum
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from settings import DEBUG_MODE
 from model import AdminConnection
-
-
-class TypeConnection(Enum):
-    ADMIN_CONNECTED = 1
-    USER_CONNECTED = 2
-    USER_DISCONNECTED = 3
 
 
 class User(QObject):

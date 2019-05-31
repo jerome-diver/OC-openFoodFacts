@@ -3,7 +3,7 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QItemSelection, \
                         QModelIndex
 
-from controller import Mode
+from enumerator import Mode
 from settings import DEBUG_MODE
 
 

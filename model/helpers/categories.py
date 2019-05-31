@@ -4,8 +4,7 @@
 class CategoriesHelper:
 
     def __init__(self, user):
-        self._user = user
-        self._connection = user.connection
+        super().__init__(user)
 
     def records_concerned(self):
         """Tell if category exist in local connection table categories"""
@@ -20,17 +19,4 @@ class CategoriesHelper:
             for row in self._connection.ask_request(request, value):
                 categories.append(row["category_id"])
         return categories
-
-    @property
-    def user(self):
-        """User property access"""
-
-        return self._user
-
-    @user.setter
-    def user(self, usr):
-        """Setter property for user"""
-
-        self._user = usr
-        self._connection = usr.connection
 

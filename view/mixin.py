@@ -2,8 +2,12 @@
 
 from PyQt5.QtCore import pyqtSlot, QObject
 
-class Share(QObject):
+class MixinSigns(QObject):
     '''Share methods'''
+
+    def __init__(self, **kargs):
+        super().__init__()
+        self.controller = kargs["controller"]
 
     @pyqtSlot()
     def on_reset_status(self):

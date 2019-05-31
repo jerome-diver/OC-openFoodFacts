@@ -13,7 +13,7 @@ class MixinControllers(QObject):
     """Slots for controllers OpenFoodFactsMode and DatabaseMode"""
 
     status_message = pyqtSignal(str)
-    checked_start = pyqtSignal(str)
+    checked_start = pyqtSignal()
     
     def __init__(self, **kargs):
         super().__init__()

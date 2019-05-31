@@ -68,4 +68,3 @@ class CategoriesModel(MixinModelsView, QStandardItemModel):
                     item_name.setForeground(QColor(16, 133, 22))
                 else:
                     item_name.setForeground(QColor(0, 0, 0))
-

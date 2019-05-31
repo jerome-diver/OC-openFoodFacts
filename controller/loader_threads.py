@@ -5,7 +5,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, \
                          QThread
 
 from settings import DEBUG_MODE
-from controller import Mode
+from enumerator import Mode
 
 
 class LoadCategories(QThread):

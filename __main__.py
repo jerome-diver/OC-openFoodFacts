@@ -3,5 +3,5 @@
 from controller import Controller, Authentication
 
 if __name__ == "__main__":
-    APPLICATION = Controller()
-    AUTHENTICATION = Authentication(APPLICATION)
+    GENERAL_CONTROLLER = Controller()
+    AUTHENTICATION = Authentication(GENERAL_CONTROLLER)

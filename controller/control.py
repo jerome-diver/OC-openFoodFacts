@@ -6,7 +6,8 @@ from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 from controller import DatabaseMode, OpenFoodFactsMode, \
                        UpdateCategories, Authentication
-from model import OpenFoodFacts, User, TypeConnection, AdminConnection
+from model import OpenFoodFacts, User
+from enumerator import TypeConnection
 from view import MainWindow
 from settings import DEBUG_MODE
 
@@ -194,14 +195,14 @@ class Controller(QObject):
                 self._current_mode.model.product_details.checked)
         self.checked_substitutes()
 
-    @pyqtSlot(str)
-    def on_checked_started(self, mode):
+    @pyqtSlot()
+    def on_checked_started(self):
         """Slot for receipt signal to said if substitutes list any selection"""
 
         self._flags["checked_product"] = True
-        if mode == "OFF_MODE":
+        if isinstance(self._current_mode, OpenFoodFactsMode):
             self._flags["checked_details"] = False
-        elif mode == "LOCAL_DB_MODE":
+        elif isinstance(self._current_mode, DatabaseMode):
             self._flags["checked_details"] = True
         self.checked_substitutes()
 

@@ -5,8 +5,7 @@ from settings import DEBUG_MODE
 class FoodsHelper:
 
     def __init__(self, user):
-        self._user = user
-        self._connection = user.connection
+        super().__init__(user)
 
     def records_concerned(self, category_id):
         """Tell if category exist in local connection table categories"""
@@ -35,19 +34,6 @@ class FoodsHelper:
             for row in self._connection.ask_request(request, values):
                 foods.append(row["food_code"])
         return foods
-
-    @property
-    def user(self):
-        """User property access"""
-
-        return self._user
-
-    @user.setter
-    def user(self, usr):
-        """Setter property for user"""
-
-        self._user = usr
-        self._connection = usr.connection
 
     @property
     def connection(self):

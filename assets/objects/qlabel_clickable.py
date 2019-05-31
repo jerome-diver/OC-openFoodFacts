@@ -1,10 +1,11 @@
-'''QLabel but with click event signal from mouse click'''
+"""QLabel but with click event signal from mouse click"""
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLabel
 
+
 class QLabelClickable(QLabel):
-    '''QLabel + clicked signal event for mouse click'''
+    """QLabel + clicked signal event for mouse click"""
 
     clicked = pyqtSignal()
 
@@ -12,6 +13,6 @@ class QLabelClickable(QLabel):
         super().__init__(parent)
 
     def mousePressEvent(self, ev):
-        '''Event from mouse click'''
+        """Event from mouse click"""
 
         self.clicked.emit()

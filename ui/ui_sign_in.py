@@ -10,7 +10,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_SignIn(object):
+    """From Qt Designer, make a PyQt5 Graphic User Interface"""
+
     def setupUi(self, SignIn):
+        """ Setup the GUI"""
+
         SignIn.setObjectName("SignIn")
         SignIn.resize(400, 200)
         SignIn.setMinimumSize(QtCore.QSize(400, 200))
@@ -94,6 +98,8 @@ class Ui_SignIn(object):
         QtCore.QMetaObject.connectSlotsByName(SignIn)
 
     def retranslateUi(self, SignIn):
+        """Give a translatable name of QWidgets Labels texts"""
+
         _translate = QtCore.QCoreApplication.translate
         SignIn.setWindowTitle(_translate("SignIn", "Connexion à la base de donnée locale"))
         self.label_username.setText(_translate("SignIn", "nom d\'utilisateur"))
