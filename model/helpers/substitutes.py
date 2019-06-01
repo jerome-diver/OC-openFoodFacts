@@ -1,6 +1,6 @@
 """Substitutes model of view helper"""
 
-from model.helpers import MixinHelpers
+from . import MixinHelpers
 
 
 class SubstitutesHelper(MixinHelpers):

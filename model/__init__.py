@@ -2,8 +2,6 @@
 
 from .database import DatabaseConnection, AdminConnection, UserConnection
 from .user import User
-#from .helpers import MixinHelpers
-#from .views import MixinModelsView
 from .helpers import CategoriesHelper, FoodsHelper, \
     SubstitutesHelper
 from .views import CategoriesModel, FoodsModel, \

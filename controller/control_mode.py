@@ -209,6 +209,7 @@ class DatabaseMode(MixinControllers, QObject):
         product_details = self._model.get_product_details(code)
         self._model.product_details.populate(product_details)
         self._window.show_substitutes(self._model.substitutes)
+        self._window.show_product_details(self._model.product_details.models)
 
     @pyqtSlot(QItemSelection, QItemSelection)
     def on_substitute_selection_changed(self, selected, deselected):

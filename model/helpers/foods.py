@@ -1,6 +1,6 @@
 """Foods model of view helper"""
 from settings import DEBUG_MODE
-from model.helpers import MixinHelpers
+from . import MixinHelpers
 
 
 class FoodsHelper(MixinHelpers):
