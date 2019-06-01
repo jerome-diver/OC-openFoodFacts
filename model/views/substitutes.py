@@ -23,7 +23,8 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
         then selected one and without empty product_name substitutes"""
 
         selected = foods.selected
-        user_state = self._user.is_connected()
+        user_state = self._user.is_connected() \
+                     and not self._user.is_admin()
         if DEBUG_MODE:
             print("=====  S u b s t i t u t e s M o d e l  =====")
             print("Populate categories view")
@@ -103,7 +104,7 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
         """Find and colored in green substitutes for user connected
         inside local database"""
 
-        if self._user.is_connected():
+        if self._user.is_connected() and not self._user.is_admin():
             ldb_substitutes = self._helper.records_concerned(selected_category)
             for index in range(self.rowCount()):
                 item_name = self.item(index, 0)

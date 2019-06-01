@@ -23,7 +23,8 @@ class FoodsModel(MixinModelsView, QStandardItemModel):
         """Return the list wiew of foods for give category string
         with openfoodfacts library helper"""
 
-        user_state = self._user.is_connected()
+        user_state = self._user.is_connected() \
+                     and not self._user.is_admin()
         if DEBUG_MODE:
             print("=====  F o o d s M o d e l  =====")
             print("Populate categories view")
@@ -66,7 +67,8 @@ class FoodsModel(MixinModelsView, QStandardItemModel):
         """Find and colored in green foods for user connected inside local
         database"""
 
-        user_state = self._user.is_connected()
+        user_state = bool(self._user.is_connected() \
+                          and not self._user.is_admin())
         if user_state:
             ldb_foods = self._helper.records_concerned(self._category_id)
             for index in range(self.rowCount()):
