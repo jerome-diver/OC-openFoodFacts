@@ -14,7 +14,7 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
     def __init__(self, **kargs):
         kargs["parent"] = kargs["views"]["substitutes"]
         super().__init__(**kargs)
-        #self.setHorizontalHeaderLabels(["Nom", "Grade", "Code"])
+        self.setHorizontalHeaderLabels(["Nom", "Score", "Code"])
         self._checked = []
 
     def populate(self, foods, substitutes, page=0, new=True):
@@ -79,17 +79,22 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
         self._checked = []
         self.removeRows(0, self.rowCount())
 
-    def generate_checked(self):
-        """Update list of checked item codes"""
+    def update_checked(self, index, code):
+        """Update checked list of codes from index selection"""
 
-        self._checked = []
-        for index in range(self.rowCount()):
-            item = self.item(index, 0)
-            code = self.item(index, 2).text()
-            if item.checkState() == Qt.Checked:
-                self._checked.append(code)
-        if DEBUG_MODE:
-            print("checked list:", self._checked)
+        item = self.item(index.row(), 0)
+        if item.checkState() == Qt.Checked:
+            self._checked.append(code)
+            if DEBUG_MODE:
+                print("checked list after add:", self._checked)
+            return True
+        else:
+            if code in self._checked:
+                self._checked.remove(code)
+            if DEBUG_MODE:
+                print("======  S u b s t i t u t e s M o d e l s  ======")
+                print("checked list after remove:", self._checked)
+            return False
 
     def reset_checkboxes(self):
         """Un-check all checkboxes from item column 0 in this model
@@ -99,6 +104,7 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
             item = self.item(index, 0)
             if item.checkState() == Qt.Checked:
                 item.setCheckState(Qt.Unchecked)
+        self._checked = []
 
     def find_substitutes_in_database(self, selected_category):
         """Find and colored in green substitutes for user connected

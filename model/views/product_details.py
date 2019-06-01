@@ -9,7 +9,7 @@ from settings import NUTRISCORE_A, NUTRISCORE_B, NUTRISCORE_C, \
 
 
 class ProductDetailsModels():
-    """Mainwindow product details views models"""
+    """MainWindow product details views models"""
 
     def __init__(self, views):
         self._views = views
@@ -78,7 +78,8 @@ class ProductDetailsModels():
     def define_with(var, food):
         """define variables records datas"""
 
-        var["code"] = food["code"]
+        var["code"] = food["code"] if "code" in food \
+                      else food["codes_tags"][1]
         var["name"] = food["product_name_fr"]
         var["description"] = food["ingredients_text"]
         var["shops_names"] = []
@@ -110,13 +111,14 @@ class ProductDetailsModels():
         self._models["packaging"] = ""
         self._models["img_thumb"] = QPixmap()
         self._checked = {}
+        print("======== RESET ProductDetailsModels ======")
 
-    def generate_checked(self, product, substitutes_checked):
-        """Generate checked list of products details from products checked"""
+    def update_checked(self, details, add=True):
+        """Update checked dictionary with nex code"""
 
         data = {}
-        self.define_with(data, product)
-        if product["code"] in substitutes_checked:
+        self.define_with(data, details)
+        if add:
             self._checked[data["code"]] = (
                 data["name"],
                 data["description"],
@@ -127,8 +129,12 @@ class ProductDetailsModels():
                 data["img_url"],
                 data["shops_names"])
         else:
-            if product["codes_tags"][1] in self._checked.keys():
-                del self._checked[product["codes_tags"][1]]
+            if data["code"] in self._checked:
+                del self._checked[data["code"]]
+        if DEBUG_MODE:
+            print("=======  P r o d u c t D e t a i l s M o d e l s  =======")
+            print("details keys list:", self._checked.keys())
+            print("detals list:", self._checked)
 
     @property
     def models(self):

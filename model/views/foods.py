@@ -53,7 +53,7 @@ class FoodsModel(MixinModelsView, QStandardItemModel):
                     name.setForeground(QColor(16, 133, 22))
                 else:
                     name.setForeground(QColor(0, 0, 0))
-                self.appendRow([name, code, score])
+                self.appendRow([name, score, code])
         self.sort(0)
 
     def reset(self):

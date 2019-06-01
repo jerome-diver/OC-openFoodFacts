@@ -188,11 +188,10 @@ class Controller(QObject):
     def on_load_details_finished(self):
         """When product substitutes checked details are loaded..."""
 
-        if isinstance(self._current_mode, OpenFoodFactsMode):
-            self._flags["checked_product"] = bool(
-                self._current_mode.model.substitutes.checked)
-            self._flags["checked_details"] = bool(
-                self._current_mode.model.product_details.checked)
+        self._flags["checked_product"] = bool(
+            self._current_mode.model.substitutes.checked)
+        self._flags["checked_details"] = bool(
+            self._current_mode.model.product_details.checked)
         self.checked_substitutes()
 
     @pyqtSlot()

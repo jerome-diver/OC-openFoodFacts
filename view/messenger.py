@@ -16,6 +16,7 @@ class Messenger(QObject):
         super().__init__()
         self._ctrl = controller
         self._flags = flags
+        self.status_message.connect(self._ctrl.window.on_status_message)
 
     @pyqtSlot()
     def on_load_categories_finished(self):
@@ -91,9 +92,10 @@ class Messenger(QObject):
         foods list view"""
 
         self._flags["product"] = False
-        self.status_message.emit("Patientez, recherche des produits "
-                                 "de substitutions proposés en cours "
-                                 "sur Open Food Facts...")
+        code = self._ctrl.model.foods.index(index.row(), 2).data()
+        self.status_message.emit("Patientez, recherche du substitut "
+                                 "pour (code {} ) en cours sur "
+                                 "Open Food Facts...".format(code))
 
     @pyqtSlot(QItemSelection, QItemSelection)
     def on_substitute_selection_changed(self, selected, deselected):
