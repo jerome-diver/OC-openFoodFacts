@@ -12,16 +12,17 @@ class FoodsHelper(MixinHelpers):
     def records_concerned(self, category_id):
         """Tell if category exist in local connection table categories"""
 
-        request = "SELECT DISTINCT fc.food_code  "\
-                  "FROM food_categories AS fc, " \
-                  "     user_foods AS uf "\
-                  "WHERE fc.food_code = uf.food_code "\
-                  "AND fc.category_id = %s "\
-                  "AND uf.user_id = %s " \
-                  "ANd fc.food_code IN (" \
-                  "     SELECT DISTINCT food_code " \
-                  "     FROM food_substitutes " \
-                  "     WHERE user_id = %s) ;"
+        request = """
+            SELECT DISTINCT fc.food_code 
+            FROM food_categories AS fc, 
+                user_foods AS uf 
+            WHERE fc.food_code = uf.food_code 
+                AND fc.category_id = %s 
+                AND uf.user_id = %s 
+                ANd fc.food_code IN ( 
+                    SELECT DISTINCT food_code 
+                    FROM food_substitutes 
+                    WHERE user_id = %s) ;"""
 
         foods = []
         if self._user:

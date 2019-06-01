@@ -238,5 +238,5 @@ class DatabaseMode(MixinControllers, QObject):
         ms.generate_checked()
         product_details = self._model.get_product_details(code)
         mpd.generate_checked(product_details, ms.checked)
-        self.checked_start.emit("LOCAL_DB_MODE")
+        self.checked_start.emit()
 

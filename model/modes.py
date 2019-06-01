@@ -146,13 +146,15 @@ class LocalDatabase(MixinModels):
 
         foods = []
         request = """
-            SELECT f.name, f.code, f.score 
+            SELECT DISTINCT f.name, f.code, f.score 
                 FROM foods AS f, 
                      food_categories AS fc,
+                     food_substitutes AS fs,
                      user_foods AS uf 
                 WHERE fc.food_code = f.code
                 AND uf.food_code = f.code 
-                AND fc.category_id = %s
+                AND fc.category_id = %s 
+                AND fs.food_code = f.code 
                 AND uf.user_id = %s ;"""
         values = (category, self._user.id)
         for row in self._connection.ask_request(request, values):
