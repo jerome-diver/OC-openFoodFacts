@@ -11,6 +11,7 @@ from settings import GRANT_USER, GRANT_USER_PASSWD, DB_PORT, \
 
 
 class DatabaseConnection(QObject):
+    """Shared methods for Admin and Normal User operations"""
 
     status_message = pyqtSignal(str)
 
@@ -139,6 +140,7 @@ class DatabaseConnection(QObject):
 
 
 class AdminConnection(DatabaseConnection):
+    """Connection for Admin Database user operations"""
 
     def __init__(self):
         super().__init__()
@@ -291,6 +293,7 @@ class AdminConnection(DatabaseConnection):
 
 
 class UserConnection(DatabaseConnection):
+    """Connection for noraml access database user operations"""
 
     def connect(self, user, password, database):
         """Connect database for ADMIN"""

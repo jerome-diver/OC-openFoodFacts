@@ -1,5 +1,6 @@
 """Mixin class for models-views helpers shared RDY code"""
 
+
 class MixinHelpers:
     """Mixin models-view helpers"""
 

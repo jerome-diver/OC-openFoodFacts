@@ -22,8 +22,8 @@ class Authentication(QObject):
         self._user = None
         self.define_user(AdminConnection())
         self.initialize_database()
-        self._sign_in = SignIn(controller=self)
-        self._sign_up = SignUp(controller=self)
+        self._sign_in = SignIn()
+        self._sign_up = SignUp()
         self.connect_signals()
 
     def define_user(self, type):
@@ -50,13 +50,11 @@ class Authentication(QObject):
     def connect_signals(self):
         """Let's connect signals to slots for concerned controller"""
 
-        self._sign_in.cancel.clicked.connect(self.on_close)
         self._sign_in.connection.clicked.connect(self.connect_user)
-        self._sign_in.username.textChanged.connect(self._sign_in.on_reset_status)
-        self._sign_in.password.textChanged.connect(self._sign_in.on_reset_status)
-        self._sign_up.cancel.clicked.connect(self.on_close)
+        self._sign_in.cancel.clicked.connect(self.on_close)
         self._sign_up.username.textChanged.connect(self.on_username_changed)
         self._sign_up.record.clicked.connect(self.new_user)
+        self._sign_up.cancel.clicked.connect(self.on_close)
         self.status_message.connect(self._sign_in.on_status)
         self.status_message.connect(self._sign_up.on_status)
 

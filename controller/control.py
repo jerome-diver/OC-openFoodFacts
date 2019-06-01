@@ -22,7 +22,7 @@ class Controller(QObject):
         super().__init__()
         self._app = QApplication([])
         self._authenticate = Authentication()
-        self._window = MainWindow(self)
+        self._window = MainWindow()
         self._window.show()
         self._current_mode = None
         self._flags = dict(user_connected=False,

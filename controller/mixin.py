@@ -3,8 +3,9 @@
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 import webbrowser
 
+from enumerator import Mode
 from view import Messenger
-from . import ThreadsController, LoadCategories, Mode
+from . import ThreadsController, LoadCategories
 from model import LocalDatabase, OpenFoodFacts
 from settings import DEBUG_MODE
 

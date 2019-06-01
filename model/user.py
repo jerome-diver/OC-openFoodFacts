@@ -4,8 +4,8 @@ it empty if not"""
 import pymysql
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from settings import DEBUG_MODE
 from model import AdminConnection
+from settings import DEBUG_MODE
 
 
 class User(QObject):

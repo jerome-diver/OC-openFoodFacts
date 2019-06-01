@@ -1,6 +1,7 @@
 """Sign-up Qt-5 Dialog view"""
 
 from PyQt5.QtWidgets import QDialog, QLineEdit
+from PyQt5.QtCore import pyqtSlot
 
 from ui import Ui_SignUp
 from view.mixin import MixinSigns
@@ -49,3 +50,8 @@ class SignUp(QDialog, Ui_SignUp, MixinSigns):
         self.password.setText("")
         self.passwd_confirm.setText("")
 
+
+    @pyqtSlot(str)
+    def on_status(self, message):
+
+        super(SignUp, self).on_status(message)

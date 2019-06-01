@@ -1,7 +1,10 @@
 """Substitutes model of view helper"""
 
+from model.helpers import MixinHelpers
 
-class SubstitutesHelper:
+
+class SubstitutesHelper(MixinHelpers):
+    """Helper for Substitutes"""
 
     def __init__(self, user):
         super().__init__(user)

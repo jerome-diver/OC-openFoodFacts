@@ -6,7 +6,7 @@ from . import User
 from . import CategoriesModel, FoodsModel, \
     SubstitutesModel, ProductDetailsModels
 from . import CategoriesHelper, FoodsHelper, SubstitutesHelper
-from controller import Widget
+from enumerator import Widget
 from settings import DEBUG_MODE
 
 

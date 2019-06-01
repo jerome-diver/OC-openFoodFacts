@@ -1,8 +1,10 @@
 """module import file"""
 
-from .user import User
 from .database import DatabaseConnection, AdminConnection, UserConnection
-from .helpers import MixinHelpers, CategoriesHelper, FoodsHelper, \
+from .user import User
+#from .helpers import MixinHelpers
+#from .views import MixinModelsView
+from .helpers import CategoriesHelper, FoodsHelper, \
     SubstitutesHelper
 from .views import CategoriesModel, FoodsModel, \
                    SubstitutesModel, ProductDetailsModels

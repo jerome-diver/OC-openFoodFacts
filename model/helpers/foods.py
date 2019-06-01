@@ -1,8 +1,10 @@
 """Foods model of view helper"""
 from settings import DEBUG_MODE
+from model.helpers import MixinHelpers
 
 
-class FoodsHelper:
+class FoodsHelper(MixinHelpers):
+    """Helper for Foods"""
 
     def __init__(self, user):
         super().__init__(user)

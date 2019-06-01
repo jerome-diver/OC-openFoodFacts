@@ -1,7 +1,10 @@
 """Categories model of view helper"""
 
+from model.helpers import MixinHelpers
 
-class CategoriesHelper:
+
+class CategoriesHelper(MixinHelpers):
+    """Helper for Categories"""
 
     def __init__(self, user):
         super().__init__(user)
