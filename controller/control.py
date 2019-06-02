@@ -27,7 +27,8 @@ class Controller(QObject):
         self._current_mode = None
         self._flags = dict(user_connected=False,
                            checked_product=False,
-                           checked_details=False)
+                           checked_details=False,
+                           end_tasks=False)
         self.connect_signals()
         self._window.local_mode.setDisabled(True)
         self._window.remove.setDisabled(True)
@@ -166,7 +167,7 @@ class Controller(QObject):
         button recorded for local database has to be disabled"""
 
         self._window.record.setEnabled(False)
-        self._window.record.setDisabled(True)
+        self._window.remove.setEnabled(False)
         if self._flags["user_connected"] != TypeConnection.USER_CONNECTED:
             self._window.record.setText("Aucun utilisateur connecté")
             self._window.remove.setText("Aucun utilisateur connecté")
@@ -178,6 +179,9 @@ class Controller(QObject):
                                         "pour la sélection")
             self._window.remove.setText("Attendez, recherche des détails "
                                         "pour la sélection")
+        elif not self._flags["end_tasks"]:
+            self._window.record.setText(("Recherches en cours..."))
+            self._window.remove.setText(("Recherches en cours..."))
         else:
             self._window.record.setText("Enregistrer dans ma base de donnée")
             self._window.remove.setText("Supprimer de ma base de donnée")
@@ -192,6 +196,9 @@ class Controller(QObject):
             self._current_mode.model.substitutes.checked)
         self._flags["checked_details"] = bool(
             self._current_mode.model.product_details.checked)
+        self._flags["end_tasks"] = bool(
+            len(self._current_mode.model.substitutes.checked) ==
+            len(self._current_mode.model.product_details.checked))
         self.checked_substitutes()
 
     @pyqtSlot()
