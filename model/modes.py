@@ -149,13 +149,11 @@ class LocalDatabase(MixinModels):
             SELECT DISTINCT f.name, f.code, f.score 
                 FROM foods AS f, 
                      food_categories AS fc,
-                     food_substitutes AS fs,
-                     user_foods AS uf 
-                WHERE fc.food_code = f.code
-                AND uf.food_code = f.code 
+                     food_substitutes AS fs
+                WHERE f.code = fc.food_code
                 AND fc.category_id = %s 
                 AND fs.food_code = f.code 
-                AND uf.user_id = %s ;"""
+                AND fs.user_id = %s ;"""
         values = (category, self._user.id)
         for row in self._connection.ask_request(request, values):
             food = {"product_name_fr": row["name"],
@@ -197,8 +195,7 @@ class LocalDatabase(MixinModels):
     def get_product_details(self, code):
         """Get product details from code and name"""
 
-        request = """
-            SELECT * FROM foods WHERE code = %s ;"""
+        request = "SELECT * FROM foods WHERE code = %s ;"
         values = (code,)
         for row in self._connection.ask_request(request, values):
             product_details = {

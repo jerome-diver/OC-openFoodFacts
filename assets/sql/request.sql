@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS food_shops (
     CONSTRAINT unique_food_shops
         UNIQUE (shop_name, food_code)) ENGINE = InnoDB;
 CREATE ROLE IF NOT EXISTS openfoodfacts_role;
-GRANT SELECT, INSERT, UPDATE, DELETE, SHOW VIEW
+GRANT SELECT, INSERT, UPDATE, DELETE, SHOW VIEW, EXECUTE
   ON openfoodfacts_substitutes.* TO openfoodfacts_role;
 CREATE TRIGGER IF NOT EXISTS foods_without_user
   AFTER DELETE ON user_foods FOR EACH ROW
@@ -94,8 +94,7 @@ CREATE TRIGGER IF NOT EXISTS foods_without_user
         (SELECT DISTINCT food_code FROM user_foods);
 CREATE TRIGGER IF NOT EXISTS foods_without_substitute
   AFTER DELETE ON food_substitutes FOR EACH ROW
-    DELETE FROM foods
-      WHERE code NOT IN
+    DELETE FROM foods WHERE code NOT IN
         (SELECT DISTINCT substitute_code FROM food_substitutes)
       AND code NOT IN
         (SELECT DISTINCT food_code FROM food_substitutes);
@@ -103,3 +102,20 @@ CREATE TRIGGER IF NOT EXISTS shops_without_food
   AFTER DELETE ON food_shops FOR EACH ROW
     DELETE FROM shops WHERE name NOT IN
     (SELECT DISTINCT shop_name FROM food_shops);
+CREATE DEFINER=openfoodfacts_role PROCEDURE IF NOT EXISTS
+remove_foods_without_substitute()
+  MODIFIES SQL DATA
+    DELETE FROM foods WHERE code NOT IN
+      (SELECT DISTINCT substitute_code FROM food_substitutes)
+    AND code NOT IN
+      (SELECT DISTINCT food_code FROM food_substitutes);
+CREATE DEFINER=openfoodfacts_role PROCEDURE IF NOT EXISTS
+remove_shops_without_food()
+  MODIFIES SQL DATA
+    DELETE FROM shops WHERE name NOT IN
+      (SELECT DISTINCT shop_name FROM food_shops);
+CREATE DEFINER=openfoodfacts_role PROCEDURE IF NOT EXISTS
+remove_foods_without_user()
+  MODIFIES SQL DATA
+    DELETE FROM foods WHERE code NOT IN
+      (SELECT DISTINCT food_code FROM user_foods);

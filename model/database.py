@@ -129,7 +129,7 @@ class DatabaseConnection(QObject):
 
         return bool(self._connection and self._connection.open)
 
-    def connect_to_off_db(self, admin=None):
+    def connect_to_off_db(self, admin=False):
         """Connect the current user on database"""
 
         if not admin:
@@ -166,8 +166,9 @@ class AdminConnection(DatabaseConnection):
 
         request = "SELECT username FROM users;"
         for row in self.ask_request(request):
-            request = "GRANT SELECT, INSERT, DELETE, UPDATE, SHOW VIEW ON " \
-                      "openfoodfacts_substitutes.* TO %s ;"
+            request = "GRANT openfoodfacts_role TO %s;"
+            #request = "GRANT SELECT, INSERT, DELETE, UPDATE, EXECUTE, " \
+            #          "SHOW VIEW ON openfoodfacts_substitutes.* TO %s ;"
             values = (row['username'],)
             self.send_request(request, values)
 
@@ -399,8 +400,19 @@ class UserConnection(DatabaseConnection):
     def del_record(self, selected, substitutes, user_id):
         """Remove selected products from database"""
 
-        for substitute in substitutes:
-            self._delete_substitute(user_id, selected, substitute)
+        try:
+            for substitute in substitutes:
+                self._delete_substitute(user_id, selected, substitute)
+            request = "CALL remove_foods_without_user;"
+            self.send_request(request)
+            request = "CALL remove_foods_without_substitute;"
+            self.send_request(request)
+            request = "CALL remove_shops_without_food;"
+            self.send_request(request)
+        except:
+            return False
+        else:
+            return True
 
     def _delete_substitute(self, user_id, food_code, food_substitute):
         """Delete product from database"""
