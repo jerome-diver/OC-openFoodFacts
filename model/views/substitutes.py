@@ -39,38 +39,38 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
             if DEBUG_MODE:
                 print("categories found in Database:", ldb_substitutes)
         for food in substitutes[page]:
-            if DEBUG_MODE:
-                print(food)
-            target = food["nutrition_grades_tags"][0]
-            if food["code"] != selected[0] \
-                    and target != "not-applicable" \
-                    and target != "unknown" \
-                    and target <= selected[1]:
-                item_name = QStandardItem(food["product_name_fr"])
-                item_name.setCheckable(True)
-                item_grade = QStandardItem(food["nutrition_grades_tags"][0])
-                item_code = QStandardItem(food["code"])
-                if DEBUG_MODE:
-                    print("populate:", food["product_name_fr"])
-                color_t = self._views["bg_color"]
-                color = QColor(color_t[0], color_t[1], color_t[2])
-                test_1 = "brands_tags" not in food.keys()
-                test_2 = "stores_tags" not in food or not food["stores_tags"]
-                if  test_1 and test_2:
-                    color = QColor(255, 0, 0)
-                elif test_1:
-                    color = QColor(255, 102, 0)
-                elif test_2:
-                    color = QColor(255, 50, 0)
-                item_name.setBackground(color)
-                item_code.setBackground(color)
-                if food["code"] in ldb_substitutes:
-                    item_name.setForeground(QColor(16, 133, 22))
-                    item_code.setForeground(QColor(16, 133, 22))
-                else:
-                    item_name.setForeground(QColor(0, 0, 0))
-                    item_code.setForeground(QColor(0, 0, 0))
-                self.appendRow([item_name, item_grade, item_code])
+            if self.trash_dirty_product(food):
+                del food
+            else:
+                target = food["nutrition_grades_tags"][0]
+                if food["code"] != selected[0] \
+                        and target <= selected[1]:
+                    item_name = QStandardItem(food["product_name_fr"])
+                    item_name.setCheckable(True)
+                    item_grade = QStandardItem(food["nutrition_grades_tags"][0])
+                    item_code = QStandardItem(food["code"])
+                    if DEBUG_MODE:
+                        print("populate:", food["product_name_fr"])
+                    color_t = self._views["bg_color"]
+                    color = QColor(color_t[0], color_t[1], color_t[2])
+                    test_1 = "brands_tags" not in food.keys()
+                    test_2 = "stores_tags" not in food or \
+                             not food["stores_tags"]
+                    if  test_1 and test_2:
+                        color = QColor(255, 0, 0)
+                    elif test_1:
+                        color = QColor(255, 102, 0)
+                    elif test_2:
+                        color = QColor(255, 50, 0)
+                    item_name.setBackground(color)
+                    item_code.setBackground(color)
+                    if food["code"] in ldb_substitutes:
+                        item_name.setForeground(QColor(16, 133, 22))
+                        item_code.setForeground(QColor(16, 133, 22))
+                    else:
+                        item_name.setForeground(QColor(0, 0, 0))
+                        item_code.setForeground(QColor(0, 0, 0))
+                    self.appendRow([item_name, item_grade, item_code])
         self.sort(1)
 
     def reset(self):

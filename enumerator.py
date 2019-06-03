@@ -7,8 +7,9 @@ class Mode(Enum):
     """Selector cursor for item selected or item checkbox checked"""
 
     CHECKED = 1
-    SELECTED = 2
-    GET = 3
+    SELECTED_FOOD = 2
+    SELECTED_SUBSTITUTE = 3
+    KILLED = 4
 
 
 class Widget(Enum):

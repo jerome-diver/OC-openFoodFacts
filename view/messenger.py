@@ -50,15 +50,17 @@ class Messenger(QObject):
             print("selected food already for:",
                   self._ctrl.model.foods.selected)
 
-    @pyqtSlot()
-    def on_load_product_details_finished(self):
+    @pyqtSlot(Mode)
+    def on_load_product_details_finished(self, mode):
         """Show details of product from Open Food Facts"""
 
-        if self._flags["call_mode"] is Mode.CHECKED:
+        if mode is Mode.CHECKED:
             self.status_message.emit("Détails des substituts sélectionnés "
                                      "trouvés")
-        else:
+        elif mode is Mode.SELECTED_SUBSTITUTE:
             self.status_message.emit("Détails du substitut choisi affiché")
+        else:
+            self.status_message.emit("Détails du produit choisi affiché")
 
     @pyqtSlot()
     def on_no_product_found(self):

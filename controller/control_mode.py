@@ -96,6 +96,8 @@ class OpenFoodFactsMode(MixinControllers, QObject):
                                   Widget.DETAILS))
         self._window.reset_views((Widget.SUBSTITUTES,
                                   Widget.DETAILS))
+        self._threads.kill_details_threads.emit(Mode.SELECTED_FOOD)
+        self._threads.kill_details_threads.emit(Mode.SELECTED_SUBSTITUTE)
         sub_model = self._model.foods
         name = sub_model.index(index.row(), 0).data()
         score = sub_model.index(index.row(), 1).data()
@@ -107,7 +109,7 @@ class OpenFoodFactsMode(MixinControllers, QObject):
             print("and foods pages is", len(self._model.foods.recorded))
         self._model.substitutes.populate(sub_model, sub_model.recorded)
         self._threads.init_product_details_thread(sub_model, index,
-                                                  Mode.GET)
+                                                  Mode.SELECTED_FOOD)
         self.show_substitutes()
 
     def show_substitutes(self):
@@ -122,19 +124,18 @@ class OpenFoodFactsMode(MixinControllers, QObject):
         if selected.indexes():
             self._model.reset_models((Widget.DETAILS,))
             self._window.reset_views((Widget.DETAILS,))
+            self._threads.kill_details_threads.emit(Mode.SELECTED_SUBSTITUTE)
             index_select = selected.indexes()[0]
-            self._flags["call_mode"] = Mode.SELECTED
             sub_model = self._views["substitutes"].model()
             self._threads.init_product_details_thread(sub_model,
                                                       index_select,
-                                                      Mode.SELECTED)
+                                                      Mode.SELECTED_SUBSTITUTE)
 
     @pyqtSlot('QStandardItem*')
     def on_substitute_checked(self, item):
         """Load, from checkbox (substitutes table view) selected, products
         details"""
 
-        self._flags["call_mode"] = Mode.CHECKED
         sub_model = self._model.substitutes
         index = sub_model.indexFromItem(item)
         self._threads.init_product_details_thread(sub_model,
@@ -203,7 +204,7 @@ class DatabaseMode(MixinControllers, QObject):
         substitutes = self._model.get_substitutes(code)
         self._model.substitutes.populate(sub_model, substitutes)
         self._threads.init_product_details_thread(sub_model, index,
-                                                  Mode.GET)
+                                                  Mode.SELECTED_FOOD)
         self._window.show_substitutes(self._model.substitutes)
 
     @pyqtSlot(QItemSelection, QItemSelection)
@@ -214,18 +215,16 @@ class DatabaseMode(MixinControllers, QObject):
             self._model.reset_models((Widget.DETAILS,))
             self._window.reset_views((Widget.DETAILS,))
             index_select = selected.indexes()[0]
-            self._flags["call_mode"] = Mode.SELECTED
             sub_model = self._views["substitutes"].model()
             self._threads.init_product_details_thread(sub_model,
                                                       index_select,
-                                                      Mode.SELECTED)
+                                                      Mode.SELECTED_SUBSTITUTE)
 
     @pyqtSlot('QStandardItem*')
     def on_substitute_checked(self, item):
         """Load, from checkbox (substitutes table view) selected,
         products details"""
 
-        self._flags["call_mode"] = Mode.CHECKED
         index = self._model.substitutes.indexFromItem(item)
         ms = self._model.substitutes
         self._threads.init_product_details_thread(ms, index, Mode.CHECKED)

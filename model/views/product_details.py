@@ -99,6 +99,8 @@ class ProductDetailsModels():
     def reset(self):
         """Reset models for product details views"""
 
+        if DEBUG_MODE:
+            print("======== RESET ProductDetailsModels ======")
         if self._models["shops"]:
             self._models["shops"].removeRows(0,
                                               self._models["shops"].
@@ -110,8 +112,6 @@ class ProductDetailsModels():
         self._models["brand"] = ""
         self._models["packaging"] = ""
         self._models["img_thumb"] = QPixmap()
-        self._checked = {}
-        print("======== RESET ProductDetailsModels ======")
 
     def update_checked(self, details, add=True):
         """Update checked dictionary with nex code"""
@@ -148,3 +148,8 @@ class ProductDetailsModels():
 
         return self._checked
 
+    @checked.setter
+    def checked(self, dct):
+        """Reset checked dictionary"""
+
+        self._checked = {}

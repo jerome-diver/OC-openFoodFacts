@@ -188,7 +188,6 @@ class Controller(QObject):
             self._window.record.setEnabled(True)
             self._window.remove.setEnabled(True)
 
-    @pyqtSlot()
     def on_load_details_finished(self):
         """When product substitutes checked details are loaded..."""
 
@@ -259,7 +258,6 @@ class Controller(QObject):
     def _refresh_views(self):
         """Refresh all views for concerned mode's running"""
 
-        #self._current_mode.model.substitutes.reset_checkboxes()
         self._current_mode.model.reset_models()
         self._window.reset_views()
         self._current_mode.initialize()

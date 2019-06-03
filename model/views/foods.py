@@ -37,16 +37,11 @@ class FoodsModel(MixinModelsView, QStandardItemModel):
         if new:
             self.reset()
         for food in foods:
-            key = "product_name_fr"
-            if key not in food:
-                del food
-            elif food[key].isspace() or food[key] == '':
-                if DEBUG_MODE:
-                    print("no way (no product name) for:", food["code"])
+            if self.trash_dirty_product(food):
                 del food
             else:
                 self._count += 1
-                name = QStandardItem(food[key].strip())
+                name = QStandardItem(food["product_name_fr"].strip())
                 code = QStandardItem(food["code"])
                 score = QStandardItem(food["nutrition_grades_tags"][0])
                 if food["code"] in ldb_foods:

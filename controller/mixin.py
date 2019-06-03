@@ -15,7 +15,6 @@ class MixinControllers(QObject):
 
     status_message = pyqtSignal(str)
     checked_start = pyqtSignal()
-    load_details_finished = pyqtSignal()
 
     def __init__(self, **kargs):
         super().__init__()
@@ -25,8 +24,7 @@ class MixinControllers(QObject):
         self._authenticate = self._general_ctrl.authenticate
         self._connection = self._authenticate.user_connection
         self._flags = {"product": True,
-                       "internet": True,
-                       "call_mode": Mode.SELECTED}
+                       "internet": True}
         self._views = {"categories": self._window.categories_list,
                        "foods": self._window.foods_list,
                        "substitutes": self._window.substitutes_list,
@@ -80,13 +78,9 @@ class MixinControllers(QObject):
             self._messenger.on_substitute_selection_changed)
         self._model.substitutes.itemChanged.connect(
             self._messenger.on_substitute_checked)
-        self.load_details_finished.connect(
-            self._messenger.on_load_product_details_finished)
         ######   Connect for general controller   ######################
         self._general_ctrl.user_event.connect(self._model.on_user_event)
         self.checked_start.connect(self._general_ctrl.on_checked_started)
-        self.load_details_finished.connect(
-            self._general_ctrl.on_load_details_finished)
 
         if self._name == "OpenFoodFactsMode":
             if DEBUG_MODE:
@@ -131,14 +125,10 @@ class MixinControllers(QObject):
             self._messenger.on_substitute_selection_changed)
         self._model.substitutes.itemChanged.disconnect(
             self._messenger.on_substitute_checked)
-        self.load_details_finished.disconnect(
-            self._general_ctrl.on_load_details_finished)
         ###### Disconnect for general controller
         self._general_ctrl.user_event.disconnect(self._model.on_user_event)
         self.checked_start.disconnect(
             self._general_ctrl.on_checked_started)
-        self.load_details_finished.disconnect(
-            self._messenger.on_load_product_details_finished)
 
         if self._name == "OpenFoodFactsMode":
             if DEBUG_MODE:
@@ -157,14 +147,19 @@ class MixinControllers(QObject):
             if DEBUG_MODE:
                 print("disconnect for DatabaseMode")
 
-    @pyqtSlot()
-    def on_load_product_details_finished(self):
+    @pyqtSlot(Mode)
+    def on_load_product_details_finished(self, mode):
         """Show details of product from Open Food Facts"""
 
-        if self._flags["call_mode"] is Mode.SELECTED:
-            self._window.show_product_details(self._model.product_details.models)
-        elif self._flags["call_mode"] is Mode.CHECKED:
-            self.load_details_finished.emit()
+        if mode is Mode.SELECTED_FOOD or \
+                mode is Mode.SELECTED_SUBSTITUTE:
+            self._window.show_product_details(
+                self._model.product_details.models)
+        elif mode is Mode.CHECKED:
+            self._general_ctrl.on_load_details_finished()
+        elif mode is Mode.KILLED:
+            if DEBUG_MODE:
+                print("==== THREAD as been KILLED  ====")
 
     @pyqtSlot()
     def on_product_url_clicked(self):
@@ -202,3 +197,9 @@ class MixinControllers(QObject):
         """Property for flags access"""
 
         return self._flags
+
+    @property
+    def messenger(self):
+        """Property for messenger"""
+
+        return self._messenger
