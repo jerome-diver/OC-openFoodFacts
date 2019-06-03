@@ -1,7 +1,7 @@
 """Mainwindow Qt-5 application"""
 
 import re
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QAbstractItemView
 from PyQt5.QtGui import QStandardItemModel, QPixmap
 from PyQt5.QtCore import pyqtSlot, QSortFilterProxyModel
 
@@ -19,6 +19,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.openfoodfacts_mode.setChecked(False)
         self.local_mode.setChecked(False)
         self.substitutes_list.verticalHeader().setVisible(False)
+        self.substitutes_list.setSelectionMode(
+            QAbstractItemView.SingleSelection)
         self.product_name.setOpenExternalLinks(True)
         self._proxy = QSortFilterProxyModel()
         self.substitutes_list.setModel(self._proxy)
