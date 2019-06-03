@@ -115,10 +115,11 @@ class Controller(QObject):
         self._window.reset_views()
         user_status = self._authenticate.user.is_connected() \
             and not self._authenticate.user.is_admin()
+        self._window.record.setHidden(state)
+        self._window.remove.setHidden(not state)
         if state:
             self._authenticate.user.connection.connect_to_off_db(
                 self._authenticate.user.is_admin())
-            self._window.record.setHidden(True)
             if isinstance(self._current_mode, OpenFoodFactsMode):
                 self._current_mode.disconnect()
                 self._current_mode = None
@@ -141,6 +142,7 @@ class Controller(QObject):
             and not self._authenticate.user.is_admin()
         self._window.local_mode.setEnabled(user_status)
         self._window.record.setHidden(not state)
+        self._window.remove.setHidden(state)
         if state:
             self._authenticate.user.connection.connect_to_off_db(
                 self._authenticate.user.is_admin())

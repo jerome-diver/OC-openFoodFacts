@@ -46,7 +46,9 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
                 if food["code"] != selected[0] \
                         and target <= selected[1]:
                     item_name = QStandardItem(food["product_name_fr"])
-                    item_name.setCheckable(True)
+                    item_name.setCheckable( not
+                        self.is_in_database(foods.category_id,
+                                            food["code"]))
                     item_grade = QStandardItem(food["nutrition_grades_tags"][0])
                     item_code = QStandardItem(food["code"])
                     if DEBUG_MODE:
@@ -111,19 +113,28 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
         inside local database"""
 
         if self._user.is_connected() and not self._user.is_admin():
-            ldb_substitutes = self._helper.records_concerned(selected_category)
             for index in range(self.rowCount()):
                 item_name = self.item(index, 0)
                 item_code = self.item(index, 2)
-                if item_code.data(Qt.DisplayRole) in ldb_substitutes:
+                if self.is_in_databse(selected_category,
+                                      item_code.data()):
                     if DEBUG_MODE:
                         print("find item code:",
                               item_code.data(Qt.DisplayRole))
+                    item_name.setCheckable(False)
                     item_name.setForeground(QColor(16, 133, 22))
                     item_code.setForeground(QColor(16, 133, 22))
                 else:
                     item_name.setForeground(QColor(0, 0, 0))
                     item_code.setForeground(QColor(0, 0, 0))
+
+    def is_in_database(self, category_id, code):
+        """Find if this code is inside this category of products"""
+
+        ldb_substitutes = self._helper.records_concerned(category_id)
+        if code in ldb_substitutes:
+            return True
+        return False
 
     @property
     def checked(self):
