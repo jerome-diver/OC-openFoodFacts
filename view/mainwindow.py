@@ -1,7 +1,8 @@
 """Mainwindow Qt-5 application"""
 
 import re
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QAbstractItemView
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QAbstractItemView, \
+    QHeaderView
 from PyQt5.QtGui import QStandardItemModel, QPixmap
 from PyQt5.QtCore import pyqtSlot, QSortFilterProxyModel
 
@@ -21,6 +22,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.substitutes_list.verticalHeader().setVisible(False)
         self.substitutes_list.setSelectionMode(
             QAbstractItemView.SingleSelection)
+        self.substitutes_list.setSelectionBehavior(
+            QAbstractItemView.SelectRows)
         self.product_name.setOpenExternalLinks(True)
         self._proxy = QSortFilterProxyModel()
         self.substitutes_list.setModel(self._proxy)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.2
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -239,6 +239,11 @@ class Ui_MainWindow(object):
         font.setStyleStrategy(QtGui.QFont.PreferAntialias)
         self.substitutes_list.setFont(font)
         self.substitutes_list.setObjectName("substitutes_list")
+        self.substitutes_list.horizontalHeader().setDefaultSectionSize(25)
+        self.substitutes_list.horizontalHeader().setMinimumSectionSize(15)
+        self.substitutes_list.horizontalHeader().setSortIndicatorShown(True)
+        self.substitutes_list.horizontalHeader().setStretchLastSection(True)
+        self.substitutes_list.verticalHeader().setSortIndicatorShown(True)
         self.verticalLayout_6.addWidget(self.substitutes_list)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")

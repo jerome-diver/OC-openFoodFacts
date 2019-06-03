@@ -46,10 +46,13 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
                 if food["code"] != selected[0] \
                         and target <= selected[1]:
                     item_name = QStandardItem(food["product_name_fr"])
-                    item_name.setCheckable( not
-                        self.is_in_database(foods.category_id,
-                                            food["code"]))
-                    item_grade = QStandardItem(food["nutrition_grades_tags"][0])
+                    item_name.setCheckable(
+                        not self.is_in_database(foods.category_id,
+                                                food["code"])\
+                        and user_state)
+                    item_grade = QStandardItem(
+                        str(food["nutrition_grades_tags"][0]).upper())
+                    item_grade.setTextAlignment(Qt.AlignCenter)
                     item_code = QStandardItem(food["code"])
                     if DEBUG_MODE:
                         print("populate:", food["product_name_fr"])
@@ -116,7 +119,7 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
             for index in range(self.rowCount()):
                 item_name = self.item(index, 0)
                 item_code = self.item(index, 2)
-                if self.is_in_databse(selected_category,
+                if self.is_in_database(selected_category,
                                       item_code.data()):
                     if DEBUG_MODE:
                         print("find item code:",
