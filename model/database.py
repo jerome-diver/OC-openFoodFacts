@@ -298,15 +298,10 @@ class AdminConnection(DatabaseConnection):
 class UserConnection(DatabaseConnection):
     """Connection for noraml access database user operations"""
 
-    def connect(self, user, password, database):
-        """Connect database for ADMIN"""
-
-        super(UserConnection, self).connect(user, password, database)
-        #self.connect_to_off_db()
-
-    def _normalize_product_details(self, product):
+    @staticmethod
+    def _normalize_product_details(product):
         """Normalize the product missing keys to be able to pass record
-        details contruction (food_selected_details)"""
+        details construction (food_selected_details)"""
 
         k_t = ("product_name_fr", "ingredients_text", "nutrition_grades_tags",
                "brands_tags", "packaging", "url", "image_front_url")
