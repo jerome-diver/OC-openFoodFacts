@@ -26,8 +26,8 @@ class Controller(QObject):
         self._window.show()
         self._current_mode = None
         self._flags = dict(user_connected=False,
-                           checked_product=False,
-                           checked_details=False,
+                           has_checked_product=False,
+                           find_all_checked_details=False,
                            end_tasks=False)
         self.connect_signals()
         self._window.local_mode.setDisabled(True)
@@ -173,10 +173,10 @@ class Controller(QObject):
         if self._flags["user_connected"] != TypeConnection.USER_CONNECTED:
             self._window.record.setText("Aucun utilisateur connecté")
             self._window.remove.setText("Aucun utilisateur connecté")
-        elif not self._flags["checked_product"]:
+        elif not self._flags["has_checked_product"]:
             self._window.record.setText("Aucune sélection de substitut")
             self._window.remove.setText("Aucune sélection de substitut")
-        elif not self._flags["checked_details"]:
+        elif not self._flags["find_all_checked_details"]:
             self._window.record.setText("Attendez, recherche des détails "
                                         "pour la sélection")
             self._window.remove.setText("Attendez, recherche des détails "
@@ -190,13 +190,12 @@ class Controller(QObject):
             self._window.record.setEnabled(True)
             self._window.remove.setEnabled(True)
 
-    def on_load_details_finished(self):
-        """When product substitutes checked details are loaded..."""
+    def on_load_details_checked_finished(self):
+        """Next for LoadProductDetails finished on Mode.CHECKED (second)"""
 
-        self._flags["checked_product"] = bool(
-            self._current_mode.model.substitutes.checked)
-        self._flags["checked_details"] = bool(
-            self._current_mode.model.product_details.checked)
+        self._flags["find_all_checked_details"] = bool(
+            len(self._current_mode.model.substitutes.checked) ==
+            len(self._current_mode.model.product_details.checked))
         self._flags["end_tasks"] = bool(
             len(self._current_mode.model.substitutes.checked) ==
             len(self._current_mode.model.product_details.checked))
@@ -204,13 +203,13 @@ class Controller(QObject):
 
     @pyqtSlot()
     def on_checked_started(self):
-        """Slot for receipt signal to said if substitutes list any selection"""
+        """Checked box substitutes state changed"""
 
-        self._flags["checked_product"] = True
-        if isinstance(self._current_mode, OpenFoodFactsMode):
-            self._flags["checked_details"] = False
-        elif isinstance(self._current_mode, DatabaseMode):
-            self._flags["checked_details"] = True
+        self._flags["has_checked_product"] = bool(
+            self._current_mode.model.substitutes.checked)
+        self._flags["find_all_checked_details"] = bool(
+            len(self._current_mode.model.substitutes.checked) ==
+            len(self._current_mode.model.product_details.checked))
         self.checked_substitutes()
 
     @pyqtSlot()

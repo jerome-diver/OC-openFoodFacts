@@ -9,7 +9,6 @@ class Mode(Enum):
     CHECKED = 1
     SELECTED_FOOD = 2
     SELECTED_SUBSTITUTE = 3
-    KILLED = 4
 
 
 class Widget(Enum):

@@ -97,18 +97,10 @@ class ProductDetailsSignals(QObject):
 
     error_signal = pyqtSignal(str)
     status_message = pyqtSignal(str)
-    finished = pyqtSignal(Mode)
+    finished = pyqtSignal(Mode, str, dict)
 
-    def __init__(self, thread):
+    def __init__(self):
         super().__init__()
-        self._thread = thread
-
-    @pyqtSlot(Mode)
-    def end_process(self, mode):
-        """End of the loop, then thread will die"""
-
-        if self._thread.mode == mode :
-            self._thread.on_air = False
 
 
 class LoadProductDetails(QRunnable):
@@ -116,25 +108,24 @@ class LoadProductDetails(QRunnable):
     for details"""
 
     count = 0
-    mode_checked = 0
-    mode_selected_food = 0
-    mode_selected_substitute = 0
 
-    def __init__(self, model, mode=Mode.SELECTED_FOOD):
+    def __init__(self, ctrl, model, mode=Mode.SELECTED_FOOD):
         super().__init__()
+        self._controller = ctrl
         self._model = model
         self._caller = None
         self._index = None
         self._mode = mode
-        if mode == Mode.CHECKED:
-            LoadProductDetails.mode_checked += 1
-        elif mode == Mode.SELECTED_FOOD:
-            LoadProductDetails.mode_selected_food += 1
-        elif mode == Mode.SELECTED_SUBSTITUTE:
-            LoadProductDetails.mode_selected_substitute += 1
-        self._on_air = True
-        self._signals = ProductDetailsSignals(self)
+        self._signals = ProductDetailsSignals()
         LoadProductDetails.count += 1
+        self.signals.finished.connect(
+            self._controller.on_load_product_details_finished)
+        self.signals.finished.connect(
+            self._controller.messenger.on_load_product_details_finished)
+        self.signals.status_message.connect(
+            self._controller.window.on_status_message)
+        self.signals.error_signal.connect(
+            self._controller.window.on_error_message)
         if DEBUG_MODE:
             print("======  L o a d P r o d u c t D e t a i l s  (start n°{"
                   "})======".format(LoadProductDetails.count))
@@ -142,35 +133,15 @@ class LoadProductDetails(QRunnable):
     def __del__(self):
         """At end time"""
 
-        if self._on_air == False:
-            LoadProductDetails.count -= self.mode_selected_food \
-                if self._mode is Mode.SELECTED_FOOD \
-                else self.mode_selected_substitute
-        else:
-            LoadProductDetails.count -= 1
-        if self._mode == Mode.CHECKED:
-            LoadProductDetails.mode_checked -= 1
-        elif self._mode == Mode.SELECTED_FOOD:
-            LoadProductDetails.mode_selected_food -= 1
-        elif self._mode == Mode.SELECTED_SUBSTITUTE:
-            LoadProductDetails.mode_selected_substitute -= 1
+        LoadProductDetails.count -= 1
         if DEBUG_MODE:
             print("======  L o a d P r o d u c t D e t a i l s  ======")
-            print("======  END Checked n° {}  ======".format(
-                LoadProductDetails.mode_checked))
-            print("======  END Selected n° {}  ======".format(
-                LoadProductDetails.mode_selected_food))
-            print("======  END Selected n° {}  ======".format(
-                LoadProductDetails.mode_selected_substitute))
             print("=====  Total in life: ", LoadProductDetails.count)
 
     def run(self):
         """Start to load details of product in background from Open Food
         Facts"""
 
-        mpd = self._model.product_details
-        mf = self._model.foods
-        ms = self._model.substitutes
         code = self._caller.index(self._index.row(), 2).data()
         name = self._caller.index(self._index.row(), 0).data()
         if DEBUG_MODE:
@@ -181,26 +152,13 @@ class LoadProductDetails(QRunnable):
                 details = self._model.download_product(code, name)
             if isinstance(self._model, LocalDatabase):
                 details = self._model.get_product_details(code)
-            if details and self._on_air:
-                if self._mode == Mode.SELECTED_FOOD and self._on_air:
-                    mpd.populate(details)
-                    mf.selected_details = details
-                elif self._mode == Mode.SELECTED_SUBSTITUTE and self._on_air:
-                    mpd.populate(details)
-                elif self._mode == Mode.CHECKED and self._on_air:
-                    to_add = ms.update_checked(self._index, code)
-                    mpd.update_checked(details, to_add)
         except:
             self._signals.error_signal.emit("Hélas, il n'y a aucun détail "
                                             "enregistré pour ce produit")
-        else:
             self._signals.status_message.emit("Aucun détail exploitable ici "
                                               "n'est fourni")
         finally:
-            if self._on_air:
-                self._signals.finished.emit(self._mode)
-            else:
-                self._signals.finished.emit(Mode.KILLED)
+            self._signals.finished.emit(self._mode, code, details)
 
     @property
     def caller(self):
@@ -232,23 +190,6 @@ class LoadProductDetails(QRunnable):
 
         return self._signals
 
-    @property
-    def mode(self):
-        """mMde property"""
-
-        return self._mode
-
-    @property
-    def on_air(self):
-        """On_air property"""
-
-        return self._on_air
-
-    @on_air.setter
-    def on_air(self, value):
-        """Setter for on_air"""
-
-        self._on_air = value
 
 class UpdateCategories(QThread):
     """Load categories from Open Food Facts in background in categories
@@ -287,8 +228,8 @@ class ThreadsController(QObject):
         self._load_foods = None
         self._product_details_checked_pool = QThreadPool()
         self._product_details_selected_pool = QThreadPool()
-        self._product_details_checked_pool.setMaxThreadCount(16)
-        self._product_details_selected_pool.setMaxThreadCount(16)
+        self._product_details_checked_pool.setMaxThreadCount(8)
+        self._product_details_selected_pool.setMaxThreadCount(8)
 
     def init_foods_thread(self, category):
         """Initialize foods thread call"""
@@ -317,17 +258,8 @@ class ThreadsController(QObject):
     def init_product_details_thread(self, model_caller, index, mode):
         """Initialize product_details thread call"""
 
-        load_product_details = LoadProductDetails(self._model, mode)
-        self.kill_details_threads.connect(
-            load_product_details.signals.end_process)
-        load_product_details.signals.finished.connect(
-            self._controller.on_load_product_details_finished)
-        load_product_details.signals.finished.connect(
-            self._controller.messenger.on_load_product_details_finished)
-        load_product_details.signals.status_message.connect(
-            self._controller.window.on_status_message)
-        load_product_details.signals.error_signal.connect(
-            self._controller.window.on_error_message)
+        load_product_details = LoadProductDetails(self._controller,
+                                                  self._model, mode)
         load_product_details.caller = model_caller
         load_product_details.index = index
         if mode is Mode.CHECKED:

@@ -25,6 +25,7 @@ class MixinControllers(QObject):
         self._connection = self._authenticate.user_connection
         self._flags = {"product": True,
                        "internet": True}
+        self._last = dict(selection=None, code=None)
         self._views = {"categories": self._window.categories_list,
                        "foods": self._window.foods_list,
                        "substitutes": self._window.substitutes_list,
@@ -147,19 +148,33 @@ class MixinControllers(QObject):
             if DEBUG_MODE:
                 print("disconnect for DatabaseMode")
 
-    @pyqtSlot(Mode)
-    def on_load_product_details_finished(self, mode):
-        """Show details of product from Open Food Facts"""
+    @pyqtSlot(Mode, str, dict)
+    def on_load_product_details_finished(self, mode, code, details):
+        """Thread LoadProductDetails signal's finished (first)"""
 
-        if mode is Mode.SELECTED_FOOD or \
-                mode is Mode.SELECTED_SUBSTITUTE:
-            self._window.show_product_details(
-                self._model.product_details.models)
+        if self._last["selection"] == mode \
+                and self._last["code"] == code:
+            if mode is Mode.SELECTED_FOOD or \
+                    mode is Mode.SELECTED_SUBSTITUTE:
+                self._model.product_details.populate(details)
+                self._window.show_product_details(
+                    self._model.product_details.models)
+        if mode == Mode.SELECTED_FOOD:
+            self._model.foods.selected_details = details
         elif mode is Mode.CHECKED:
-            self._general_ctrl.on_load_details_finished()
-        elif mode is Mode.KILLED:
-            if DEBUG_MODE:
-                print("==== THREAD as been KILLED  ====")
+            to_add = bool(code in self._model.substitutes.checked)
+            self._model.product_details.update_checked(details, to_add)
+            self._general_ctrl.on_load_details_checked_finished()
+        checked_lst = self.model.substitutes.checked
+        checked_details = self.model.product_details.checked
+        if self._threads._product_details_checked_pool.activeThreadCount() \
+                == 0:
+            self._threads._product_details_checked_pool.signalsBlocked()
+            if len(checked_details) > len(checked_lst):
+                for k in checked_details.keys():
+                    if k not in checked_lst:
+                        del checked_details[k]
+            self._threads._product_details_checked_pool.releaseThread()
 
     @pyqtSlot()
     def on_product_url_clicked(self):

@@ -96,8 +96,6 @@ class OpenFoodFactsMode(MixinControllers, QObject):
                                   Widget.DETAILS))
         self._window.reset_views((Widget.SUBSTITUTES,
                                   Widget.DETAILS))
-        self._threads.kill_details_threads.emit(Mode.SELECTED_FOOD)
-        self._threads.kill_details_threads.emit(Mode.SELECTED_SUBSTITUTE)
         sub_model = self._model.foods
         name = sub_model.index(index.row(), 0).data()
         score = sub_model.index(index.row(), 1).data()
@@ -108,6 +106,9 @@ class OpenFoodFactsMode(MixinControllers, QObject):
             print("you are just selecting food:", self._model.foods.selected)
             print("and foods pages is", len(self._model.foods.recorded))
         self._model.substitutes.populate(sub_model, sub_model.recorded)
+        self._last = {
+            "selection": Mode.SELECTED_FOOD,
+            "code": sub_model.index(index.row(), 2).data() }
         self._threads.init_product_details_thread(sub_model, index,
                                                   Mode.SELECTED_FOOD)
         self.show_substitutes()
@@ -124,9 +125,11 @@ class OpenFoodFactsMode(MixinControllers, QObject):
         if selected.indexes():
             self._model.reset_models((Widget.DETAILS,))
             self._window.reset_views((Widget.DETAILS,))
-            self._threads.kill_details_threads.emit(Mode.SELECTED_SUBSTITUTE)
             index_select = selected.indexes()[0]
             sub_model = self._views["substitutes"].model()
+            self._last = {
+                "selection": Mode.SELECTED_SUBSTITUTE,
+                "code": sub_model.index(index_select.row(), 2).data() }
             self._threads.init_product_details_thread(sub_model,
                                                       index_select,
                                                       Mode.SELECTED_SUBSTITUTE)
@@ -138,9 +141,14 @@ class OpenFoodFactsMode(MixinControllers, QObject):
 
         sub_model = self._model.substitutes
         index = sub_model.indexFromItem(item)
-        self._threads.init_product_details_thread(sub_model,
-                                                  index,
-                                                  Mode.CHECKED)
+        code = sub_model.index(index.row(), 2).data()
+        if sub_model.update_checked(item, code):
+            self._threads.init_product_details_thread(sub_model,
+                                                      index,
+                                                      Mode.CHECKED)
+        else:
+            # clear thread from pool and/or send a kill signal
+            pass
         self.checked_start.emit()
 
     @property
@@ -203,6 +211,9 @@ class DatabaseMode(MixinControllers, QObject):
         sub_model.selected = (code, score, name)
         substitutes = self._model.get_substitutes(code)
         self._model.substitutes.populate(sub_model, substitutes)
+        self._last = {
+            "selection": Mode.SELECTED_FOOD,
+            "code": sub_model.index(index.row(), 2).data() }
         self._threads.init_product_details_thread(sub_model, index,
                                                   Mode.SELECTED_FOOD)
         self._window.show_substitutes(self._model.substitutes)
@@ -215,7 +226,10 @@ class DatabaseMode(MixinControllers, QObject):
             self._model.reset_models((Widget.DETAILS,))
             self._window.reset_views((Widget.DETAILS,))
             index_select = selected.indexes()[0]
-            sub_model = self._views["substitutes"].model()
+            sub_model = self._model.substitutes
+            self._last = {
+                "selection": Mode.SELECTED_SUBSTITUTE,
+                "code": sub_model.index(index_select.row(), 2).data() }
             self._threads.init_product_details_thread(sub_model,
                                                       index_select,
                                                       Mode.SELECTED_SUBSTITUTE)
@@ -227,6 +241,13 @@ class DatabaseMode(MixinControllers, QObject):
 
         index = self._model.substitutes.indexFromItem(item)
         ms = self._model.substitutes
-        self._threads.init_product_details_thread(ms, index, Mode.CHECKED)
+        code = ms.index(index.row(), 2).data()
+        if ms.update_checked(item, code):
+            self._threads.init_product_details_thread(ms,
+                                                      index,
+                                                      Mode.CHECKED)
+        else:
+            # clear thread from pool and/or send a kill signal
+            pass
         self.checked_start.emit()
 

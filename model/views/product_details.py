@@ -117,8 +117,8 @@ class ProductDetailsModels():
         """Update checked dictionary with nex code"""
 
         data = {}
-        self.define_with(data, details)
         if add:
+            self.define_with(data, details)
             self._checked[data["code"]] = (
                 data["name"],
                 data["description"],
@@ -129,6 +129,7 @@ class ProductDetailsModels():
                 data["img_url"],
                 data["shops_names"])
         else:
+            self.define_with(data, details)
             if data["code"] in self._checked:
                 del self._checked[data["code"]]
         if DEBUG_MODE:

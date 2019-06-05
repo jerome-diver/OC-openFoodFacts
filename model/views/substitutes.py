@@ -84,10 +84,11 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
         self._checked = []
         self.removeRows(0, self.rowCount())
 
-    def update_checked(self, index, code):
+    def update_checked(self, item, code):
         """Update checked list of codes from index selection"""
 
-        item = self.item(index.row(), 0)
+        if DEBUG_MODE:
+            print("======  S u b s t i t u t e s M o d e l s  ======")
         if item.checkState() == Qt.Checked:
             self._checked.append(code)
             if DEBUG_MODE:
@@ -97,7 +98,6 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
             if code in self._checked:
                 self._checked.remove(code)
             if DEBUG_MODE:
-                print("======  S u b s t i t u t e s M o d e l s  ======")
                 print("checked list after remove:", self._checked)
             return False
 
