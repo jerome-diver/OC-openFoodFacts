@@ -285,8 +285,10 @@ class ThreadsController(QObject):
         self._controller = controller
         self._model = controller.model
         self._load_foods = None
-        self._product_details_pool = QThreadPool()
-        self._product_details_pool.setMaxThreadCount(16)
+        self._product_details_checked_pool = QThreadPool()
+        self._product_details_selected_pool = QThreadPool()
+        self._product_details_checked_pool.setMaxThreadCount(16)
+        self._product_details_selected_pool.setMaxThreadCount(16)
 
     def init_foods_thread(self, category):
         """Initialize foods thread call"""
@@ -328,7 +330,10 @@ class ThreadsController(QObject):
             self._controller.window.on_error_message)
         load_product_details.caller = model_caller
         load_product_details.index = index
-        self._product_details_pool.start(load_product_details)
+        if mode is Mode.CHECKED:
+            self._product_details_checked_pool.start(load_product_details)
+        else:
+            self._product_details_selected_pool.start(load_product_details)
 
     def wash_product_details_thread(self, mode):
         """Clean product_details thread"""

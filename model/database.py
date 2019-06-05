@@ -67,7 +67,6 @@ class DatabaseConnection(QObject):
                     cursor.executemany(request)
                 else:
                     cursor.execute(request)
-            self._connection.commit()
         except OperationalError as error:
             if DEBUG_MODE:
                 print("=====  D a t a b a s e  =====")
@@ -86,6 +85,8 @@ class DatabaseConnection(QObject):
                 print("=====  D a t a b a s e  =====")
                 print(e.args[0], e.args[1])
             self._connection.rollback()
+        else:
+            self._connection.commit()
         finally:
             if cursor:
                 cursor.close()
@@ -106,7 +107,6 @@ class DatabaseConnection(QObject):
                 cursor.execute(request, values)
             else:
                 cursor.execute(request)
-            self._connection.commit()
         except OperationalError as e:
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
@@ -119,6 +119,8 @@ class DatabaseConnection(QObject):
             if DEBUG_MODE:
                 print(e.args[0], e.args[1])
             self._connection.rollback()
+        else:
+            self._connection.commit()
         finally:
             if cursor:
                 cursor.close()
