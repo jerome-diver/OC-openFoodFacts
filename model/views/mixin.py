@@ -1,5 +1,7 @@
 """Mixin class to share attributes and own Properties to use"""
 
+from PyQt5.QtCore import Qt
+
 from settings import DEBUG_MODE
 
 class MixinModelsView():
@@ -12,6 +14,11 @@ class MixinModelsView():
         self._general_ctrl = kargs["general_ctrl"]
         self._views = kargs["views"]
         self._user = self._general_ctrl.authenticate.user
+
+    def flags(self, index):
+        """Read only for QStandardItem.flags call override"""
+
+        return Qt.ItemFlags(Qt.ItemIsEnabled + Qt.ItemIsSelectable)
 
     @staticmethod
     def trash_dirty_product(product):

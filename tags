@@ -33,7 +33,6 @@ GENERAL_CONTROLLER	__main__.py	/^    GENERAL_CONTROLLER = Controller()$/;"	v
 GRANT_USER	settings.py	/^GRANT_USER = os.getenv("MARIA_GRANT_OFF_USER")$/;"	v
 GRANT_USER_PASSWD	settings.py	/^GRANT_USER_PASSWD = os.getenv("MARIA_GRANT_OFF_PASSWD")$/;"	v
 How to install	README.md	/^## How to install$/;"	s
-KILLED	enumerator.py	/^    KILLED = 4$/;"	v	class:Mode
 Langage used	README.md	/^## Langage used$/;"	s
 Libraries dependancies	README.md	/^## Libraries dependancies$/;"	s
 LoadCategories	controller/loader_threads.py	/^class LoadCategories(QThread):$/;"	c
@@ -92,12 +91,12 @@ __init__	controller/authentication.py	/^    def __init__(self):$/;"	m	class:Auth
 __init__	controller/control.py	/^    def __init__(self):$/;"	m	class:Controller
 __init__	controller/control_mode.py	/^    def __init__(self, **kargs):$/;"	m	class:DatabaseMode
 __init__	controller/control_mode.py	/^    def __init__(self, **kargs):$/;"	m	class:OpenFoodFactsMode
+__init__	controller/loader_threads.py	/^    def __init__(self):$/;"	m	class:ProductDetailsSignals
 __init__	controller/loader_threads.py	/^    def __init__(self, connection, off_model):$/;"	m	class:UpdateCategories
 __init__	controller/loader_threads.py	/^    def __init__(self, controller):$/;"	m	class:ThreadsController
+__init__	controller/loader_threads.py	/^    def __init__(self, ctrl, model, mode=Mode.SELECTED_FOOD):$/;"	m	class:LoadProductDetails
 __init__	controller/loader_threads.py	/^    def __init__(self, model):$/;"	m	class:LoadFoods
 __init__	controller/loader_threads.py	/^    def __init__(self, model, connection):$/;"	m	class:LoadCategories
-__init__	controller/loader_threads.py	/^    def __init__(self, model, mode=Mode.SELECTED_FOOD):$/;"	m	class:LoadProductDetails
-__init__	controller/loader_threads.py	/^    def __init__(self, thread):$/;"	m	class:ProductDetailsSignals
 __init__	controller/mixin.py	/^    def __init__(self, **kargs):$/;"	m	class:MixinControllers
 __init__	model/database.py	/^    def __init__(self):$/;"	m	class:AdminConnection
 __init__	model/database.py	/^    def __init__(self):$/;"	m	class:DatabaseConnection
@@ -120,7 +119,7 @@ __init__	view/mixin.py	/^    def __init__(self, **kargs):$/;"	m	class:MixinSigns
 __init__	view/sign_in.py	/^    def __init__(self, **kargs):$/;"	m	class:SignIn
 __init__	view/sign_up.py	/^    def __init__(self, **kargs):$/;"	m	class:SignUp
 _delete_substitute	model/database.py	/^    def _delete_substitute(self, user_id, food_code, food_substitute):$/;"	m	class:UserConnection
-_normalize_product_details	model/database.py	/^    def _normalize_product_details(self, product):$/;"	m	class:UserConnection
+_normalize_product_details	model/database.py	/^    def _normalize_product_details(product):$/;"	m	class:UserConnection
 _record_product	model/database.py	/^    def _record_product(self, user_id, category_id, food_code, details):$/;"	m	class:UserConnection
 _refresh_views	controller/control.py	/^    def _refresh_views(self):$/;"	m	class:Controller
 ask_request	model/database.py	/^    def ask_request(self, request, values=None):$/;"	m	class:DatabaseConnection
@@ -141,7 +140,6 @@ checked_substitutes	controller/control.py	/^    def checked_substitutes(self):$/
 clicked	assets/objects/qlabel_clickable.py	/^    clicked = pyqtSignal()$/;"	v	class:QLabelClickable
 connect	controller/mixin.py	/^    def connect(self):$/;"	m	class:MixinControllers
 connect	model/database.py	/^    def connect(self, user, password, database):$/;"	m	class:DatabaseConnection
-connect	model/database.py	/^    def connect(self, user, password, database):$/;"	m	class:UserConnection
 connect	model/user.py	/^    def connect(self, username, password, family=None, nick=None):$/;"	m	class:User
 connect_signals	controller/authentication.py	/^    def connect_signals(self):$/;"	m	class:Authentication
 connect_signals	controller/control.py	/^    def connect_signals(self):$/;"	m	class:Controller
@@ -170,14 +168,13 @@ download_categories	model/modes.py	/^    def download_categories(self):$/;"	m	cl
 download_foods	model/modes.py	/^    def download_foods(self, category, page=1):$/;"	m	class:OpenFoodFacts
 download_product	model/modes.py	/^    def download_product(self, code, name):$/;"	m	class:OpenFoodFacts
 end_process	controller/loader_threads.py	/^    def end_process(self):$/;"	m	class:LoadFoods
-end_process	controller/loader_threads.py	/^    def end_process(self, mode):$/;"	m	class:ProductDetailsSignals
 error_signal	controller/loader_threads.py	/^    error_signal = pyqtSignal(str)$/;"	v	class:ProductDetailsSignals
 exist_username	model/database.py	/^    def exist_username(self, username):$/;"	m	class:AdminConnection
 family	model/user.py	/^    def family(self):$/;"	m	class:User
 find_categories_in_database	model/views/categories.py	/^    def find_categories_in_database(self):$/;"	m	class:CategoriesModel
 find_foods_in_database	model/views/foods.py	/^    def find_foods_in_database(self):$/;"	m	class:FoodsModel
 find_substitutes_in_database	model/views/substitutes.py	/^    def find_substitutes_in_database(self, selected_category):$/;"	m	class:SubstitutesModel
-finished	controller/loader_threads.py	/^    finished = pyqtSignal(Mode)$/;"	v	class:ProductDetailsSignals
+finished	controller/loader_threads.py	/^    finished = pyqtSignal(Mode, str, dict)$/;"	v	class:ProductDetailsSignals
 flags	controller/mixin.py	/^    def flags(self):$/;"	m	class:MixinControllers
 foods	model/mixin.py	/^    def foods(self):$/;"	m	class:MixinModels
 generate_database	model/database.py	/^    def generate_database(self):$/;"	m	class:AdminConnection
@@ -206,10 +203,6 @@ kill_details_threads	controller/loader_threads.py	/^    kill_details_threads= py
 kill_foods_thread	controller/control_mode.py	/^    kill_foods_thread = pyqtSignal()$/;"	v	class:OpenFoodFactsMode
 load_categories	controller/control_mode.py	/^    def load_categories(self):$/;"	m	class:OpenFoodFactsMode
 messenger	controller/mixin.py	/^    def messenger(self):$/;"	m	class:MixinControllers
-mode	controller/loader_threads.py	/^    def mode(self):$/;"	m	class:LoadProductDetails
-mode_checked	controller/loader_threads.py	/^    mode_checked = 0$/;"	v	class:LoadProductDetails
-mode_selected_food	controller/loader_threads.py	/^    mode_selected_food = 0$/;"	v	class:LoadProductDetails
-mode_selected_substitute	controller/loader_threads.py	/^    mode_selected_substitute = 0$/;"	v	class:LoadProductDetails
 model	controller/mixin.py	/^    def model(self):$/;"	m	class:MixinControllers
 models	model/views/product_details.py	/^    def models(self):$/;"	m	class:ProductDetailsModels
 mousePressEvent	assets/objects/qlabel_clickable.py	/^    def mousePressEvent(self, ev):$/;"	m	class:QLabelClickable
@@ -219,8 +212,6 @@ nick	model/user.py	/^    def nick(self):$/;"	m	class:User
 no_product_found	controller/loader_threads.py	/^    no_product_found = pyqtSignal()$/;"	v	class:LoadFoods
 normalize	model/modes.py	/^        def normalize(product):$/;"	f	member:OpenFoodFacts.download_product	file:
 normalize_foods_products	model/modes.py	/^        def normalize_foods_products(foods_products):$/;"	f	member:OpenFoodFacts.download_foods	file:
-on_air	controller/loader_threads.py	/^    def on_air(self):$/;"	m	class:LoadProductDetails
-on_air	controller/loader_threads.py	/^    def on_air(self, value):$/;"	m	class:LoadProductDetails
 on_category_selected	controller/control_mode.py	/^    def on_category_selected(self, index):$/;"	m	class:DatabaseMode
 on_category_selected	controller/control_mode.py	/^    def on_category_selected(self, index):$/;"	m	class:OpenFoodFactsMode
 on_category_selected	view/messenger.py	/^    def on_category_selected(self, index):$/;"	m	class:Messenger
@@ -234,10 +225,10 @@ on_internet_access	controller/control_mode.py	/^    def on_internet_access(self,
 on_internet_access	view/messenger.py	/^    def on_internet_access(self, status):$/;"	m	class:Messenger
 on_load_categories_finished	controller/control_mode.py	/^    def on_load_categories_finished(self):$/;"	m	class:OpenFoodFactsMode
 on_load_categories_finished	view/messenger.py	/^    def on_load_categories_finished(self):$/;"	m	class:Messenger
-on_load_details_finished	controller/control.py	/^    def on_load_details_finished(self):$/;"	m	class:Controller
+on_load_details_checked_finished	controller/control.py	/^    def on_load_details_checked_finished(self):$/;"	m	class:Controller
 on_load_foods_finished	controller/control_mode.py	/^    def on_load_foods_finished(self):$/;"	m	class:OpenFoodFactsMode
 on_load_foods_finished	view/messenger.py	/^    def on_load_foods_finished(self):$/;"	m	class:Messenger
-on_load_product_details_finished	controller/mixin.py	/^    def on_load_product_details_finished(self, mode):$/;"	m	class:MixinControllers
+on_load_product_details_finished	controller/mixin.py	/^    def on_load_product_details_finished(self, mode, code, details):$/;"	m	class:MixinControllers
 on_load_product_details_finished	view/messenger.py	/^    def on_load_product_details_finished(self, mode):$/;"	m	class:Messenger
 on_local_mode	controller/control.py	/^    def on_local_mode(self, state):$/;"	m	class:Controller
 on_new_food_page	controller/control_mode.py	/^    def on_new_food_page(self, page, total):$/;"	m	class:OpenFoodFactsMode
@@ -334,7 +325,7 @@ threads	controller/control_mode.py	/^    def threads(self):$/;"	m	class:OpenFood
 trash_dirty_product	model/views/mixin.py	/^    def trash_dirty_product(product):$/;"	m	class:MixinModelsView
 update_categories	model/database.py	/^    def update_categories(self, off_categories):$/;"	m	class:AdminConnection
 update_checked	model/views/product_details.py	/^    def update_checked(self, details, add=True):$/;"	m	class:ProductDetailsModels
-update_checked	model/views/substitutes.py	/^    def update_checked(self, index, code):$/;"	m	class:SubstitutesModel
+update_checked	model/views/substitutes.py	/^    def update_checked(self, item, code):$/;"	m	class:SubstitutesModel
 user	controller/authentication.py	/^    def user(self):$/;"	m	class:Authentication
 user	controller/authentication.py	/^    def user(self, usr):$/;"	m	class:Authentication
 user	model/helpers/mixin.py	/^    def user(self):$/;"	m	class:MixinHelpers

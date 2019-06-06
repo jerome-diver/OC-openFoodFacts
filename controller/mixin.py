@@ -175,6 +175,7 @@ class MixinControllers(QObject):
                     if k not in checked_lst:
                         del checked_details[k]
             self._threads._product_details_checked_pool.releaseThread()
+            self._general_ctrl.on_load_details_checked_finished()
 
     @pyqtSlot()
     def on_product_url_clicked(self):
