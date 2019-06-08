@@ -39,6 +39,14 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
             if DEBUG_MODE:
                 print("categories found in Database:", ldb_substitutes)
         for food in substitutes[page]:
+            checkable = bool(not self.is_in_database(
+                    foods.category_id,
+                    food["code"]) and user_state) \
+                if self._general_ctrl.current_mode.name == \
+                   "OpenFoodFactsMode" \
+                else bool(self.is_in_database(
+                    foods.category_id,
+                    food["code"]) and user_state)
             if self.trash_dirty_product(food):
                 del food
             else:
@@ -46,10 +54,7 @@ class SubstitutesModel(MixinModelsView, QStandardItemModel):
                 if food["code"] != selected[0] \
                         and target <= selected[1]:
                     item_name = QStandardItem(food["product_name_fr"])
-                    item_name.setCheckable(
-                        not self.is_in_database(foods.category_id,
-                                                food["code"])\
-                        and user_state)
+                    item_name.setCheckable(checkable)
                     item_grade = QStandardItem(
                         str(food["nutrition_grades_tags"][0]).upper())
                     item_grade.setTextAlignment(Qt.AlignCenter)

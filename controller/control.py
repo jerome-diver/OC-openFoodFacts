@@ -281,3 +281,9 @@ class Controller(QObject):
         """Property for views dict of QWidgets views"""
 
         return self._views
+
+    @property
+    def current_mode(self):
+        """Property for current_mode"""
+
+        return self._current_mode
