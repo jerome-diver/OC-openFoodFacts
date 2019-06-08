@@ -90,13 +90,14 @@ class Controller(QObject):
             self._authenticate.user.connection.status_message.connect(
                 self._window.on_status_message)
         elif connected == TypeConnection.USER_DISCONNECTED:
+            self._window.signup.setHidden(False)
             self.status_message.emit("L'utilisateur est déconnecté de la base "
                                      "de donnée locale")
-            self._window.signup.setHidden(False)
             self._window.user_informations.setText("")
             self._authenticate.user.connection.status_message.disconnect(
                 self._window.on_status_message)
         elif connected == TypeConnection.ADMIN_CONNECTED:
+            self._window.signup.setHidden(False)
             if self._window.local_mode.isChecked():
                 self.on_openfoodfacts_mode(True)
             self._window.local_mode.setDisabled(True)
