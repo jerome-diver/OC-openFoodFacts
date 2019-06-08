@@ -36,10 +36,16 @@ class SignUp(QDialog, Ui_SignUp, MixinSigns):
         """Property setter"""
 
         self._user_create = value
-        self.label_password.setHidden(not value)
-        self.label.setHidden(not value)
-        self.passwd_confirm.setHidden(not value)
-        self.password.setHidden(not value)
+        self.define_view()
+
+    def define_view(self):
+        """Define what to show/hide in the dialog box"""
+
+        self.label_password.setHidden(self._user_create)
+        self.label.setHidden(self._user_create)
+        self.passwd_confirm.setHidden(self._user_create)
+        self.password.setHidden(self._user_create)
+
 
     def reset(self):
         """Reset entries"""

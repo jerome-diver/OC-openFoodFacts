@@ -79,11 +79,14 @@ class Authentication(QObject):
     def on_close(self):
         """Dialog box close slot"""
 
-        if self._dialog_open == "SignUp":
-            self._sign_up.close()
-        elif self._dialog_open == "SignIn" and \
-                not self._sign_in.user_has_to_be_create:
+        if self._dialog_open == "SignIn" and \
+             not self._sign_in.user_has_to_be_create:
             self._sign_in.close()
+        elif self._dialog_open == "SignUp":
+            self._sign_up.close()
+            if self._sign_in.user_has_to_be_create:
+                self._sign_in.user_has_to_be_create = False
+                self._sign_up.user_create = False
 
     @pyqtSlot(bool, str)
     def on_new_status_connection(self, connected, status):
@@ -151,28 +154,23 @@ class Authentication(QObject):
         if len(username) <= 6:
             self.status_message.emit("Nom d'utilisateur trop court "
                                      "(+ de 8 lettres)")
-        elif self._sign_up.user_create:
-            if self._user.connection.exist_username(username):
-                self.status_message.emit("{} exite déjà".format(username))
-            elif password != confirm_passwd:
-                self.status_message.emit(
-                    "Les mots de passe ne correspondent pas")
-            else:
-                try:
-                    self._user.connection.create_user(username, password)
-                    self._user.connection.record_user(
-                        username, nick_name, family_name)
-                except:
-                    set.status_message.emit("Problème lors de l'enregstrement")
-                else:
-                    self.status_message.emit("Utilisateur enregistré")
-                    self.user.new_user_ready()
-                    self.on_close()
-
+        elif self._user.connection.exist_username(username):
+            self.status_message.emit("{} exite déjà".format(username))
+        elif password != confirm_passwd:
+            self.status_message.emit(
+                "Les mots de passe ne correspondent pas")
         else:
-            self._user.connection.record_user(
-                username, nick_name, family_name)
-            self.on_close()
+            try:
+                self._user.connection.create_user(username, password)
+                self._user.connection.record_user(
+                    username, nick_name, family_name)
+            except:
+                set.status_message.emit("Problème lors de l'enregstrement")
+            else:
+                self.status_message.emit("Utilisateur enregistré")
+                self.user.new_user_ready()
+                self._sign_up.user_create = False
+                self.on_close()
 
     @property
     def user_connection(self):
