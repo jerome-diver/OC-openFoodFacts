@@ -204,8 +204,13 @@ class AdminConnection(DatabaseConnection):
         """Return if record users.username for username exist"""
 
         db_cursor = self._connection.cursor()
+        request = "USE openfoodfacts_substitutes;"
+        db_cursor.execute(request)
         request = "SELECT id FROM users WHERE username=%s ;"
         values = (username,)
+        print("==========================")
+        print(username)
+        print("==========================")
         exist = False
         try:
             db_cursor.execute(request, values)

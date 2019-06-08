@@ -14,6 +14,7 @@ class SignIn(QDialog, Ui_SignIn, MixinSigns):
     def __init__(self, **kargs):
         super().__init__(**kargs)
         self.setupUi(self)
+        self._user_has_to_be_create = False
         self.password.setEchoMode(QLineEdit.Password)
         self.username.textChanged.connect(self.on_reset_status)
         self.password.textChanged.connect(self.on_reset_status)
@@ -35,3 +36,18 @@ class SignIn(QDialog, Ui_SignIn, MixinSigns):
         """send back to parent"""
 
         super(SignIn, self).on_status(message)
+
+    @property
+    def user_has_to_be_create(self):
+        "Property for user_has_to_be_create"
+
+        return self._user_has_to_be_create
+
+    @user_has_to_be_create.setter
+    def user_has_to_be_create(self, value):
+        """Setter for user_has_to_be_create"""
+
+        if isinstance(value, bool):
+            self._user_has_to_be_create = value
+        else:
+            raise Exception("user_has_to_be_create has to be a bool value")

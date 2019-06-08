@@ -64,18 +64,16 @@ class Authentication(QObject):
         """Sing-in button call from controller"""
 
         self._sign_in.reset()
-        self._sign_in.open()
         self._dialog_open = "SignIn"
-        self._dialog_count += 1
+        self._sign_in.open()
 
     @pyqtSlot()
     def on_sign_up(self):
         """Sing-up button slot"""
 
         self._sign_up.reset()
-        self._sign_up.open()
         self._dialog_open = "SignUp"
-        self._dialog_count += 1
+        self._sign_up.open()
 
     @pyqtSlot()
     def on_close(self):
@@ -83,11 +81,9 @@ class Authentication(QObject):
 
         if self._dialog_open == "SignUp":
             self._sign_up.close()
-            self._dialog_count -= 1
-        elif self._dialog_open == "SignIn":
+        elif self._dialog_open == "SignIn" and \
+                not self._sign_in.user_has_to_be_create:
             self._sign_in.close()
-            self._dialog_count -= 1
-        self._dialog_open = None if self._dialog_count == 0 else "SignIn"
 
     @pyqtSlot(bool, str)
     def on_new_status_connection(self, connected, status):
@@ -121,11 +117,14 @@ class Authentication(QObject):
             if not self._user.connection.exist_username(username):
                 self.status_message.emit(
                     "l'utilisateur est inconnu de la base locale")
-                self._sign_up.user_create = False
+                self._sign_in.user_has_to_be_create = True
+                self._sign_up.user_create = True
                 self.on_sign_up()
                 self._sign_up.set_exist_username(username=username,
                                                  password=password)
             else:
+                self._sign_in.user_has_to_be_create = False
+                self._sign_up.user_create = False
                 self.define_user(UserConnection())
                 self._user.connect(username, password)
         else:
