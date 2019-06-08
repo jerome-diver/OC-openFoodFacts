@@ -165,17 +165,16 @@ class MixinControllers(QObject):
             to_add = bool(code in self._model.substitutes.checked)
             self._model.product_details.update_checked(details, to_add)
             self._general_ctrl.on_load_details_checked_finished()
-        checked_lst = self.model.substitutes.checked
-        checked_details = self.model.product_details.checked
-        if self._threads._product_details_checked_pool.activeThreadCount() \
-                == 0:
-            self._threads._product_details_checked_pool.signalsBlocked()
-            if len(checked_details) > len(checked_lst):
-                for k in checked_details.keys():
-                    if k not in checked_lst:
-                        del checked_details[k]
-            self._threads._product_details_checked_pool.releaseThread()
-            self._general_ctrl.on_load_details_checked_finished()
+        #checked_lst = self.model.substitutes.checked
+        #checked_details = self.model.product_details.checked
+        #if self._threads._product_details_checked_pool.activeThreadCount() \
+        #        == 0:
+        #    self._threads.lock.lockForWrite()
+        #    if len(checked_details) > len(checked_lst):
+        #        for k in checked_details.keys():
+        #            if k not in checked_lst:
+        #                del checked_details[k]
+        #    self._threads.lock.unlock()
 
     @pyqtSlot()
     def on_product_url_clicked(self):
@@ -183,6 +182,12 @@ class MixinControllers(QObject):
 
         url = self._model.product_details.models["url"]
         webbrowser.open(url)
+
+    @property
+    def name(self):
+        """Property for class name"""
+
+        return self._name
 
     @property
     def model(self):

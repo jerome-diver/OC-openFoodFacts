@@ -195,6 +195,7 @@ class DatabaseMode(MixinControllers, QObject):
         foods = self._model.get_foods(id)
         self._model.foods.populate(foods)
         self._window.show_foods(self._model.foods)
+        self._messenger.on_load_foods_finished()
 
     @pyqtSlot(QModelIndex)
     def on_food_selected(self, index):

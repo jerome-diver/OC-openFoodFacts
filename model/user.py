@@ -57,6 +57,12 @@ class User(QObject):
                               self._id, "-", self._nick, "-", self._family)
                     self.status_connection.emit(True, "Vous êtes connecté")
 
+    def new_user_ready(self):
+        """When user has been created successfully"""
+
+        self.status_connection.emit(True, "Nouvel utilisateur {} "
+                                          "enregistré".format(self._username))
+
     def disconnect(self):
         """disconnect User to local database"""
 

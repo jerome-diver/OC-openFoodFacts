@@ -208,6 +208,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>nickname</tabstop>
+  <tabstop>familyname</tabstop>
+  <tabstop>username</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>passwd_confirm</tabstop>
+  <tabstop>record</tabstop>
+  <tabstop>cancel</tabstop>
+ </tabstops>
  <resources>
   <include location="images.qrc"/>
  </resources>

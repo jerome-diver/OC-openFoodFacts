@@ -84,26 +84,37 @@ class Messenger(QObject):
         """Slot for next action on clicked category selection from
         category list view"""
 
-        self.status_message.emit("Patientez, recherche des produits "
-                                 "relatifs à la catégorie en cours "
-                                 "sur Open Food Facts...")
+        text = "Patientez, recherche des produits relatifs à la catégorie" \
+               " en cours sur Open Food Facts..."
+        if self._ctrl.name == "DatabaseMode":
+            text = "Patientez, recherche des produits relatifs à la " \
+                   "catégorie dans la base de donnée locale..."
+        self.status_message.emit(text)
 
     @pyqtSlot(QModelIndex)
     def on_food_selected(self, index):
         """Slot for next action on clicked foods selection from
         foods list view"""
 
+        text = "Patientez, recherche du substitut pour (code {} ) en " \
+              "cours sur Open Food Facts..."
+        if self._ctrl.name == "DatabaseMode":
+            text = "Patientez, recherche du substitut pour (code {} ) en " \
+                   "cours sur la base de données locale..."
         self._flags["product"] = False
         code = self._ctrl.model.foods.index(index.row(), 2).data()
-        self.status_message.emit("Patientez, recherche du substitut "
-                                 "pour (code {} ) en cours sur "
-                                 "Open Food Facts...".format(code))
+        self.status_message.emit(text.format(code))
 
     @pyqtSlot(QItemSelection, QItemSelection)
     def on_substitute_selection_changed(self, selected, deselected):
         """Load details from new selection of substitutes table view"""
 
         if selected.indexes():
+            text = "Patientez, recherche sur le code "\
+                   "produit {} sélectionné sur OpenFoodFacts"
+            if self._ctrl.name == "DatabaseMode":
+                text = "Patientez, recherche sur le code " \
+                       "produit {} sélectionné sur la base de données locale"
             index = selected.indexes()[0]
             sub_model = self._ctrl._views["substitutes"].model()
             code = sub_model.index(index.row(), 2).data()
@@ -112,8 +123,7 @@ class Messenger(QObject):
                 print("=====  M e s s e n g e r  =====")
                 print("now searching product for code", code,
                       "name", name)
-            self.status_message.emit("Patientez, recherche sur le code "
-                                     "produit {} sélectionné".format(code))
+            self.status_message.emit(text.format(code))
 
     @pyqtSlot('QStandardItem*')
     def on_substitute_checked(self, item):

@@ -2,7 +2,7 @@
 background to not freeze application"""
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, \
-                         QThread, QRunnable, QThreadPool
+                         QThread, QRunnable, QThreadPool, QReadWriteLock
 
 from settings import DEBUG_MODE
 from enumerator import Mode
@@ -109,14 +109,22 @@ class LoadProductDetails(QRunnable):
 
     count = 0
 
-    def __init__(self, ctrl, model, mode=Mode.SELECTED_FOOD):
+    def __init__(self, ctrl, model, mode):
         super().__init__()
         self._controller = ctrl
         self._model = model
+        self._mode = mode
         self._caller = None
         self._index = None
-        self._mode = mode
         self._signals = ProductDetailsSignals()
+        self.connect()
+        if DEBUG_MODE:
+            print("======  L o a d P r o d u c t D e t a i l s  (start n°{"
+                  "})======".format(LoadProductDetails.count))
+
+    def connect(self):
+        """Connect signals"""
+
         LoadProductDetails.count += 1
         self.signals.finished.connect(
             self._controller.on_load_product_details_finished)
@@ -126,9 +134,6 @@ class LoadProductDetails(QRunnable):
             self._controller.window.on_status_message)
         self.signals.error_signal.connect(
             self._controller.window.on_error_message)
-        if DEBUG_MODE:
-            print("======  L o a d P r o d u c t D e t a i l s  (start n°{"
-                  "})======".format(LoadProductDetails.count))
 
     def __del__(self):
         """At end time"""
@@ -220,6 +225,7 @@ class ThreadsController(QObject):
     """Proxy class to control threads"""
 
     kill_details_threads= pyqtSignal(Mode)
+    lock = QReadWriteLock()
 
     def __init__(self, controller):
         super().__init__()

@@ -20,10 +20,12 @@ class OpenFoodFacts(MixinModels):
             categories = openfoodfacts.facets.get_categories()
         except:
             self.internet_access.emit(False)
+        else:
+            self.internet_access.emit(True)
+            categories = [c for c in categories if c["products"] >= 2]
+            categories = sorted(categories, key=lambda kv: kv["name"])
+        finally:
             return categories
-        self.internet_access.emit(True)
-        categories = [c for c in categories if c["products"] >= 2]
-        return sorted(categories, key=lambda kv: kv["name"])
 
     def download_foods(self, category, page=1):
         """Return foods from category"""

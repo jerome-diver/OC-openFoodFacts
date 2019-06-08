@@ -94,7 +94,7 @@ __init__	controller/control_mode.py	/^    def __init__(self, **kargs):$/;"	m	cla
 __init__	controller/loader_threads.py	/^    def __init__(self):$/;"	m	class:ProductDetailsSignals
 __init__	controller/loader_threads.py	/^    def __init__(self, connection, off_model):$/;"	m	class:UpdateCategories
 __init__	controller/loader_threads.py	/^    def __init__(self, controller):$/;"	m	class:ThreadsController
-__init__	controller/loader_threads.py	/^    def __init__(self, ctrl, model, mode=Mode.SELECTED_FOOD):$/;"	m	class:LoadProductDetails
+__init__	controller/loader_threads.py	/^    def __init__(self, ctrl, model, mode):$/;"	m	class:LoadProductDetails
 __init__	controller/loader_threads.py	/^    def __init__(self, model):$/;"	m	class:LoadFoods
 __init__	controller/loader_threads.py	/^    def __init__(self, model, connection):$/;"	m	class:LoadCategories
 __init__	controller/mixin.py	/^    def __init__(self, **kargs):$/;"	m	class:MixinControllers
@@ -138,6 +138,7 @@ checked	model/views/substitutes.py	/^    def checked(self):$/;"	m	class:Substitu
 checked_start	controller/mixin.py	/^    checked_start = pyqtSignal()$/;"	v	class:MixinControllers
 checked_substitutes	controller/control.py	/^    def checked_substitutes(self):$/;"	m	class:Controller
 clicked	assets/objects/qlabel_clickable.py	/^    clicked = pyqtSignal()$/;"	v	class:QLabelClickable
+connect	controller/loader_threads.py	/^    def connect(self):$/;"	m	class:LoadProductDetails
 connect	controller/mixin.py	/^    def connect(self):$/;"	m	class:MixinControllers
 connect	model/database.py	/^    def connect(self, user, password, database):$/;"	m	class:DatabaseConnection
 connect	model/user.py	/^    def connect(self, username, password, family=None, nick=None):$/;"	m	class:User
@@ -176,6 +177,7 @@ find_foods_in_database	model/views/foods.py	/^    def find_foods_in_database(sel
 find_substitutes_in_database	model/views/substitutes.py	/^    def find_substitutes_in_database(self, selected_category):$/;"	m	class:SubstitutesModel
 finished	controller/loader_threads.py	/^    finished = pyqtSignal(Mode, str, dict)$/;"	v	class:ProductDetailsSignals
 flags	controller/mixin.py	/^    def flags(self):$/;"	m	class:MixinControllers
+flags	model/views/mixin.py	/^    def flags(self, index):$/;"	m	class:MixinModelsView
 foods	model/mixin.py	/^    def foods(self):$/;"	m	class:MixinModels
 generate_database	model/database.py	/^    def generate_database(self):$/;"	m	class:AdminConnection
 generate_users_role	model/database.py	/^    def generate_users_role(self):$/;"	m	class:AdminConnection
@@ -202,10 +204,12 @@ is_in_database	model/views/substitutes.py	/^    def is_in_database(self, categor
 kill_details_threads	controller/loader_threads.py	/^    kill_details_threads= pyqtSignal(Mode)$/;"	v	class:ThreadsController
 kill_foods_thread	controller/control_mode.py	/^    kill_foods_thread = pyqtSignal()$/;"	v	class:OpenFoodFactsMode
 load_categories	controller/control_mode.py	/^    def load_categories(self):$/;"	m	class:OpenFoodFactsMode
+lock	controller/loader_threads.py	/^    lock = QReadWriteLock()$/;"	v	class:ThreadsController
 messenger	controller/mixin.py	/^    def messenger(self):$/;"	m	class:MixinControllers
 model	controller/mixin.py	/^    def model(self):$/;"	m	class:MixinControllers
 models	model/views/product_details.py	/^    def models(self):$/;"	m	class:ProductDetailsModels
 mousePressEvent	assets/objects/qlabel_clickable.py	/^    def mousePressEvent(self, ev):$/;"	m	class:QLabelClickable
+name	controller/mixin.py	/^    def name(self):$/;"	m	class:MixinControllers
 new_record	model/database.py	/^    def new_record(self, category_id, selected, substitutes, user_id):$/;"	m	class:UserConnection
 new_user	controller/authentication.py	/^    def new_user(self):$/;"	m	class:Authentication
 nick	model/user.py	/^    def nick(self):$/;"	m	class:User

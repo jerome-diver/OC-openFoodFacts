@@ -18,7 +18,7 @@ class MixinModelsView():
     def flags(self, index):
         """Read only for QStandardItem.flags call override"""
 
-        return Qt.ItemFlags(Qt.ItemIsEnabled + Qt.ItemIsSelectable)
+        return Qt.ItemFlags(Qt.ItemIsEnabled + Qt.ItemIsSelectable + Qt.ItemIsUserCheckable)
 
     @staticmethod
     def trash_dirty_product(product):

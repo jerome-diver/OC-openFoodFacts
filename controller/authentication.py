@@ -2,6 +2,7 @@
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
+from time import sleep
 
 from enumerator import TypeConnection
 from model import DatabaseConnection, AdminConnection, \
@@ -158,8 +159,17 @@ class Authentication(QObject):
                 self.status_message.emit(
                     "Les mots de passe ne correspondent pas")
             else:
-                self._user.connection.create_user(username, password)
-                self.status_message.emit("Utilisateur enregistré")
+                try:
+                    self._user.connection.create_user(username, password)
+                    self._user.connection.record_user(
+                        username, nick_name, family_name)
+                except:
+                    set.status_message.emit("Problème lors de l'enregstrement")
+                else:
+                    self.status_message.emit("Utilisateur enregistré")
+                    self.user.new_user_ready()
+                    self.on_close()
+
         else:
             self._user.connection.record_user(
                 username, nick_name, family_name)
