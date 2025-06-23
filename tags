@@ -157,8 +157,10 @@ count	controller/loader_threads.py	/^    count = 0$/;"	v	class:LoadProductDetail
 count	model/views/foods.py	/^    def count(self):$/;"	m	class:FoodsModel
 count	model/views/foods.py	/^    def count(self, value):$/;"	m	class:FoodsModel
 create_user	model/database.py	/^    def create_user(self, username, password):$/;"	m	class:AdminConnection
+current_mode	controller/control.py	/^    def current_mode(self):$/;"	m	class:Controller
 db_categories_status	model/database.py	/^        def db_categories_status(off_cat, cat):$/;"	f	member:AdminConnection.update_categories	file:
 define_user	controller/authentication.py	/^    def define_user(self, type):$/;"	m	class:Authentication
+define_view	view/sign_up.py	/^    def define_view(self):$/;"	m	class:SignUp
 define_with	model/views/product_details.py	/^    def define_with(var, food):$/;"	m	class:ProductDetailsModels
 del_record	model/database.py	/^    def del_record(self, selected, substitutes, user_id):$/;"	m	class:UserConnection
 disconnect	controller/mixin.py	/^    def disconnect(self):$/;"	m	class:MixinControllers
@@ -212,6 +214,7 @@ mousePressEvent	assets/objects/qlabel_clickable.py	/^    def mousePressEvent(sel
 name	controller/mixin.py	/^    def name(self):$/;"	m	class:MixinControllers
 new_record	model/database.py	/^    def new_record(self, category_id, selected, substitutes, user_id):$/;"	m	class:UserConnection
 new_user	controller/authentication.py	/^    def new_user(self):$/;"	m	class:Authentication
+new_user_ready	model/user.py	/^    def new_user_ready(self):$/;"	m	class:User
 nick	model/user.py	/^    def nick(self):$/;"	m	class:User
 no_product_found	controller/loader_threads.py	/^    no_product_found = pyqtSignal()$/;"	v	class:LoadFoods
 normalize	model/modes.py	/^        def normalize(product):$/;"	f	member:OpenFoodFacts.download_product	file:
@@ -340,6 +343,8 @@ user_connection	controller/authentication.py	/^    def user_connection(self):$/;
 user_create	view/sign_up.py	/^    def user_create(self):$/;"	m	class:SignUp
 user_create	view/sign_up.py	/^    def user_create(self, value):$/;"	m	class:SignUp
 user_event	controller/control.py	/^    user_event = pyqtSignal(User)$/;"	v	class:Controller
+user_has_to_be_create	view/sign_in.py	/^    def user_has_to_be_create(self):$/;"	m	class:SignIn
+user_has_to_be_create	view/sign_in.py	/^    def user_has_to_be_create(self, value):$/;"	m	class:SignIn
 username	model/user.py	/^    def username(self):$/;"	m	class:User
 views	controller/control.py	/^    def views(self):$/;"	m	class:Controller
 views	controller/mixin.py	/^    def views(self):$/;"	m	class:MixinControllers

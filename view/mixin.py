@@ -14,8 +14,7 @@ class MixinSigns(QObject):
         """Reset status and bg color for status and username edit line"""
 
         stylesheet = "background-color: rgba(0,0,0,0); color: black;"
-        self.status.setStyleSheet(stylesheet)
-        self.username.setStyleSheet(stylesheet)
+        self.setup_widget(stylesheet)
         self.status.setText("")
 
     @pyqtSlot(str)
@@ -23,6 +22,11 @@ class MixinSigns(QObject):
         """Print a status message to status label QObject of QDialog"""
 
         stylesheet = "color: red; background-color: rgba(20,20,20,0.7);"
+        self.setup_widget(stylesheet)
+        self.status.setText(message)
+
+    def setup_widget(self, stylesheet):
+        """Setup widgets status and username stylesheet"""
+
         self.status.setStyleSheet(stylesheet)
         self.username.setStyleSheet(stylesheet)
-        self.status.setText(message)
